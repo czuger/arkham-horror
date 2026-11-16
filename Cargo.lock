@@ -323,6 +323,12 @@ checksum = "0e9c71c2167ca323c882b99918929403426e2373ea17242ff5653e0d5e1058be"
 [[package]]
 name = "engine"
 version = "0.1.0"
+dependencies = [
+ "data",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
 
 [[package]]
 name = "equivalent"
@@ -1068,6 +1074,10 @@ dependencies = [
 [[package]]
 name = "simulator"
 version = "0.1.0"
+dependencies = [
+ "data",
+ "engine",
+]
 
 [[package]]
 name = "slab"

@@ -6,11 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A browser adaptation of **Arkham Horror 2nd edition** (French edition, *Horreur à Arkham*), for private use: **solo mode** (one human player, the other investigators played by AIs), **base game only**.
 
-Milestone **J0 (foundation) is done** (2026-11-16): a Cargo workspace under `crates/` (`data`, `engine`, `ai` are empty library stubs; `simulator` is a stub binary; `server` builds the `arkham` binary, which serves a « bonjour » page that counts visits in PoloDB). Milestone **J1 (data) is done** (2026-11-16): `data/` holds `board.ron`, `gate_markers.ron`, `monsters.ron`, `investigators.ron`, `ancient_ones.ron`, and a 39-card sample in `location_cards.ron`, `gate_cards.ron`, `mythos_cards.ron`, `investigator_cards.ron`, all loaded and cross-checked by the `data` crate (`GameData::load`, `check`, `check_assets`; tests in `crates/data/tests/` load the real files). The card-effect vocabulary (types in `crates/data/src/cards/`) is described in French in `vocabulaire_cartes.md`. Next: J2 (engine). The rest of the cards is transcribed later, on the same vocabulary. The repository also holds planning and reference documents, all written in French, plus the base-game images in `assets/`. Keep new project documents in French, matching their plain style.
+Milestone **J0 (foundation) is done** (2026-11-16): a Cargo workspace under `crates/` (`data`, `engine`, `ai` are empty library stubs; `simulator` is a stub binary; `server` builds the `arkham` binary, which serves a « bonjour » page that counts visits in PoloDB). Milestone **J1 (data) is done** (2026-11-16): `data/` holds `board.ron`, `gate_markers.ron`, `monsters.ron`, `investigators.ron`, `ancient_ones.ron`, and a 39-card sample in `location_cards.ron`, `gate_cards.ron`, `mythos_cards.ron`, `investigator_cards.ron`, all loaded and cross-checked by the `data` crate (`GameData::load`, `check`, `check_assets`; tests in `crates/data/tests/` load the real files). The card-effect vocabulary (types in `crates/data/src/cards/`) is described in French in `vocabulaire_cartes.md`. Milestone **J2 (engine) is done** (2026-11-16): `engine` plays whole games on the card sample; `simulator jouer` plays one in text mode, `simulator masse` plays many with random answers. Rule gaps met while coding (R9–R17) were settled by the user the same day and are in `regles/decisions.md`. Next: J3 (all cards). The rest of the cards is transcribed later, on the same vocabulary. The repository also holds planning and reference documents, all written in French, plus the base-game images in `assets/`. Keep new project documents in French, matching their plain style.
 
 ## Commands
 
 - Build: `cargo build` (cold build ≈ 2.5 min, mostly RocksDB's C++ under PoloDB; incremental: seconds). Toolchain pinned to Rust 1.100.0 in `rust-toolchain.toml`.
+- Play in text mode: `cargo run -p simulator -- jouer --graine 5`; bulk random games: `cargo run --release -p simulator -- masse --parties 1000 --joueurs 3` (data folder from `ARKHAM_DATA`, default `data`).
 - Run the server: `cargo run -p server` → http://127.0.0.1:3000. Settings via env vars `ARKHAM_ADDR`, `ARKHAM_DB` (database folder, default `arkham.db`), `ARKHAM_ASSETS`, `ARKHAM_STATIC`; logs via `RUST_LOG`. Run it from the repo root so `assets/` and `static/` resolve.
 - Tests: `cargo test`; a single test: `cargo test -p server visits_are_counted`.
 - Full local CI: `scripts/ci.sh` (rustfmt, clippy `-D warnings`, tests, cargo-audit, cargo-deny). The same steps are in `.github/workflows/ci.yml`; there is no git remote yet.
@@ -24,11 +25,13 @@ Technical facts found at J0 (details in `manques_et_questions.md` §2):
 - One RustSec advisory with no upstream fix is ignored, with its reason, in both `deny.toml` and `.cargo/audit.toml` (askama's build-time `basic-toml`). Re-check it on every askama upgrade.
 - Data files (`data/*.ron`): ids are English snake_case (`train_station`), player-facing values French; each file starts with `#![enable(implicit_some)]` and a `version` checked against the type's `VERSION`; structs use `deny_unknown_fields`. Locations have no arrow field: a monster in a location always goes to its own street. Board values were read from the board image and must be proofread by the user; the wiki monster table had errors, token images are authoritative.
 - Rust 1.100 cargo warns on unused crate dependencies: add inter-crate deps (`engine` → `data`, etc.) only when the code uses them.
+- Engine (J2): `engine::play(data, setup, responder)` replays a game from its `Setup` (seed included) and asks the `Responder` for each `Decision` (a list of labelled options; the answer is an index). `Replay` feeds recorded answers, `Waiting` stops at the first open decision. Rule code is `impl Game` blocks in `crates/engine/src/rules/`, one topic per file; it unwinds with `Halt` (`Waiting`, `KnockedOut`, `Awakened`, `Over`…) through `?`. All randomness goes through `Game::die` / the in-repo `Rng` (xoshiro256**; its output is pinned by a test, never change it). Use `BTreeMap`, never `HashMap`, in the state (replay order). Unit tests in `crates/engine/src/tests/` build a clean state and force dice (`run(state, answers, dice, |game| …)`).
+- Ancient One and monster texts are coded by id in `rules/ancient_one_powers.rs`, `rules/ancient_one_attacks.rs`, `rules/monster_specials.rs` and `rules/monster_movement.rs`.
 
 | File | Role |
 |---|---|
 | `plan_creation_jeu.md` | **The current plan (2026-11-16). Read this first.** Architecture (axum + tokio single-thread server, embedded database — now PoloDB, server-rendered HTML with minimal JS), crate layout, data format, engine design (decision/response model), AI, milestones J0–J6, tests, hosting. |
-| `manques_et_questions.md` | Up-to-date list of missing data (M1–M24), technical points to verify (T1–T6), rules R1–R8 (settled, see `regles/decisions.md`) and questions for the user (Q1–Q23); §2 also records the J0 measurements. |
+| `manques_et_questions.md` | Up-to-date list of missing data (M1–M24), technical points to verify (T1–T6), rules R1–R17 (settled, see `regles/decisions.md`) and questions for the user (Q1–Q23); §2 also records the J0 measurements. |
 | `plan_mise_en_ligne.md` | The earlier plan (WASM client, no server). Its architecture is superseded; its Parts 2–3 (missing data M1–M20, open questions) are kept for reference. |
 | `vocabulaire_cartes.md` | How card effects are written in the data files: effect primitives, lasting effects, abilities, the « effet spécial » list, the sample and the load-time checks. Update it whenever the vocabulary changes. |
 | `regles/decisions.md` | Rules the rulebook leaves open, settled with the user (date and reason each). Authoritative for the engine. |
@@ -60,7 +63,7 @@ One executable holds everything: rules engine, AIs, web server and embedded data
 
 Planned tests: unit tests per phase and rule, property tests (no impossible states, no negative resources), data consistency checks, one auto-generated test per card, thousands of AI-only games that must end without crashing, seed + answer-list replay, HTTP route tests with a temporary DB. CI: rustfmt, clippy, tests, cargo-audit, cargo-deny.
 
-Settled rules go in `regles/decisions.md` with date and reason. R1–R8 were all settled on 2026-11-16 (the user accepted every recommendation).
+Settled rules go in `regles/decisions.md` with date and reason. R1–R17 were all settled on 2026-11-16 (the user accepted every recommendation).
 
 ## Rust code guidelines
 

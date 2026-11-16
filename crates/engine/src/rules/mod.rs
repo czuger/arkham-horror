@@ -1,0 +1,33 @@
+//! The rules, as `impl Game` blocks grouped by topic.
+
+pub(crate) mod abilities;
+pub(crate) mod ancient_one_attacks;
+pub(crate) mod ancient_one_powers;
+pub(crate) mod arkham_encounters;
+pub(crate) mod card_effects;
+pub(crate) mod cards;
+pub(crate) mod check;
+pub(crate) mod combat;
+pub(crate) mod combat_gear;
+pub(crate) mod doom_and_terror;
+pub(crate) mod effects;
+pub(crate) mod facing;
+pub(crate) mod final_battle;
+pub(crate) mod gates;
+pub(crate) mod graph;
+pub(crate) mod monster_movement;
+pub(crate) mod monster_specials;
+pub(crate) mod monster_stats;
+pub(crate) mod monsters;
+pub(crate) mod movement;
+pub(crate) mod mythos;
+pub(crate) mod other_effects;
+pub(crate) mod other_world_encounters;
+pub(crate) mod preparation;
+pub(crate) mod resources;
+pub(crate) mod rumors;
+pub(crate) mod stats;
+pub(crate) mod status;
+pub(crate) mod triggers;
+pub(crate) mod turn;
+pub(crate) mod upkeep;

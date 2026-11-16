@@ -116,6 +116,20 @@ Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2.
 - **R7** FAQ officielle (`FAQ_Officiel_032017_V2.pdf`) : je l'intègre dans `regles/base.md` avant de coder le moteur ? *(Recommandé : oui, au jalon J1.)* → **Fait le 16/11/2026** : `regles/base.md` §23.
 - **R8** Réserves de pions (Argent, Santé Mentale, Résistance, Indices, Signes des Anciens…) : limitées aux quantités de la boîte, ou illimitées ? *(Recommandé : illimitées, sauf les 20 pions Destin et les 6 Signes des Anciens nécessaires à la victoire ; c'est l'usage courant et cela évite des cas limites.)*
 
+### Nouveaux points apparus en écrivant le moteur (J2, 16/11/2026)
+
+**Tous tranchés le 16/11/2026** : tu as accepté chaque recommandation. Le détail est dans `regles/decisions.md`, qui fait foi.
+
+- **R9** Vague de monstres quand la limite est atteinte : le livret laisse les joueurs choisir quels portails reçoivent les monstres avant d'aller en Périphérie. *(Recommandé : ordre fixe, le portail de la vague d'abord puis les autres dans l'ordre d'ouverture ; l'effet est minime et cela évite une décision de plus.)*
+- **R10** Armes et sorts en combat : le livret permet de changer d'armes d'un round à l'autre. Aujourd'hui, une carte prise en main le reste jusqu'à la fin du combat (sauf usage unique). *(Recommandé : ajouter la possibilité de lâcher une carte entre deux rounds, règle complète.)*
+- **R11** Indices : en fin de mouvement, l'investigateur prend tous les Indices du lieu ; seul sur le lieu où le Mythe pose un Indice, il le prend. Le livret dit « peut ». *(Recommandé : automatique, ce n'est jamais un désavantage.)*
+- **R12** Effets « qui finit son mouvement » (Couvre-feu) : un investigateur retardé n'a pas de mouvement, il n'est donc pas concerné. *(Recommandé : oui.)*
+- **R13** La Femme Boursouflée : rater le test de Volonté fait rater tous les tests de Combat de ce combat, pas seulement le premier. *(Recommandé : oui, tout le combat.)*
+- **R14** Investigateur dévoré : la nouvelle fiche est tirée parmi les fiches inutilisées, l'ancienne comprise (lecture littérale de « remélange sa fiche »). *(Recommandé : oui, lecture littérale.)*
+- **R15** Ithaqua, début de la Bataille : « un échec » au dé lancé pour chaque objet = un dé qui n'est pas un succès (1 à 4 ; 1 à 3 si béni ; 1 à 5 si maudit). *(Recommandé : oui.)*
+- **R16** Un bonus « aux tests de Discrétion » (Il Pleut des Cordes) compte aussi pour les tests d'Évasion, qui sont des tests de Discrétion (§11.6). Un bonus aux tests d'Évasion ne compte pas pour la Discrétion. *(Recommandé : oui.)*
+- **R17** Chien de Tindalos : s'il n'y a aucun investigateur dans un lieu où il peut aller, il ne bouge pas. *(Recommandé : oui.)*
+
 ---
 
 ## 4. Questions

@@ -105,9 +105,17 @@ La partie est entièrement définie par la graine aléatoire, les données du je
 - l'**annulation** d'un coup (rejouer jusqu'à la réponse précédente) ;
 - des tests reproductibles.
 
-### 4.4 Règles non tranchées
+### 4.4 Mise en œuvre (J2)
 
-Avant de coder une règle, vérifier `regles/base.md` §22 et les questions de `manques_et_questions.md`. Chaque règle tranchée est consignée dans `regles/decisions.md`, avec la date et la raison. R1 à R8 sont tranchées depuis le 16/11/2026.
+- Le moteur est dans le module `engine`. Une partie = une préparation (graine, nombre de joueurs, investigateurs et Grand Ancien choisis ou tirés au hasard) + la liste des réponses. La fonction `play` rejoue la partie depuis le début à chaque appel, jusqu'à la fin ou jusqu'à la première décision sans réponse. Le rejeu coûte quelques millisecondes ; il garantit que reprise, annulation et tests donnent exactement la même partie.
+- Chaque décision est une liste d'options numérotées, avec un libellé en français ; la réponse est le numéro choisi. Une décision à une seule option est prise sans rien demander.
+- Les dés sortent d'un générateur écrit dans le projet (et non d'une bibliothèque), pour qu'une mise à jour ne change jamais les parties enregistrées.
+- Les textes du Grand Ancien (adorateurs, pouvoir, début de bataille, attaque) et ceux des monstres sont codés par nom, comme les « effets spéciaux » des cartes.
+- Pas encore traité au J2 (prévu au J3, avec la transcription des cartes) : capacités spéciales des lieux du plateau, capacités uniques des investigateurs, cartes hors de l'échantillon (une possession fixe absente de l'échantillon est sautée, avec une ligne au journal). Les échanges entre investigateurs viendront avec les IA (J4).
+
+### 4.5 Règles non tranchées
+
+Avant de coder une règle, vérifier `regles/base.md` §22 et les questions de `manques_et_questions.md`. Chaque règle tranchée est consignée dans `regles/decisions.md`, avec la date et la raison. R1 à R17 sont tranchées depuis le 16/11/2026.
 
 ---
 
@@ -212,7 +220,7 @@ Pas de page de connexion ni de table `utilisateur` dans la première version.
 | **J5 — Serveur** | Pages, formulaires, htmx, plateau cliquable, sauvegarde, reprise, annulation, journal. | Une partie complète jouée dans le navigateur en local, humain + IA, avec reprise après redémarrage du serveur. |
 | **J6 — Livraison locale** | Configuration par fichier, mode d'emploi d'installation (compiler, lancer, où est la base), sauvegarde du fichier de base. | Le projet se lance sur une machine neuve en suivant le mode d'emploi. |
 
-**Avancement** : J0 terminé le 16/11/2026 (résultats des vérifications T1 à T6 dans `manques_et_questions.md` §2). J1 terminé le 16/11/2026 : FAQ intégrée aux règles (`regles/base.md` §23) ; plateau, marqueurs Portail, monstres, investigateurs et Grands Anciens saisis dans `data/`, chargés et contrôlés par le module `data` ; vocabulaire des cartes choisi sur un échantillon de 39 cartes (`vocabulaire_cartes.md`, fichiers `data/*_cards.ron`), avec 4 cartes en effet spécial.
+**Avancement** : J0 terminé le 16/11/2026 (résultats des vérifications T1 à T6 dans `manques_et_questions.md` §2). J1 terminé le 16/11/2026 : FAQ intégrée aux règles (`regles/base.md` §23) ; plateau, marqueurs Portail, monstres, investigateurs et Grands Anciens saisis dans `data/`, chargés et contrôlés par le module `data` ; vocabulaire des cartes choisi sur un échantillon de 39 cartes (`vocabulaire_cartes.md`, fichiers `data/*_cards.ron`), avec 4 cartes en effet spécial. J2 terminé le 16/11/2026 : moteur complet sur l'échantillon (§4.4), 44 tests de règles avec dés imposés, parties entières jouables en mode texte (`simulator jouer`) et en masse (`simulator masse`), rejeu exact vérifié ; 10 000 parties au hasard, de 1 à 8 joueurs, sans plantage. Points de règles apparus en route : R9 à R17, tranchés le même jour (`regles/decisions.md`).
 
 Les jalons J1 et J3 dépendent de la transcription des cartes, que je fais à partir des images (`manques_et_questions.md` §1, Q7). C'est le vrai chemin critique. Les nombres d'exemplaires (Q8) sont saisis de mémoire et marqués « à vérifier » en attendant tes recherches.
 
