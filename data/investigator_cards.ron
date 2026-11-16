@@ -1,0 +1,267 @@
+// Cartes Investigateur (jeu de base) : échantillon de 20 cartes.
+//
+// Relevé le 16/11/2026 sur les images (assets/cartes/). Vocabulaire des effets :
+// voir vocabulaire_cartes.md.
+// Nombres d'exemplaires (« copies ») : de mémoire, À VÉRIFIER sur la boîte, sauf
+// Prêt Bancaire, Acompte et Membre de la Loge (8, liste du matériel de la règle).
+// Mains : icônes en bas à gauche de la carte.
+// Errata de la FAQ appliqués (regles/base.md §23) : Thomas F. Malone a Vigueur +1
+// (et non « Combat ») ; Signe des Anciens se joue « Rencontres à Arkham : lors de
+// la fermeture d'un portail ».
+#![enable(implicit_some)]
+InvestigatorCards(
+    version: 1,
+    cards: [
+        // --- Objets Communs ---
+        (
+            id: "revolver_38",
+            deck: CommonItem,
+            name: "Révolver .38",
+            copies: 2,
+            price: 4,
+            hands: 1,
+            subtitle: "Arme Physique",
+            weapon: (kind: Physical, bonus: 3),
+            text: "+3 aux tests de Combat.",
+            image: "cartes/objets_communs/revolver_38.jpg",
+        ),
+        (
+            id: "dynamite",
+            deck: CommonItem,
+            name: "Dynamite",
+            copies: 2,
+            price: 4,
+            hands: 2,
+            subtitle: "Arme Physique",
+            weapon: (kind: Physical, bonus: 8, discard_after_use: true),
+            text: "+8 aux tests de Combat (Défaussez après usage).",
+            image: "cartes/objets_communs/dynamite.jpg",
+        ),
+        (
+            id: "ancient_tome",
+            deck: CommonItem,
+            name: "Tome Ancien",
+            copies: 2,
+            price: 4,
+            subtitle: "Tome",
+            text: "Mouvement : déchargez et dépensez 2 points de mouvement pour faire un test de Savoir (-1). Si vous réussissez, piochez 1 Sort et défaussez cette carte. Si vous échouez, rien ne se passe.",
+            abilities: [
+                (
+                    timing: Movement,
+                    cost: [Exhaust, MovementPoints(2)],
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Draw(deck: Spell), DiscardThis])],
+                ),
+            ],
+            image: "cartes/objets_communs/tome.jpg",
+        ),
+        (
+            id: "whiskey",
+            deck: CommonItem,
+            name: "Whisky",
+            copies: 2,
+            price: 1,
+            text: "N'importe quelle phase : défaussez le Whisky pour réduire de 1 une perte de Santé Mentale.",
+            abilities: [(timing: OnLoss(Sanity), cost: [DiscardThis], effects: [ReduceLoss(1)])],
+            image: "cartes/objets_communs/whisky.jpg",
+        ),
+        (
+            id: "lantern",
+            deck: CommonItem,
+            name: "Lanterne",
+            copies: 2,
+            price: 3,
+            text: "+1 aux tests de Chance.",
+            ongoing: [CheckBonus(check: Luck, amount: 1)],
+            image: "cartes/objets_communs/lanterne.jpg",
+        ),
+        (
+            id: "research_materials",
+            deck: CommonItem,
+            name: "Matériel de Recherche",
+            copies: 2,
+            price: 1,
+            text: "N'importe quelle phase : défaussez Matériel de Recherche au lieu de dépenser 1 pion Indice.",
+            ongoing: [ClueSubstitute],
+            image: "cartes/objets_communs/materiel.jpg",
+        ),
+        // --- Objets Uniques ---
+        (
+            id: "holy_water",
+            deck: UniqueItem,
+            name: "Eau Bénite",
+            copies: 4,
+            price: 4,
+            hands: 2,
+            subtitle: "Arme Magique",
+            weapon: (kind: Magical, bonus: 6, discard_after_use: true),
+            text: "+6 aux tests de Combat (Défaussez après usage).",
+            image: "cartes/objets_uniques/eau_benite.jpg",
+        ),
+        (
+            id: "elder_sign",
+            deck: UniqueItem,
+            name: "Signe des Anciens",
+            copies: 4,
+            price: 5,
+            text: "Rencontres à Arkham : lors de la fermeture d'un portail, perdez 1 Résistance et 1 Santé Mentale et remettez cette carte dans la boîte. Vous n'avez pas besoin de faire un test de compétence ou de dépenser de pions Indice pour sceller le portail. De plus, retirez un pion destin de l'échelle du destin du Grand Ancien.",
+            special: "elder_sign",
+            image: "cartes/objets_uniques/signe_des_anciens.jpg",
+        ),
+        // --- Sorts ---
+        (
+            id: "wither",
+            deck: Spell,
+            name: "Flétrissement",
+            copies: 6,
+            hands: 1,
+            subtitle: "Formule Magique",
+            casting: (modifier: -1, sanity_cost: 1),
+            text: "N'importe quelle phase : lancez et déchargez ce sort pour gagner +6 aux tests de Combat jusqu'à la fin de ce combat.",
+            abilities: [(timing: AnyPhase, cast: true, cost: [Exhaust], effects: [CombatBonus(6)])],
+            image: "cartes/sorts/fletrissement.jpg",
+        ),
+        (
+            id: "find_gate",
+            deck: Spell,
+            name: "Trouver le Portail",
+            copies: 4,
+            subtitle: "Formule Magique",
+            casting: (modifier: -1, sanity_cost: 1),
+            text: "Mouvement : lancez et déchargez ce sort pour immédiatement retourner à Arkham à partir d'un Autre Monde.",
+            abilities: [
+                (
+                    timing: Movement,
+                    cast: true,
+                    only: InOtherWorld,
+                    cost: [Exhaust],
+                    effects: [ReturnToArkham],
+                ),
+            ],
+            image: "cartes/sorts/trouver_un_portail.jpg",
+        ),
+        // --- Compétences ---
+        (
+            id: "bravery",
+            deck: Skill,
+            name: "Bravoure",
+            copies: 2,
+            text: "N'importe quelle phase : déchargez cette carte pour refaire un test d'Horreur.",
+            abilities: [(timing: AfterCheck(Horror), cost: [Exhaust], effects: [Reroll])],
+            image: "cartes/competences/bravoure.jpg",
+        ),
+        (
+            id: "luck",
+            deck: Skill,
+            name: "Chance",
+            copies: 2,
+            text: "Chance +1. Quand vous dépensez un jeton Indice pour ajouter un dé à un test de Chance, ajoutez un dé supplémentaire.",
+            ongoing: [SkillBonus(skill: Luck, amount: 1), ExtraClueDie(Luck)],
+            image: "cartes/competences/chance.jpg",
+        ),
+        // --- Alliés ---
+        (
+            id: "anna_kaslow",
+            deck: Ally,
+            name: "Anna Kaslow",
+            copies: 1,
+            text: "Chance +2. Gagnez 2 pions Indice quand Anna Kaslow se joint à vous.",
+            ongoing: [SkillBonus(skill: Luck, amount: 2)],
+            abilities: [(timing: OnTake, effects: [Gain(Clues, 2)])],
+            image: "cartes/allies/allie_anna_kaslow.jpg",
+        ),
+        (
+            id: "duke",
+            deck: Ally,
+            name: "Duke",
+            copies: 1,
+            text: "+1 au maximum de Santé Mentale. Défaussez cette carte pour restaurer immédiatement votre Santé Mentale à son maximum.",
+            ongoing: [MaxBonus(Sanity, 1)],
+            abilities: [(timing: AnyPhase, cost: [DiscardThis], effects: [RestoreToMax(Sanity)])],
+            image: "cartes/allies/allie_duke.jpg",
+        ),
+        (
+            id: "thomas_f_malone",
+            deck: Ally,
+            name: "Thomas F. Malone",
+            copies: 1,
+            text: "Savoir +1, Vigueur +1. Piochez 1 sort quand Thomas F. Malone se joint à vous.",
+            ongoing: [SkillBonus(skill: Lore, amount: 1), SkillBonus(skill: Fight, amount: 1)],
+            abilities: [(timing: OnTake, effects: [Draw(deck: Spell)])],
+            image: "cartes/allies/allie_thomas_f_malone.jpg",
+        ),
+        // --- Cartes spéciales ---
+        (
+            id: "blessing",
+            deck: Special,
+            name: "Bénédiction",
+            copies: 4,
+            text: "Entretien : lancez un dé et défaussez cette carte sur un 1. N'importe quelle phase : quand vous lancez des dés, vous obtenez un succès sur 4, 5 ou 6. Si vous êtes Maudit, défaussez cette carte au lieu de recevoir une carte Malédiction.",
+            ongoing: [SuccessOn(4)],
+            abilities: [(timing: Upkeep, effects: [RollDie(at_most: 1, effects: [DiscardThis])])],
+            special: "blessing_and_curse_cancel",
+            image: "cartes/speciales/benediction.jpg",
+        ),
+        (
+            id: "curse",
+            deck: Special,
+            name: "Malédiction",
+            copies: 4,
+            text: "Entretien : lancez un dé et défaussez cette carte sur un 1. N'importe quelle phase : quand vous lancez des dés, vous n'obtenez un succès que sur un 6. Si vous êtes Béni, défaussez cette carte au lieu de recevoir une carte Bénédiction.",
+            ongoing: [SuccessOn(6)],
+            abilities: [(timing: Upkeep, effects: [RollDie(at_most: 1, effects: [DiscardThis])])],
+            special: "blessing_and_curse_cancel",
+            image: "cartes/speciales/malediction.jpg",
+        ),
+        (
+            id: "bank_loan",
+            deck: Special,
+            name: "Prêt Bancaire",
+            copies: 8,
+            text: "Gagnez 10 $ quand vous prenez cette carte. Entretien : lancez un dé. De 1 à 3, payez 1 $ ou défaussez tous vos objets ainsi que cette carte. Vous ne pouvez plus obtenir de Prêt Bancaire pendant cette partie. N'importe quelle phase : payez 10 $ pour rembourser votre Prêt Bancaire et défaussez cette carte. Vous pouvez décider de prendre un nouveau Prêt Bancaire plus tard durant la partie.",
+            abilities: [
+                (timing: OnTake, effects: [Gain(Money, 10)]),
+                (
+                    timing: Upkeep,
+                    effects: [
+                        RollDie(
+                            at_most: 3,
+                            effects: [
+                                Choice([
+                                    (label: "Payer 1 $", effects: [Pay(Money, 1)]),
+                                    (
+                                        label: "Défausser tous vos objets et le Prêt",
+                                        effects: [DiscardAll(Items), DiscardThis, Special("no_more_bank_loans")],
+                                    ),
+                                ]),
+                            ],
+                        ),
+                    ],
+                ),
+                (timing: AnyPhase, cost: [Pay(Money, 10)], effects: [DiscardThis]),
+            ],
+            image: "cartes/speciales/pret_bancaire.jpg",
+        ),
+        (
+            id: "retainer",
+            deck: Special,
+            name: "Acompte",
+            copies: 8,
+            text: "Entretien : gagnez 2 $, puis lancez un dé. Défaussez cette carte sur un 1.",
+            abilities: [
+                (
+                    timing: Upkeep,
+                    effects: [Gain(Money, 2), RollDie(at_most: 1, effects: [DiscardThis])],
+                ),
+            ],
+            image: "cartes/speciales/acompte.jpg",
+        ),
+        (
+            id: "silver_twilight_membership",
+            deck: Special,
+            name: "Membre de la Loge du Crépuscule d'Argent",
+            copies: 8,
+            text: "N'importe quelle phase : quand vous faites une rencontre à la Loge du Crépuscule d'Argent, vous faites à la place une rencontre au Cœur de la Loge.",
+            image: "cartes/speciales/membre_loge_argent.jpg",
+        ),
+    ],
+)

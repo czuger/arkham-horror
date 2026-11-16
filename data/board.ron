@@ -1,0 +1,402 @@
+// Plateau d'Arkham (jeu de base) : lieux, rues, Autres Mondes, cases spéciales.
+//
+// Relevé le 16/11/2026 sur l'image du plateau (assets/plateau/arkham.jpg).
+// À vérifier sur le plateau réel : liaisons, flèches des monstres, lieux instables.
+//
+// - Chaque lieu est relié à la seule rue de son quartier. Ses flèches (blanche
+//   et noire) mènent toujours à cette rue.
+// - Flèches des rues : les blanches font le tour de la ville dans un sens, les
+//   noires dans l'autre (Quartier Nord → Centre-Ville → Quartier Est → …).
+// - Positions en pixels sur l'image 1064×1576, approximatives (à affiner au jalon J5).
+// - Autres Mondes : l'image est tournée ; la 1re zone est en bas, la 2e en haut.
+#![enable(implicit_some)]
+Board(
+    version: 1,
+    image: "plateau/arkham.jpg",
+    streets: [
+        (
+            id: "northside",
+            name: "Quartier Nord",
+            neighbours: ["downtown", "merchant_district"],
+            white_arrow: "downtown",
+            black_arrow: "merchant_district",
+            position: (x: 245, y: 265),
+        ),
+        (
+            id: "downtown",
+            name: "Centre-Ville",
+            neighbours: ["northside", "easttown", "merchant_district"],
+            white_arrow: "easttown",
+            black_arrow: "northside",
+            position: (x: 447, y: 262),
+        ),
+        (
+            id: "easttown",
+            name: "Quartier Est",
+            neighbours: ["downtown", "rivertown"],
+            white_arrow: "rivertown",
+            black_arrow: "downtown",
+            position: (x: 548, y: 410),
+        ),
+        (
+            id: "merchant_district",
+            name: "Quartier Marchand",
+            neighbours: ["northside", "downtown", "rivertown", "miskatonic_u"],
+            white_arrow: "northside",
+            black_arrow: "miskatonic_u",
+            position: (x: 315, y: 542),
+        ),
+        (
+            id: "rivertown",
+            name: "Quartier de la Rivière",
+            neighbours: ["easttown", "merchant_district", "french_hill"],
+            white_arrow: "french_hill",
+            black_arrow: "easttown",
+            position: (x: 532, y: 538),
+        ),
+        (
+            id: "miskatonic_u",
+            name: "Université Miskatonic",
+            neighbours: ["merchant_district", "french_hill", "uptown"],
+            white_arrow: "merchant_district",
+            black_arrow: "uptown",
+            position: (x: 318, y: 800),
+        ),
+        (
+            id: "french_hill",
+            name: "French Hill",
+            neighbours: ["rivertown", "miskatonic_u", "southside"],
+            white_arrow: "southside",
+            black_arrow: "rivertown",
+            position: (x: 535, y: 828),
+        ),
+        (
+            id: "uptown",
+            name: "Quartier Résidentiel",
+            neighbours: ["miskatonic_u", "southside"],
+            white_arrow: "miskatonic_u",
+            black_arrow: "southside",
+            position: (x: 355, y: 1137),
+        ),
+        (
+            id: "southside",
+            name: "Quartier Sud",
+            neighbours: ["french_hill", "uptown"],
+            white_arrow: "uptown",
+            black_arrow: "french_hill",
+            position: (x: 553, y: 1142),
+        ),
+    ],
+    locations: [
+        // Quartier Nord
+        (
+            id: "train_station",
+            name: "Gare",
+            street: "northside",
+            stability: Stable,
+            position: (x: 165, y: 55),
+        ),
+        (
+            id: "newspaper",
+            name: "Journal",
+            street: "northside",
+            stability: Stable,
+            position: (x: 75, y: 175),
+        ),
+        (
+            id: "curiositie_shoppe",
+            name: "Boutique de Souvenirs",
+            street: "northside",
+            stability: Stable,
+            ability: (
+                name: "Achat",
+                text: "Au lieu de faire une rencontre ici, vous pouvez piocher 3 Objets Uniques et acheter l'un d'eux à son prix indiqué. Défaussez les deux autres objets.",
+            ),
+            closes_at_terror: 6,
+            position: (x: 75, y: 300),
+        ),
+        // Centre-Ville
+        (
+            id: "bank_of_arkham",
+            name: "Banque d'Arkham",
+            street: "downtown",
+            stability: Stable,
+            ability: (
+                name: "Prêt Bancaire",
+                text: "Au lieu de faire une rencontre ici, vous pouvez prendre un Prêt Bancaire si vous n'en avez pas déjà un.",
+            ),
+            position: (x: 315, y: 60),
+        ),
+        (
+            id: "arkham_asylum",
+            name: "Asile d'Arkham",
+            street: "downtown",
+            stability: Stable,
+            ability: (
+                name: "Soins Psychiatriques",
+                text: "Au lieu de faire une rencontre ici, vous pouvez récupérer de la Santé Mentale en recevant des soins psychiatriques. Vous pouvez récupérer 1 Santé Mentale gratuitement ou payer 2 $ pour restaurer votre Santé Mentale au maximum.",
+            ),
+            position: (x: 460, y: 60),
+        ),
+        (
+            id: "independence_square",
+            name: "Square de l'Indépendance",
+            street: "downtown",
+            stability: Unstable,
+            position: (x: 605, y: 55),
+        ),
+        // Quartier Est
+        (
+            id: "hibbs_roadhouse",
+            name: "Relais Routier de Hibb",
+            street: "easttown",
+            stability: Unstable,
+            position: (x: 605, y: 205),
+        ),
+        (
+            id: "velmas_diner",
+            name: "Restaurant de Velma",
+            street: "easttown",
+            stability: Stable,
+            position: (x: 760, y: 205),
+        ),
+        (
+            id: "police_station",
+            name: "Poste de Police",
+            street: "easttown",
+            stability: Stable,
+            ability: (
+                name: "Adjoint",
+                text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 10 en force, 2 trophées de portail, ou des trophées de monstres pour un total de 5 en force et 1 trophée de portail pour devenir l'Adjoint au Shérif d'Arkham. Prenez la carte correspondante.",
+            ),
+            position: (x: 760, y: 350),
+        ),
+        // Quartier Marchand
+        (
+            id: "unvisited_isle",
+            name: "Île Inexplorée",
+            street: "merchant_district",
+            stability: Unstable,
+            position: (x: 70, y: 485),
+        ),
+        (
+            id: "river_docks",
+            name: "Les Quais",
+            street: "merchant_district",
+            stability: Stable,
+            ability: (
+                name: "Personnage Louche",
+                text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 5 en force ou 1 trophée de portail pour gagner 5 $.",
+            ),
+            position: (x: 70, y: 610),
+        ),
+        (
+            id: "the_unnamable",
+            name: "L'Innommable",
+            street: "merchant_district",
+            stability: Unstable,
+            position: (x: 215, y: 665),
+        ),
+        // Quartier de la Rivière
+        (
+            id: "graveyard",
+            name: "Cimetière",
+            street: "rivertown",
+            stability: Unstable,
+            position: (x: 765, y: 545),
+        ),
+        (
+            id: "black_cave",
+            name: "Caverne Noire",
+            street: "rivertown",
+            stability: Unstable,
+            position: (x: 765, y: 665),
+        ),
+        (
+            id: "general_store",
+            name: "Magasin",
+            street: "rivertown",
+            stability: Stable,
+            ability: (
+                name: "Achat",
+                text: "Au lieu de faire une rencontre ici, vous pouvez piocher 3 Objets Communs et en acheter un à son prix normal. Défaussez les deux autres objets.",
+            ),
+            closes_at_terror: 3,
+            position: (x: 590, y: 670),
+        ),
+        // Université Miskatonic
+        (
+            id: "science_building",
+            name: "Département Scientifique",
+            street: "miskatonic_u",
+            stability: Unstable,
+            ability: (
+                name: "Dissection",
+                text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 5 en force ou 1 trophée de portail pour gagner 2 pions Indice.",
+            ),
+            position: (x: 65, y: 770),
+        ),
+        (
+            id: "administration",
+            name: "Administration",
+            street: "miskatonic_u",
+            stability: Stable,
+            ability: (
+                name: "Cours",
+                text: "Au lieu de faire une rencontre ici, vous pouvez payer 8 $ pour piocher 2 Compétences. Gardez-en une et défaussez l'autre.",
+            ),
+            position: (x: 145, y: 960),
+        ),
+        (
+            id: "library",
+            name: "Bibliothèque",
+            street: "miskatonic_u",
+            stability: Stable,
+            position: (x: 285, y: 915),
+        ),
+        // French Hill
+        (
+            id: "witch_house",
+            name: "La Maison de la Sorcière",
+            street: "french_hill",
+            stability: Unstable,
+            position: (x: 765, y: 870),
+        ),
+        (
+            id: "silver_twilight_lodge",
+            name: "Loge du Crépuscule d'Argent",
+            street: "french_hill",
+            stability: Unstable,
+            ability: (
+                name: "Cœur de la Loge",
+                text: "Si vous êtes Membre du Crépuscule d'Argent, vous regardez alors la notice du Cœur de la Loge quand vous faites une rencontre ici.",
+            ),
+            position: (x: 628, y: 935),
+        ),
+        // Quartier Résidentiel
+        (
+            id: "st_marys_hospital",
+            name: "Hôpital Sainte-Marie",
+            street: "uptown",
+            stability: Stable,
+            ability: (
+                name: "Soins Médicaux",
+                text: "Au lieu de faire une rencontre ici, vous pouvez récupérer de la Résistance en recevant des soins médicaux. Vous pouvez récupérer 1 Résistance gratuitement ou payer 2 $ pour restaurer votre Résistance au maximum.",
+            ),
+            position: (x: 70, y: 1130),
+        ),
+        (
+            id: "ye_olde_magick_shoppe",
+            name: "La Vieille Échoppe de Magie",
+            street: "uptown",
+            stability: Stable,
+            ability: (
+                name: "Cours de Magie",
+                text: "Au lieu de faire une rencontre ici, vous pouvez payer 5 $ pour piocher 2 Sorts. Gardez-en un et défaussez l'autre.",
+            ),
+            closes_at_terror: 9,
+            position: (x: 178, y: 1305),
+        ),
+        (
+            id: "woods",
+            name: "Bois",
+            street: "uptown",
+            stability: Unstable,
+            position: (x: 365, y: 1310),
+        ),
+        // Quartier Sud
+        (
+            id: "historical_society",
+            name: "Société des Historiens",
+            street: "southside",
+            stability: Unstable,
+            position: (x: 535, y: 1310),
+        ),
+        (
+            id: "mas_boarding_house",
+            name: "Pension de Ma",
+            street: "southside",
+            stability: Stable,
+            ability: (
+                name: "Recruter",
+                text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 10 en force, 2 trophées de portail, ou des trophées de monstres pour un total de 5 en force et 1 trophée de portail pour prendre l'Allié de votre choix dans le paquet Allié.",
+            ),
+            position: (x: 765, y: 1095),
+        ),
+        (
+            id: "south_church",
+            name: "Église Méridionale",
+            street: "southside",
+            stability: Stable,
+            ability: (
+                name: "Bénédiction",
+                text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 5 en force ou 1 trophée de portail pour que l'investigateur de votre choix devienne Béni.",
+            ),
+            position: (x: 705, y: 1275),
+        ),
+    ],
+    other_worlds: [
+        (
+            id: "rlyeh",
+            name: "R'lyeh",
+            colors: [Red, Yellow],
+            first_area: (x: 955, y: 150),
+            second_area: (x: 955, y: 65),
+        ),
+        (
+            id: "plateau_of_leng",
+            name: "Plateau de Leng",
+            colors: [Red, Green],
+            first_area: (x: 955, y: 340),
+            second_area: (x: 955, y: 255),
+        ),
+        (
+            id: "dreamlands",
+            name: "Les Contrées du Rêve",
+            colors: [Red, Yellow, Green, Blue],
+            first_area: (x: 955, y: 520),
+            second_area: (x: 955, y: 440),
+        ),
+        (
+            id: "great_hall_of_celeano",
+            name: "Grand Hall de Celeano",
+            colors: [Green, Blue],
+            first_area: (x: 955, y: 720),
+            second_area: (x: 955, y: 640),
+        ),
+        (
+            id: "yuggoth",
+            name: "Yuggoth",
+            colors: [Yellow, Blue],
+            first_area: (x: 955, y: 910),
+            second_area: (x: 955, y: 830),
+        ),
+        (
+            id: "city_of_the_great_race",
+            name: "Cité de la Grande Race",
+            colors: [Green, Yellow],
+            first_area: (x: 955, y: 1105),
+            second_area: (x: 955, y: 1025),
+        ),
+        (
+            id: "abyss",
+            name: "Les Abysses",
+            colors: [Red, Blue],
+            first_area: (x: 955, y: 1305),
+            second_area: (x: 955, y: 1225),
+        ),
+        (
+            id: "another_dimension",
+            name: "Une Autre Dimension",
+            colors: [Red, Yellow, Green, Blue],
+            first_area: (x: 955, y: 1500),
+            second_area: (x: 955, y: 1420),
+        ),
+    ],
+    special_areas: [
+        (kind: Outskirts, name: "Périphérie", position: (x: 520, y: 1515)),
+        (kind: Sky, name: "Ciel", position: (x: 640, y: 1515)),
+        (kind: LostInTimeAndSpace, name: "Perdu dans le Temps et l'Espace", position: (x: 760, y: 1515)),
+        (kind: JailCell, name: "Cellule de Prison", position: (x: 680, y: 425)),
+    ],
+)

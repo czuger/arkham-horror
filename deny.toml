@@ -1,0 +1,40 @@
+[graph]
+all-features = false
+
+[advisories]
+version = 2
+yanked = "deny"
+# No upstream fix yet; review on every askama upgrade.
+ignore = [
+    # basic-toml is unmaintained; only used by askama at compile time.
+    { id = "RUSTSEC-2026-0374", reason = "askama build-time dependency" },
+]
+
+[licenses]
+version = 2
+confidence-threshold = 0.9
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+
+# Our own crates are not published: no license check on them.
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

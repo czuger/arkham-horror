@@ -1,0 +1,30 @@
+[package]
+name = "server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "arkham"
+path = "src/main.rs"
+
+[dependencies]
+askama.workspace = true
+axum.workspace = true
+serde.workspace = true
+polodb_core.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+tempfile = "3.27"
+
+[lints]
+workspace = true

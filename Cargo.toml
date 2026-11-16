@@ -1,0 +1,35 @@
+[workspace]
+resolver = "3"
+members = ["crates/data", "crates/engine", "crates/ai", "crates/server", "crates/simulator"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+publish = false
+license = "LicenseRef-private"
+
+[workspace.dependencies]
+askama = "0.16.1"
+axum = "0.8.9"
+serde = { version = "1.0.229", features = ["derive"] }
+polodb_core = "5.3.0"
+ron = "0.12.3"
+thiserror = "2.0.21"
+tokio = { version = "1.54.1", features = ["rt", "macros", "net", "signal"] }
+tower-http = { version = "0.7.1", features = ["fs", "set-header"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+
+[workspace.lints.rust]
+missing_docs = "warn"
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "warn"
+expect_used = "warn"
+wildcard_imports = "warn"
+too_many_lines = "warn"
+
+[profile.dev.package."*"]
+opt-level = 1

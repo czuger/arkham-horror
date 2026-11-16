@@ -6,14 +6,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A browser adaptation of **Arkham Horror 2nd edition** (French edition, *Horreur à Arkham*), for private use: **solo mode** (one human player, the other investigators played by AIs), **base game only**.
 
-**No code exists yet**, and the folder is not a git repository. There is no build, lint or test command to run. The repository currently holds planning and reference documents, all written in French, plus the base-game images in `assets/`. Keep new project documents in French, matching their plain style.
+Milestone **J0 (foundation) is done** (2026-11-16): a Cargo workspace under `crates/` (`data`, `engine`, `ai` are empty library stubs; `simulator` is a stub binary; `server` builds the `arkham` binary, which serves a « bonjour » page that counts visits in PoloDB). Milestone **J1 (data) is done** (2026-11-16): `data/` holds `board.ron`, `gate_markers.ron`, `monsters.ron`, `investigators.ron`, `ancient_ones.ron`, and a 39-card sample in `location_cards.ron`, `gate_cards.ron`, `mythos_cards.ron`, `investigator_cards.ron`, all loaded and cross-checked by the `data` crate (`GameData::load`, `check`, `check_assets`; tests in `crates/data/tests/` load the real files). The card-effect vocabulary (types in `crates/data/src/cards/`) is described in French in `vocabulaire_cartes.md`. Next: J2 (engine). The rest of the cards is transcribed later, on the same vocabulary. The repository also holds planning and reference documents, all written in French, plus the base-game images in `assets/`. Keep new project documents in French, matching their plain style.
+
+## Commands
+
+- Build: `cargo build` (cold build ≈ 2.5 min, mostly RocksDB's C++ under PoloDB; incremental: seconds). Toolchain pinned to Rust 1.100.0 in `rust-toolchain.toml`.
+- Run the server: `cargo run -p server` → http://127.0.0.1:3000. Settings via env vars `ARKHAM_ADDR`, `ARKHAM_DB` (database folder, default `arkham.db`), `ARKHAM_ASSETS`, `ARKHAM_STATIC`; logs via `RUST_LOG`. Run it from the repo root so `assets/` and `static/` resolve.
+- Tests: `cargo test`; a single test: `cargo test -p server visits_are_counted`.
+- Full local CI: `scripts/ci.sh` (rustfmt, clippy `-D warnings`, tests, cargo-audit, cargo-deny). The same steps are in `.github/workflows/ci.yml`; there is no git remote yet.
+
+Technical facts found at J0 (details in `manques_et_questions.md` §2):
+
+- Database: **PoloDB** (`polodb_core` 5.3, MongoDB-like, serde documents, RocksDB underneath). SurrealDB was tried first and dropped by the user on 2026-11-16 (too many constraints); do not bring it back.
+- PoloDB calls are synchronous and short; they run directly on the single tokio `current_thread` runtime. RocksDB adds 3 helper threads.
+- The database is flushed and unlocked when the last `Database` clone is dropped; drop it before reopening the same folder (tests do).
+- Game state is meant to be stored as a JSON **string** field (BSON has no unsigned 64-bit integers).
+- One RustSec advisory with no upstream fix is ignored, with its reason, in both `deny.toml` and `.cargo/audit.toml` (askama's build-time `basic-toml`). Re-check it on every askama upgrade.
+- Data files (`data/*.ron`): ids are English snake_case (`train_station`), player-facing values French; each file starts with `#![enable(implicit_some)]` and a `version` checked against the type's `VERSION`; structs use `deny_unknown_fields`. Locations have no arrow field: a monster in a location always goes to its own street. Board values were read from the board image and must be proofread by the user; the wiki monster table had errors, token images are authoritative.
+- Rust 1.100 cargo warns on unused crate dependencies: add inter-crate deps (`engine` → `data`, etc.) only when the code uses them.
 
 | File | Role |
 |---|---|
-| `plan_creation_jeu.md` | **The current plan (2026-11-16). Read this first.** Architecture (axum + tokio single-thread server, embedded SurrealDB, server-rendered HTML with minimal JS), crate layout, data format, engine design (decision/response model), AI, milestones J0–J6, tests, hosting. |
-| `manques_et_questions.md` | Up-to-date list of missing data (M1–M24), technical points to verify (T1–T6), unsettled rules (R1–R7) and questions for the user (Q1–Q23). |
+| `plan_creation_jeu.md` | **The current plan (2026-11-16). Read this first.** Architecture (axum + tokio single-thread server, embedded database — now PoloDB, server-rendered HTML with minimal JS), crate layout, data format, engine design (decision/response model), AI, milestones J0–J6, tests, hosting. |
+| `manques_et_questions.md` | Up-to-date list of missing data (M1–M24), technical points to verify (T1–T6), rules R1–R8 (settled, see `regles/decisions.md`) and questions for the user (Q1–Q23); §2 also records the J0 measurements. |
 | `plan_mise_en_ligne.md` | The earlier plan (WASM client, no server). Its architecture is superseded; its Parts 2–3 (missing data M1–M20, open questions) are kept for reference. |
-| `regles/base.md` | Base-game rules, transcribed from the official French rulebook (Edge 2016 revised edition). Transcription notes are marked ⚠ in italics; §22 lists rulebook inconsistencies that are still unresolved. |
+| `vocabulaire_cartes.md` | How card effects are written in the data files: effect primitives, lasting effects, abilities, the « effet spécial » list, the sample and the load-time checks. Update it whenever the vocabulary changes. |
+| `regles/decisions.md` | Rules the rulebook leaves open, settled with the user (date and reason each). Authoritative for the engine. |
+| `regles/base.md` | Base-game rules, transcribed from the official French rulebook (Edge 2016 revised edition). Transcription notes are marked ⚠ in italics; §22 lists rulebook inconsistencies; §23 holds the base-game part of the official FAQ v2.0 (2017: card errata + rulings), which overrides the rulebook. |
 | `inventaire.md` | Inventory of the source material (a 2017 scrape of the French wiki `wiki.horreuraarkham.fr`): what each HTML/PDF file contains and what data is still missing (§7–§8). |
 
 The scraped sources live **outside** this repo, at `~/python/perso/scraper/pages/wiki.horreuraarkham.fr/` (= `/Users/ced/python/perso/scraper/pages/wiki.horreuraarkham.fr/`). As of 2026-11-16 the folder holds 953 HTML, 66 PDF and about 3,100 wiki images, all in one flat folder (images are named `images__x__xy__<name>`). They mix three games; only Arkham Horror 2nd ed. is relevant — ignore *Mansions of Madness* (`_mom`/`_MoM` suffix) and *Elder Sign* (`_es` suffix) pages.
@@ -29,8 +48,8 @@ Base-game images are sorted by theme in `assets/` (plateau, cartes, fiches, mons
 One executable holds everything: rules engine, AIs, web server and embedded database.
 
 - **Server**: axum + tokio on a **single thread** (`current_thread` runtime). No game state in memory: each request loads the game from the DB, applies the answer, lets the AIs play up to the next human decision, then saves.
-- **Database**: SurrealDB embedded with `kv-surrealkv` (tables `partie`, `action`, `evenement`). Game data (cards, board…) stays in versioned RON files under `data/`, never in the DB or the code.
-- **UI**: server-rendered HTML (askama or maud, to decide), classic forms with POST → redirect → GET, plus **htmx** (served locally, no CDN) to swap page fragments. **No heavy JavaScript** and no client-side state; a few small hand-written optional scripts at most. Must stay playable without JS. Card and token images come from `assets/`.
+- **Database**: PoloDB embedded (collections `partie`, `action`, `evenement`). Game data (cards, board…) stays in versioned RON files under `data/`, never in the DB or the code.
+- **UI**: server-rendered HTML with **askama** (user's choice, 2026-11-16), classic forms with POST → redirect → GET, plus **htmx** (served locally, no CDN) to swap page fragments. **No heavy JavaScript** and no client-side state; a few small hand-written optional scripts at most. Must stay playable without JS. Card and token images come from `assets/`.
 - AI turns and the Mythos phase are played **in one block** after each human answer; the human follows them in the journal.
 - **Hosting and access control are out of scope** (the user has a dedicated environment). The project only has to run locally: listen on `127.0.0.1`, no login page.
 - Cargo workspace: `data` (types + loading + consistency checks), `engine` (rules: deterministic, serializable, no I/O), `ai` (policies answering decisions), `server` (axum), `simulator` (CLI for mass AI-only games; kept out of the server because it would block the single thread).
@@ -41,7 +60,7 @@ One executable holds everything: rules engine, AIs, web server and embedded data
 
 Planned tests: unit tests per phase and rule, property tests (no impossible states, no negative resources), data consistency checks, one auto-generated test per card, thousands of AI-only games that must end without crashing, seed + answer-list replay, HTTP route tests with a temporary DB. CI: rustfmt, clippy, tests, cargo-audit, cargo-deny.
 
-Settled rules go in `regles/decisions.md` (to create) with date and reason.
+Settled rules go in `regles/decisions.md` with date and reason. R1–R8 were all settled on 2026-11-16 (the user accepted every recommendation).
 
 ## Rust code guidelines
 
@@ -127,4 +146,4 @@ Adopted on 2026-11-16 from the user's style guide (gist `czuger/e216e802e61c9c6d
 - Terminology follows the 2016 French edition: **Vigueur** is the skill the first French edition called « Combat » (*Fight* in English).
 - Golden rule of the game: when in doubt, choose the outcome that is worst for the investigator.
 - Card texts are copyrighted. The planned repository must stay **private**.
-- Before writing engine code for a rule, check `regles/base.md` §22 and the unsettled rules R1–R7 in `manques_et_questions.md`; several rules are not settled yet. Do not decide them silently — ask the user.
+- Before writing engine code for a rule, check `regles/decisions.md` (settled rules, authoritative), `regles/base.md` §23 (official FAQ) and §22. Any new gap in the rules: do not decide it silently — ask the user, then record it in `decisions.md`.

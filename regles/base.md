@@ -31,6 +31,7 @@
 20. [Icônes de lieu et capacités spéciales des monstres](#20-icônes-de-lieu-et-capacités-spéciales-des-monstres)
 21. [Tableaux récapitulatifs](#21-tableaux-récapitulatifs)
 22. [Incohérences relevées dans le livret](#22-incohérences-relevées-dans-le-livret)
+23. [FAQ officielle (jeu de base)](#23-faq-officielle-jeu-de-base)
 
 ---
 
@@ -360,7 +361,7 @@ Quand un monstre volant doit bouger pendant le Mythe :
 
 > *Exemple* : une Larve Stellaire va dans le Quartier Résidentiel, où se trouvent Joe Diamond et Ashcan Pete. À leur prochaine phase de Mouvement, l'un ou les deux devront l'affronter.
 
-⚠ *Le livret ne dit pas explicitement ce que fait un volant dans un **lieu** sans investigateur et sans investigateur dans une rue connectée. A et B couvrent « lieu ou zone de rues », C ne couvre que « zone de rues ». Par défaut, on peut supposer qu'il suit la flèche comme un monstre normal (à vérifier dans la FAQ).*
+⚠ *Le livret ne dit pas explicitement ce que fait un volant dans un **lieu** sans investigateur et sans investigateur dans une rue connectée. A et B couvrent « lieu ou zone de rues », C ne couvre que « zone de rues ». La FAQ officielle règle le cas : il va dans le **Ciel** (§23.9, R3 dans `decisions.md`).*
 
 ### 9.4 Activer la capacité de la carte Mythe
 Le premier joueur applique le texte spécial selon le genre de la carte (indiqué en haut) :
@@ -679,7 +680,7 @@ Chaque round :
 
 1. **Restauration** : comme une phase d'Entretien (restaurer les cartes, utiliser les capacités du personnage, ajuster les compétences). Puis le marqueur Premier Joueur passe à gauche. Les joueurs peuvent ensuite **s'échanger des objets** comme s'ils étaient au même endroit.
 2. **Les investigateurs attaquent** : du premier joueur dans le sens horaire, chaque investigateur encore en lice fait un **test de Combat** avec la **valeur de Combat du Grand Ancien** comme modificateur.
-   - Les succès sont **cumulés pour tout le groupe**. Chaque fois que le total atteint le **nombre de joueurs (éliminés compris)**, on **retire un pion Destin** et le compteur repart à 0.
+   - Les succès sont **cumulés pour tout le groupe**. Chaque fois que le total atteint le **nombre de joueurs (éliminés compris)**, on **retire un pion Destin** ; le surplus est gardé pour la suite (FAQ, §23.11).
    - Quand le **dernier pion Destin** est retiré, les investigateurs ont **gagné**.
 3. **Le Grand Ancien attaque** : il applique son **Attaque** à chaque investigateur (souvent un test de compétence à réussir).
    - Un investigateur à **0 Santé Mentale ou 0 Résistance** à cause de cette attaque est **dévoré** et son joueur est **éliminé** (pas de nouvel investigateur).
@@ -732,7 +733,7 @@ En général, **un seul exemplaire** de chaque carte spéciale par joueur : Acom
 ### 18.6 Échanger de l'équipement
 - Deux investigateurs dans le **même lieu, la même zone de rues ou le même Autre Monde** peuvent échanger **argent, Objets Communs et Uniques, Sorts**.
 - On peut le faire avant, pendant ou après le mouvement, **jamais pendant un combat**.
-- ⚠ *Les Alliés et les Compétences ne figurent pas dans la liste.*
+- ⚠ *Les Alliés et les Compétences ne figurent pas dans la liste.* Tranché (R5, `decisions.md`) : ils ne s'échangent pas.
 
 ### 18.7 Problèmes de timing
 Si plusieurs effets se produisent en même temps, les joueurs choisissent l'ordre. En cas de désaccord, le premier joueur décide.
@@ -841,8 +842,194 @@ Chaque fois que les joueurs doivent choisir ensemble (placement des monstres, In
 
 ## 22. Incohérences relevées dans le livret
 
-- **Monstres à l'ouverture d'un portail** (p. 9-10) : « s'il y a **au moins 5** joueurs, deux monstres apparaissent » contre « s'il y a **plus de 5** joueurs, on place deux monstres ». La règle VO dit 5 joueurs ou plus. → **À trancher avec la FAQ officielle** (`FAQ_Officiel_032017_V2.pdf`).
+- **Monstres à l'ouverture d'un portail** (p. 9-10) : « s'il y a **au moins 5** joueurs, deux monstres apparaissent » contre « s'il y a **plus de 5** joueurs, on place deux monstres ». La règle VO dit 5 joueurs ou plus. → **Tranché (R1, `decisions.md`), confirmé par la FAQ** (§23.5) : 5 investigateurs ou plus.
 - **Le tour de jeu** (p. 5) est décrit deux fois avec des formulations différentes. La seconde (phase Mythe jouée **une seule fois** par le premier joueur) est la bonne.
-- **Monstre volant dans un lieu** sans investigateur ni investigateur dans une rue connectée : cas non couvert (§9.3).
+- **Monstre volant dans un lieu** sans investigateur ni investigateur dans une rue connectée : cas non couvert (§9.3). → **Réglé par la FAQ** (§23.9) : il va dans le Ciel.
 - **Bataille finale** (p. 19 et 20) : on retire un pion Destin chaque fois que les succès cumulés atteignent le « nombre de joueurs ». La p. 20 précise « **y compris les joueurs éliminés** ».
 - **Fiche d'Amanda Sharpe et schémas** (p. 6-7, 10, 19, 21) : le texte des illustrations est extrait dans le désordre. Seul ce qui était lisible sans ambiguïté a été repris.
+
+---
+
+## 23. FAQ officielle (jeu de base)
+
+> **Source** : `images__a__a4__FAQ_Officiel_032017_V2.pdf` (FAQ et errata Edge, version 2.0 du 24/03/2017), pages 1 à 15, extraites avec `pdftotext`. Seule la partie « jeu de base » est reprise ; les questions qui ne portent que sur des extensions sont laissées de côté. Intégrée le 16/11/2026 (décision R7, `decisions.md`).
+> Les points que le livret révisé de 2016 dit déjà ne sont pas répétés. Le renvoi (§N) indique la section de ce document que le point complète. **En cas de conflit, la FAQ l'emporte sur le livret.**
+
+### 23.1 Errata des cartes et fiches
+
+La boîte révisée (impression **0002JAN13FR** ou plus récente) intègre déjà ces corrections. Elles servent à vérifier les images de `assets/` (manque M14), qui peuvent venir d'une impression plus ancienne.
+
+- **Partout** : toute mention d'un test de « Combat » (compétence) se lit **test de Vigueur** (13 cartes Portail, 7 cartes Lieu, 5 cartes Investigateur, les fiches Investigateur, certaines fiches Grand Ancien, la Vague de Chaleur).
+- **Shub-Niggurath** : son Attaque demande un test de **Discrétion** (et non de « Furtivité »).
+- **Ithaqua** : le Pouvoir « Vents Glacés » ajoute « De plus, toutes les cartes Temps sont défaussées sans activer leur Capacité Spéciale. » Son Attaque est un test de Vigueur.
+- **Le Pharaon Noir** (marqueur Monstre) : il a la capacité **Masque** ; sa capacité demande un test de Vigueur.
+- **Cartes Portail** :
+  - [Rouge] R'lyeh / Les Abysses / Autre : « Les couleurs vous aveuglent… » est un test de **Savoir**, non de Chance.
+  - [Rouge] R'lyeh / Les Contrées du Rêve / Autre : la rencontre « Réussissez un test de Chance (-1)… » se passe dans **Les Abysses**.
+  - [Rouge] R'lyeh / Les Contrées du Rêve / Autre : le texte de R'lyeh « L'ombre essaye de forcer le passage… » se termine par « **vous êtes retardé** ».
+  - [Bleue] Les Contrées du Rêve / Celeano / Autre : le texte de Celeano fait gagner « **2 Résistance et 2 Santé Mentale** ».
+  - [Verte] Cité de la Grande Race / Celeano / Autre : la rencontre « Les marchands de ce pays… » se passe sur **Le Plateau de Leng**.
+- **Cartes Mythe** :
+  - « Les Gangs Nettoient le Quartier Est ! » : « Tous les monstres dans les rues ou les lieux du Quartier Est retournent dans la tasse. »
+  - « Vague de Chaleur » : le premier effet porte sur des tests de Vigueur.
+- **Carte Lieu** [Grise] Relais Routier de Hibb / Poste de Police / Restaurant de Velma : au Poste de Police, « Si vous réussissez un test de Chance (-1)… », la carte à chercher dans les Objets Communs est un **Révolver .38**.
+- **Alliés** Thomas F. Malone et Tom « Mountain » Murphy : leur trait est Vigueur. Tom Murphy est immunisé contre **Irrésistible** (et non « Déferlement », qui n'existe pas).
+- **Objet Unique Signe des Anciens** : le texte devrait être « Rencontres à Arkham : lors de la fermeture d'un portail… ». Il ne s'utilise pas pendant n'importe quelle phase et ne concerne pas le scellement.
+
+### 23.2 Préparation et tour de jeu
+
+- **Première carte Mythe** (§3, étape 14) : si elle n'a **pas de portail**, la défausser et repiocher jusqu'à en trouver une qui en a (comme pour une Rumeur).
+- **Investigateurs ou joueurs** : quand il y a plus d'investigateurs que de joueurs, toute règle qui parle du « nombre de joueurs » compte les **investigateurs**. *(Confirme R2.)*
+- **« Au début de la phase d'Entretien » / « au début d'un tour »** (§5) : si l'effet concerne la restauration d'une carte, il se résout à l'étape « Restaurer les cartes déchargées » ; sinon à l'étape « Actions d'Entretien ».
+- **Bénédiction, Malédiction, Prêt Bancaire, Acompte** : **pas de jet d'entretien** lors de la première phase d'Entretien qui suit leur acquisition. Si l'on en reçoit une alors qu'on en a déjà une, on la traite comme **tout juste acquise** (pas de jet à l'Entretien suivant).
+- **Prêt Bancaire** : on ne peut pas refuser exprès de le rembourser. Sur un 4, 5 ou 6 au jet d'Entretien, on ne peut pas le défausser.
+- **« Perdez votre prochain tour »** : on saute toutes les phases **sauf le Mythe**, Entretien compris. À distinguer de « restez ici au prochain tour », qui veut seulement dire **retardé**.
+- **« Votre tour s'achève »** : l'investigateur ne fait plus rien jusqu'à la phase Mythe.
+- **Moment des actions** : une action se fait à n'importe quel moment de la phase imprimée, si ses conditions sont remplies. Mais une fois une carte Rencontre piochée, elle doit être résolue avant toute autre action. *Exemple* : l'Allié Duke peut être défaussé avant la pioche, ou après le jet de dés si l'investigateur n'est pas devenu fou entre-temps. Exception : Rempart de Chair, prévu pour répondre à une perte.
+- **Lieux stables et instables** : un lieu instable a un **diamant rouge** et aucun signe des anciens ; tout lieu avec un diamant vert ou un signe des anciens est stable.
+
+### 23.3 Mouvement, indices et retard (§6, §14.5)
+
+- **Ramasser des Indices**, seulement dans deux cas :
+  1. en phase de Mouvement, en **terminant** son mouvement sur un lieu ou une zone de rues qui en contient, **après** avoir combattu ou échappé aux monstres présents ;
+  2. en phase Mythe, quand un Indice est posé sur le lieu d'un investigateur (désaccord : le premier joueur choisit qui le prend).
+  
+  On ne ramasse **pas** d'Indices en arrivant sur un lieu pendant l'Entretien (retour de « Perdu dans le temps et l'espace »), les Rencontres à Arkham ou les Rencontres dans un Autre Monde.
+- **Indice posé sur un portail** : si un investigateur avec un marqueur Exploré est sur un lieu avec portail, l'Indice du Mythe n'y apparaît pas (le portail l'empêche).
+- **Combattre ou échapper aux monstres**, seulement dans deux cas :
+  1. en phase de Mouvement, en terminant son mouvement là où il y a des monstres ou en tentant d'en partir (un monstre à la fois, dans l'ordre choisi), **même retardé** ;
+  2. en phase de Rencontres, quand une rencontre fait apparaître un monstre.
+  
+  Un investigateur **déplacé par une rencontre** n'affronte pas les monstres de son lieu d'arrivée.
+- **Retour d'un Autre Monde** : l'investigateur n'est pas obligé d'affronter les monstres de son lieu d'arrivée pendant cette phase de Mouvement. Il peut choisir d'en affronter certains, à sa guise, **seulement s'il est revenu pendant la phase de Mouvement** ; sinon il attend la phase de Mouvement suivante.
+- **Retardé** : c'est un état oui/non, on ne peut pas être « doublement retardé ». Pendant la phase de Mouvement qui suit, l'investigateur peut seulement **se relever** et **échanger** avec ceux qui sont au même endroit. Une fois relevé, il doit combattre ou échapper aux monstres de son lieu. Il ne peut ni bouger, ni utiliser de points de mouvement, ni utiliser d'objet ou de capacité qui remplace le mouvement, ni lancer de Sort « Phase de Mouvement ». Retardé pendant un combat, il ne se relève qu'à la phase de Mouvement du **tour suivant**.
+- **Autre Monde** : on ne peut ni recevoir de points de mouvement (Motocyclette, Rubis de R'lyeh…), ni utiliser un objet qui en dépense (Necronomicon…).
+
+### 23.4 Rencontres (§7, §8, §18.2, §18.3)
+
+- **Rencontre qui envoie ailleurs** : l'investigateur ignore les monstres et les Indices de son lieu d'arrivée, et y fait une rencontre normale (avec ou sans portail, §7).
+- **Rencontre « allez à… puis revenez »** : une fois les rencontres suivantes résolues, l'investigateur revient au lieu de la première. En cas de conflit, **la première rencontre l'emporte**. Si la seconde rencontre (même dans un Autre Monde) le retarde, il revient aussitôt et il est retardé là.
+- **« Restez ici deux tours et gagnez 2 Indices »** : les deux effets sont indépendants. S'il doit partir avant (portail qui l'aspire…), il garde les Indices.
+- **« Un portail et un monstre apparaissent ! »** : le portail d'abord (l'investigateur présent est aspiré et **retardé**), puis le monstre, qui reste sur le plateau comme un monstre normal. **On ajoute un pion Destin.**
+- **Plusieurs monstres à affronter** dans une rencontre : on les pioche tous à la fois, puis on les affronte dans l'ordre choisi.
+- **Rencontre qui ferme un portail** : le marqueur Portail n'est **pas** pris comme trophée mais remis sous la pile. Ce portail ne peut pas être scellé.
+- **Capacités spéciales des lieux** (§18.2) : on ne peut les utiliser que si on peut les résoudre **entièrement** (au moins 1 $ pour acheter, assez d'Indices ou de trophées…). Une seule fois par tour et par investigateur. Ce ne sont **pas** des rencontres.
+- **Magasin et Boutique de Souvenirs** : sur les trois objets piochés, on **doit en acheter un** si on en a les moyens, et **un seul**. Les deux autres retournent sous le paquet.
+- **Dépenser des trophées Monstre** : on compte la force **modifiée** par les effets en cours. Pas besoin de les donner par paquets exacts, mais on ne peut pas dépenser plus que nécessaire, et pas de « monnaie ».
+- **Darrell Simmons, Gloria Goldberg** : face à « piochez 2 cartes et choisissez-en 1 », ils en piochent 3.
+
+### 23.5 Portails et Autres Mondes (§6.4, §9.1, §15)
+
+- **Portail ouvert par une rencontre** sur un investigateur : il est aspiré et **retardé**, comme en phase Mythe.
+- **Aspiré par un portail**, seulement dans trois cas : en Rencontres à Arkham sans marqueur Exploré sur un lieu ou une zone de rues avec un portail ; en phase Mythe quand un portail s'ouvre ou est déplacé sur son lieu (il est alors **retardé**) ; par une carte ou capacité précise.
+- **Marqueur Exploré** : on le reçoit chaque fois qu'on passe **directement** d'un Autre Monde à un lieu d'Arkham avec un portail vers ce monde : mouvement normal depuis la 2e zone, rencontre de 1re zone qui renvoie à Arkham, Sort Trouver le Portail, Boîte à Portail (même si le portail de retour mène à un autre monde). **Pas** de marqueur Exploré si l'on se perd dans le temps et l'espace, ni si une rencontre envoie vers un lieu précis sans dire « retournez à Arkham » (ex. la bifurcation des Abysses vers la Caverne Noire).
+- **Retardé dans un Autre Monde puis renvoyé à Arkham** : il reste retardé.
+- **« Le portail par lequel vous êtes entré »** : c'est exactement ce portail-là.
+- **Fermer un portail** : tous les monstres qui ont le même symbole que lui retournent dans la réserve, **Périphérie comprise**.
+- **Portail sur un lieu fermé** : le portail recouvre le lieu (marqueur posé au-dessus du marqueur Fermé). Quand il est fermé, les monstres et investigateurs présents vont dans la rue.
+- **Lieu fermé temporairement** : les monstres et investigateurs présents vont aussitôt dans la rue, comme pour une fermeture définitive.
+- **Portail sur un lieu stable ou dans une rue** (par un effet de jeu) : il peut être fermé, **jamais scellé**.
+- **Vague de monstres** (§9.1 B) : confirmée telle que dans le livret, exemple compris.
+- **2 monstres à l'ouverture** : s'il y a **au moins 5 investigateurs** en jeu. *(Confirme R1.)*
+
+### 23.6 Objets, sorts, compétences (§13, §14)
+
+- **Ce qui compte comme objet** (pertes, échanges, effets « défaussez un objet ») : Objets Communs, Objets Uniques, **Sorts**, Véhicule de Patrouille, Révolver de l'Adjoint. Rien d'autre.
+- **Fou ou inconscient avec un seul objet** : on perd la moitié **arrondie à l'inférieur**, donc rien.
+- **« Ne peut être perdu ou volé que si vous l'acceptez »** : s'applique en cas de folie, d'inconscience, de Prêt Bancaire non remboursé, et de tout effet qui fait perdre ou voler un objet.
+- **Défausser une carte pour payer un coût** : on ne gagne pas en plus l'effet prévu pour sa défausse (ex. Duke défaussé pour payer ne restaure pas la Santé Mentale).
+- **« Coût » et « sacrifice »** sont synonymes. **Harvey Walters** (Esprit Fort) et **Michael McGlen** réduisent les **pertes**, pas les **coûts** (ex. le coût d'un Sort).
+- **« Cherchez dans le paquet » une carte précise** : on fouille tout le paquet, on la prend, on remélange. **Le premier exemplaire d'un type** (un Tome, une Arme…) : on retourne les cartes du dessus une à une jusqu'à en trouver une ; les cartes révélées vont sous le paquet.
+- **Durée des bonus de combat**, selon la forme du texte :
+  - arme normale (« +X aux tests de Combat ») : tant qu'on lui consacre ses mains, plusieurs combats par tour ;
+  - arme à usage unique (« … défaussez après usage ») : un seul test de Combat ;
+  - arme à un coup (« Déchargez avant un test de Combat… ») : un seul test, puis déchargée ;
+  - sort de combat (« Lancez et déchargez pour gagner +X… jusqu'à la fin de ce combat ») : tout le combat tant qu'on lui consacre ses mains, donc un seul monstre par tour. En Bataille finale, il est relancé à chaque round.
+- **Fouet et Croix** : leurs capacités secondaires marchent sans les tenir en main. Le Fouet peut être tenu pour son bonus même déchargé.
+- **Lancer un sort avec la moitié de sa Santé Mentale** : permis ; on fait le test, le sort agit s'il réussit, puis l'investigateur devient fou (avant le combat s'il lançait un sort de combat). **Avec une Santé Mentale insuffisante** : impossible de le lancer.
+- **Plusieurs exemplaires d'un sort** : on peut retenter avec le second après un échec, mais les mains du premier restent prises.
+- **Sort raté en combat** : il occupe ses mains pendant tout le round (étapes 2 et 3).
+- **Sorts « N'importe quelle phase »** (Enchanter une Arme, Flétrissement, Atrophie, Terrible Malédiction d'Azathoth, Signe Rouge de Shudde M'ell) : à tout moment du combat, y compris avant le test d'Horreur ou avant de choisir entre fuir et combattre.
+- **Rempart de Chair** : se lance quand on doit perdre au moins 1 Résistance ; annule **une seule** perte (un seul test de Combat raté), pas tous les dégâts d'un monstre.
+- **Brumes de Releh** : marche pour n'importe quel test d'Évasion. En cas d'échec du sort, on peut quand même tenter l'Évasion normalement.
+- **Voix de Râ** : son bonus n'est pas réduit par l'Immunité ou la Résistance Magique.
+- **Signe Rouge de Shudde M'ell** : n'annule que les capacités **en gras** (pas les dégâts spéciaux de la Maigre Bête de la Nuit ou de la Chose Très Ancienne, ni les instructions des Masques).
+- **Trouver le Portail** : impossible retardé dans un Autre Monde. Possible juste après être entré dans un Autre Monde par la capacité de la Maigre Bête de la Nuit, sans faire de rencontre.
+- **Boîte à Portail** : permet de revenir par n'importe quel portail, même s'il ne mène pas au monde quitté (avec un marqueur Exploré).
+- **Flûte des Dieux Extérieurs** : les tests d'Évasion et d'Horreur se font avant ; la Flûte ne remplace que le test de Combat de l'étape « Combattre ou fuir ».
+- **Compétences nommées d'après une compétence** (ex. Discrétion) : **deux** bonus distincts, le +1 permanent **et** le dé supplémentaire par Indice dépensé.
+- **Relance** : on relance **tous** les dés du test, y compris ceux des Indices dépensés avant la relance.
+- **On ne peut pas rater exprès** un test ni ignorer des succès.
+- **Donner ou dépenser une ressource qu'on n'a pas** : impossible ; la condition n'est pas remplie.
+
+### 23.7 Échanges (§18.6)
+
+- Quand : à tout moment de la **phase de Mouvement** (avant, pendant ou après le déplacement, sans y mettre fin), **jamais pendant un combat**. Aussi pendant la Restauration de la Bataille finale et pendant la Bataille finale (tous les investigateurs y sont considérés au même endroit). Un investigateur **retardé** ou qui perd son tour peut quand même échanger.
+- Où : même lieu, même zone de rues ou même zone d'Autre Monde.
+- **Échangeable** : Argent, Objets Communs, Objets Uniques, Sorts, **Révolver de l'Adjoint**, **Véhicule de Patrouille**.
+- **Non échangeable** : Indices, **Alliés**, **Compétences**, Acompte, Adjoint au Shérif, Prêt Bancaire, Bénédiction, Malédiction, trophées Monstre et Portail, et toute carte non désignée comme échangeable. *(Confirme R5.)*
+
+### 23.8 Statut des investigateurs (§14)
+
+- **Dévoré** : Santé Mentale et Résistance à 0 **en même temps**, ou maximum de l'une des deux réduit à 0 (déjà au livret, confirmé).
+- **Combat sans issue** (ex. Michael McGlen ne peut plus lancer assez de dés pour tuer le monstre) : sa Santé Mentale tombe à 0, il devient fou et le combat s'arrête.
+- **Adjoint au Shérif** : il peut être arrêté et reste Adjoint. Il n'est pas touché par le Couvre-Feu. On ne peut pas devenir Adjoint si le poste est déjà pris.
+- **Véhicule de Patrouille** : l'investigateur va directement au lieu choisi en ignorant les monstres du trajet, mais doit échapper normalement aux monstres de son lieu de départ et d'arrivée. Il remplace tout le mouvement.
+- **Nouvel investigateur** (après un investigateur dévoré) : il commence à jouer **au début du tour suivant**.
+
+### 23.9 Monstres (§9.3, §16)
+
+- **Monstres volants**, règles complètes (remplacent le §9.3 en cas de doute) :
+  1. ils ne bougent que lorsque leur symbole sort en phase Mythe ;
+  2. ils ne quittent pas une case où se trouve déjà un investigateur ;
+  3. **depuis un lieu ou une zone de rues**, ils vont vers une zone de rues adjacente qui contient un investigateur ; **s'il n'y en a aucune, ils vont dans le Ciel** ;
+  4. depuis le Ciel, ils vont vers une zone de rues du plateau qui contient un investigateur (plusieurs choix : la Discrétion la plus faible ; égalité : le premier joueur choisit). Si aucun investigateur n'est dans une rue, ils restent dans le Ciel.
+  
+  *(Corrige R3 : un volant seul dans un lieu part dans le Ciel, il ne reste pas sur place. Voir `decisions.md`.)*
+- **Chien de Tindalos** et monstres qui vont « vers l'investigateur le plus proche » : à égalité de distance, celui qui a la **Discrétion la plus faible** ; nouvelle égalité, le premier joueur choisit.
+- **Maigre Bête de la Nuit** :
+  - affrontée dans un Autre Monde : le portail le plus proche est celui qui mène à Arkham ; un test d'Évasion ou de Combat raté ramène l'investigateur à Arkham, avec un marqueur Exploré ;
+  - après avoir envoyé un investigateur dans un portail, elle **reste** où elle est ;
+  - s'il n'y a aucun portail ouvert, le combat s'arrête sans effet.
+- **Chthonien** : sa perte de Résistance « au lieu de bouger » ne touche que les investigateurs **à Arkham**.
+- **Immunité et Résistance Magique/Physique** : réduisent seulement le bonus de Combat des armes et sorts, pas leurs autres effets.
+- **Le Pharaon Noir** (Masque) : les armes marchent normalement contre lui ; on fait toujours un test de Combat, mais avec le Savoir au lieu de la Vigueur.
+- **Limite de monstres et Périphérie** (§16), exemple de la FAQ : à 3 joueurs, limite 6, Périphérie 5. Avec 6 monstres à Arkham et 4 en Périphérie, une vague de 3 monstres : les 2 premiers vont en Périphérie (elle passe à 6, dépasse 5), la Terreur monte de 1 et les 6 monstres de la Périphérie retournent dans la réserve ; le 3e va ensuite en Périphérie.
+- **Cartes qui renvoient des monstres « à Arkham » dans la réserve** : la Périphérie ne compte pas comme « à Arkham ».
+
+### 23.10 Cartes Mythe (§9)
+
+- **Environnement** : sans la mention « à Arkham », l'effet touche aussi les investigateurs dans les Autres Mondes (et les monstres qui y apparaissent par rencontre). C'est le cas de « Tout est Calme à Arkham ! » et de « Un Vent Néfaste Souffle sur Arkham ».
+- **L'Environnement a priorité** sur les autres effets en conflit (ex. Alignement Planétaire : coût des sorts à 0 malgré tout effet qui l'augmente).
+- **Carte Mythe piochée hors de la phase Mythe** (par un effet) : défaussée sans autre effet que celui qui l'a fait piocher.
+- **Marqueurs Activité** : de simples rappels (souvent une Rumeur active).
+- **« La Sécurité du Campus Améliorée ! »**, Flûte des Dieux Extérieurs : ne touchent pas les monstres de « La Terrible Expérience », qui ne sont pas vraiment sur le plateau. Si « La Terrible Expérience » échoue pendant « Il Pleut des Cordes », les Vampires de Feu en jeu retournent dans la réserve.
+- **« Parade du 4 Juillet ! »** : l'investigateur chassé d'un lieu du Quartier Marchand va au plus court pour le quitter ; à égalité à 2 cases ou plus, il choisit.
+
+### 23.11 Terreur, réveil et Bataille finale (§16.3, §17)
+
+- **Terreur à 10** : **tous les monstres de la Périphérie retournent dans la réserve** (en plus des effets du livret).
+- **Réveil par le nombre de monstres** (Terreur à 10, double de la limite) : on compte seulement les monstres dans le **Ciel** et dans les **quartiers d'Arkham**.
+- **Bataille finale** :
+  - une fois commencée, plus aucun **Indice** ne peut être gagné, et plus d'**argent** du tout (même pour restaurer une arme qui en coûte) ;
+  - la Restauration est une phase d'Entretien **complète** ;
+  - succès nécessaires = nombre de joueurs × pions Destin. On retire un pion Destin par tranche de « nombre de joueurs » succès, et **le reste est conservé** pour le round suivant (ex. 4 joueurs, 9 succès : 2 pions retirés, 1 succès gardé) ;
+  - un investigateur dévoré juste avant le réveil n'est pas remplacé ; son joueur est éliminé, mais le nombre de succès par pion Destin ne baisse pas ;
+  - les capacités « tant qu'il dort » du Grand Ancien agissent **toute la partie**, Bataille finale comprise ;
+  - **Statue de Garde** qui annule une attaque : le round compte quand même (ex. Hastur : le modificateur décroît normalement) ;
+  - **Ithaqua**, Début de Bataille : un jet séparé par objet ; les objets qui ne peuvent être perdus ou volés sont protégés ;
+  - **Yog-Sothoth**, « La Clé et la Porte » : il faut 2 succès pour fermer un portail ; le scellement coûte toujours 5 Indices.
+- **Ithaqua, Vents Glacés** : si une carte Temps sort alors qu'un autre Environnement est en jeu, on ne le remplace pas ; on résout portail, Indice et mouvement des monstres, puis on défausse la carte Temps sans sa capacité.
+
+### 23.12 Capacités d'investigateurs du jeu de base
+
+- **Carolyn Fern** (Psychologie) et **Vincent Lee** (Physicien) : utilisables dans n'importe quel lieu, zone de rues ou zone d'Autre Monde, sauf mention contraire.
+- **Kate Winthrop** (Science !) :
+  - elle empêche les monstres précis d'une rencontre (le Mi-Go du Département Scientifique…) et ceux qui apparaissent par une rencontre d'Autre Monde ;
+  - avec un marqueur Exploré, sur le portail où se produit une **vague de monstres** : la vague entière est annulée ;
+  - sur un **autre** portail pendant une vague : aucun monstre chez elle, le même nombre est réparti sur les autres portails ;
+  - si un portail ne s'ouvre pas à cause d'elle, **pas de pion Destin**.
+
+### 23.13 Divers
+
+- **Réserve d'Indices vide** : remplacer par n'importe quoi ; la réserve est de fait illimitée. *(Va dans le sens de R8.)*

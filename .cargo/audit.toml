@@ -1,0 +1,3 @@
+# Same ignore as deny.toml (see the reason there).
+[advisories]
+ignore = ["RUSTSEC-2026-0374"]

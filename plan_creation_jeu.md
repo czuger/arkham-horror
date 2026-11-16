@@ -5,7 +5,7 @@ Rédigé le 16/11/2026. Ce plan remplace la partie « architecture » de `plan_m
 Cadre retenu :
 
 - **Serveur** : axum + tokio, **sur un seul thread** (runtime « current_thread »).
-- **Base de données** : SurrealDB embarquée dans le serveur, stockage sur disque avec `kv-surrealkv`. Pas de serveur de base de données séparé.
+- **Base de données** : PoloDB (`polodb_core`) embarquée dans le serveur, stockage sur disque dans un dossier. Pas de serveur de base de données séparé. *(Décision du 16/11/2026 : SurrealDB, retenue d'abord, est abandonnée : trop de contraintes — 22 threads d'appoint, licence BSL, compilation longue, alertes de sécurité.)*
 - **Interface** : pages HTML rendues par le serveur, formulaires classiques, avec **htmx** pour rafraîchir des morceaux de page sans tout recharger. **Pas de client JavaScript lourd** : pas d'application dans le navigateur, le serveur garde toute la logique.
 - **Jeu** : un humain joue un investigateur, le système joue les autres investigateurs (IA) et le Mythe. Les tours des IA sont joués **d'un bloc** ; l'humain les suit dans le journal. **Jeu de base seul**, usage privé.
 - **Hébergement** : hors périmètre (environnement dédié de l'utilisateur). Le projet doit **fonctionner en local**.
@@ -22,7 +22,7 @@ navigateur  ──HTTP──▶  serveur axum (1 thread)
                           ├── pages HTML (gabarits)
                           ├── moteur de règles  ◀── données du jeu (fichiers)
                           ├── IA des investigateurs
-                          └── SurrealDB (fichier surrealkv) : parties, journal des actions
+                          └── PoloDB (dossier sur disque) : parties, journal des actions
 ```
 
 Principe central : **le moteur ne décide jamais seul.** Il fait avancer la partie jusqu'au prochain point où quelqu'un doit choisir, et il pose une « décision à prendre ». Si elle revient à l'humain, le serveur affiche un formulaire. Si elle revient à une IA, le serveur appelle l'IA, applique sa réponse, et continue. Le moteur traite exactement de la même façon une réponse humaine et une réponse d'IA.
@@ -36,7 +36,7 @@ Principe central : **le moteur ne décide jamais seul.** Il fait avancer la part
 | `data` | Types des données du jeu (lieux, cartes, monstres, investigateurs, Grands Anciens) et leur chargement depuis les fichiers, avec contrôles de cohérence. | — |
 | `engine` | Les règles. État de partie, décisions, application des réponses, événements. Déterministe, sans entrée-sortie, sans base de données. | `data` |
 | `ai` | Les politiques qui répondent aux décisions à la place des investigateurs IA. | `engine` |
-| `server` | axum : pages, formulaires, sessions, SurrealDB, fichiers statiques (images d'`assets/`). | tous |
+| `server` | axum : pages, formulaires, sessions, PoloDB, fichiers statiques (images d'`assets/`). | tous |
 | `simulator` | Petit exécutable en ligne de commande : joue des parties IA seules, en masse, pour tester et calibrer. **Hors du serveur**, parce qu'une longue simulation bloquerait le thread unique. | `engine`, `ai` |
 
 Règle de dépendance : `engine` ne connaît ni le web ni la base. On doit pouvoir le tester et le rejouer sans rien d'autre.
@@ -107,7 +107,7 @@ La partie est entièrement définie par la graine aléatoire, les données du je
 
 ### 4.4 Règles non tranchées
 
-Avant de coder une règle, vérifier `regles/base.md` §22 et les questions de `manques_et_questions.md`. Chaque règle tranchée est consignée dans `regles/decisions.md` (nouveau fichier), avec la date et la raison.
+Avant de coder une règle, vérifier `regles/base.md` §22 et les questions de `manques_et_questions.md`. Chaque règle tranchée est consignée dans `regles/decisions.md`, avec la date et la raison. R1 à R8 sont tranchées depuis le 16/11/2026.
 
 ---
 
@@ -144,17 +144,17 @@ Plusieurs niveaux d'IA, une stratégie d'équipe coordonnée, et la possibilité
 
 ### 6.1 Technique
 
-- tokio en mode **current_thread** : tout le code du jeu tourne sur le thread principal. Note : tokio et SurrealDB gardent quelques threads d'appoint pour les écritures disque, c'est inévitable et sans effet sur la logique du jeu.
+- tokio en mode **current_thread** : tout le code du jeu tourne sur le thread principal. Note : PoloDB (qui repose sur RocksDB) garde 3 threads d'appoint pour les écritures disque, c'est inévitable et sans effet sur la logique du jeu. Les appels à PoloDB sont bloquants mais très courts (moins d'une milliseconde) : ils tournent directement sur le thread unique.
 - axum pour les routes, un moteur de gabarits HTML (askama ou maud, à choisir), tower-http pour servir `assets/` et le CSS.
-- **Aucun état de partie en mémoire** : à chaque requête, le serveur charge la partie depuis SurrealDB, applique la réponse, fait jouer les IA jusqu'à la prochaine décision humaine, puis enregistre. C'est simple, robuste, et le thread unique ne pose aucun problème de verrou. Si un jour c'est trop lent, on ajoutera un cache.
+- **Aucun état de partie en mémoire** : à chaque requête, le serveur charge la partie depuis PoloDB, applique la réponse, fait jouer les IA jusqu'à la prochaine décision humaine, puis enregistre. C'est simple, robuste, et le thread unique ne pose aucun problème de verrou. Si un jour c'est trop lent, on ajoutera un cache.
 - Formulaire → POST → redirection → GET (le rafraîchissement de la page ne rejoue jamais un coup). Avec htmx, le serveur renvoie à la place le **fragment** de page à remplacer (le plateau, la décision en cours, le journal) ; sans htmx, la page entière. Les mêmes gabarits servent aux deux.
 - Après une réponse de l'humain, le serveur joue **tous les tours d'IA et la phase Mythe d'un bloc**, jusqu'à la prochaine décision humaine, puis renvoie la page avec le journal de ce qui s'est passé entre-temps.
 
-### 6.2 Base de données SurrealDB
+### 6.2 Base de données PoloDB
 
-Tables prévues :
+Collections prévues (PoloDB range des documents dans des « collections », l'équivalent des tables) :
 
-| Table | Contenu |
+| Collection | Contenu |
 |---|---|
 | `partie` | identifiant, date, graine, version des données, investigateur humain, statut (en cours, gagnée, perdue), **État complet** (sérialisé) |
 | `action` | partie, numéro d'ordre, décision posée, réponse donnée, auteur (humain ou IA), horodatage |
@@ -204,13 +204,15 @@ Pas de page de connexion ni de table `utilisateur` dans la première version.
 
 | Jalon | Contenu | Critère de fin |
 |---|---|---|
-| **J0 — Socle** | Dépôt git, espace de travail Cargo, CI, vérification technique de la pile (SurrealDB `kv-surrealkv` + tokio current_thread + axum compilent et tournent ensemble ; temps de compilation acceptable). Choix du moteur de gabarits. | Une page « bonjour » servie par axum, qui lit et écrit une ligne dans SurrealDB. |
+| **J0 — Socle** | Dépôt git, espace de travail Cargo, CI, vérification technique de la pile (PoloDB + tokio current_thread + axum compilent et tournent ensemble ; temps de compilation acceptable). Choix du moteur de gabarits. | Une page « bonjour » servie par axum, qui lit et écrit une ligne dans la base. |
 | **J1 — Données** | Format des fichiers, graphe du plateau, investigateurs, Grands Anciens, monstres, marqueurs Portail. Vocabulaire des cartes choisi sur un échantillon. Contrôles de cohérence. | Toutes les données hors texte de cartes chargées et validées. |
 | **J2 — Moteur (un investigateur)** | Tour complet : Entretien, Mouvement, Rencontres, Mythe, combat, tests, statuts, portails, Terreur, réveil, Bataille finale. Cartes limitées à l'échantillon. Pilotable depuis le `simulator` en mode texte. | Une partie entière se joue en ligne de commande, avec rejeu exact depuis la graine. |
 | **J3 — Cartes** | Transcription de toutes les cartes du jeu de base dans le vocabulaire (Lieu, Portail, Mythe, objets, sorts, compétences, alliés, spéciales). Effets spéciaux codés. | 100 % des cartes chargées ; chaque carte jouée au moins une fois en simulation. |
 | **J4 — IA** | Politique de priorité, simulations massives, calibrage. | Des milliers de parties IA seules sans plantage ; statistiques publiées dans le dépôt. |
 | **J5 — Serveur** | Pages, formulaires, htmx, plateau cliquable, sauvegarde, reprise, annulation, journal. | Une partie complète jouée dans le navigateur en local, humain + IA, avec reprise après redémarrage du serveur. |
 | **J6 — Livraison locale** | Configuration par fichier, mode d'emploi d'installation (compiler, lancer, où est la base), sauvegarde du fichier de base. | Le projet se lance sur une machine neuve en suivant le mode d'emploi. |
+
+**Avancement** : J0 terminé le 16/11/2026 (résultats des vérifications T1 à T6 dans `manques_et_questions.md` §2). J1 terminé le 16/11/2026 : FAQ intégrée aux règles (`regles/base.md` §23) ; plateau, marqueurs Portail, monstres, investigateurs et Grands Anciens saisis dans `data/`, chargés et contrôlés par le module `data` ; vocabulaire des cartes choisi sur un échantillon de 39 cartes (`vocabulaire_cartes.md`, fichiers `data/*_cards.ron`), avec 4 cartes en effet spécial.
 
 Les jalons J1 et J3 dépendent de la transcription des cartes, que je fais à partir des images (`manques_et_questions.md` §1, Q7). C'est le vrai chemin critique. Les nombres d'exemplaires (Q8) sont saisis de mémoire et marqués « à vérifier » en attendant tes recherches.
 
@@ -222,7 +224,7 @@ Les jalons J1 et J3 dépendent de la transcription des cartes, que je fais à pa
 2. **Données** : contrôles de cohérence lancés en test ; nombre d'exemplaires de chaque paquet ; chaque image existe.
 3. **Cartes** : pour chaque carte, un test « la carte s'exécute sans erreur dans un état type », généré automatiquement depuis les données.
 4. **IA** : simulations en masse (CI : quelques centaines de parties ; en local : des milliers).
-5. **Serveur** : tests des routes avec une base SurrealDB temporaire ; une réponse illégale envoyée par formulaire est refusée ; le rejeu d'une partie sauvegardée redonne le même État.
+5. **Serveur** : tests des routes avec une base PoloDB temporaire ; une réponse illégale envoyée par formulaire est refusée ; le rejeu d'une partie sauvegardée redonne le même État.
 6. **Manuel** : quelques parties complètes dans le navigateur avant la mise en ligne.
 
 ---
@@ -230,8 +232,8 @@ Les jalons J1 et J3 dépendent de la transcription des cartes, que je fais à pa
 ## 9. Intégration continue et livraison
 
 - À chaque modification : rustfmt, clippy (avertissements interdits), tests, cargo-audit, cargo-deny.
-- Livrable : un exécutable + le dossier `data/` + le dossier `assets/` + le fichier htmx + le fichier de base SurrealDB, créé au premier lancement. L'installation sur la machine de l'utilisateur est hors périmètre.
-- Sauvegarde : copie du fichier de base, serveur arrêté (SurrealDB embarquée : un seul processus écrit dedans).
+- Livrable : un exécutable + le dossier `data/` + le dossier `assets/` + le fichier htmx + le dossier de base PoloDB, créé au premier lancement. L'installation sur la machine de l'utilisateur est hors périmètre.
+- Sauvegarde : copie du dossier de base, serveur arrêté (PoloDB embarquée : un seul processus écrit dedans).
 - Mise à jour : arrêt, remplacement de l'exécutable, redémarrage ; les parties sauvegardées sont migrées au premier chargement si le format a changé.
 - Retour en arrière : garder l'exécutable précédent et une copie de la base d'avant la mise à jour.
 

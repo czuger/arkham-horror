@@ -1,0 +1,103 @@
+// Cartes Portail (jeu de base) : échantillon de 4 cartes sur 49.
+//
+// Relevé le 16/11/2026 sur les images (assets/cartes/portail/). Vocabulaire des
+// effets : voir vocabulaire_cartes.md. La couleur est celle du bord de la carte.
+// Errata de la FAQ appliqué : « test de Combat » se lit « test de Vigueur » (cp011).
+// Un exemplaire de chaque carte.
+#![enable(implicit_some)]
+GateCards(
+    version: 1,
+    cards: [
+        (
+            id: "cp003",
+            color: Red,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Un monstre visqueux apparaît !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    world: "abyss",
+                    text: "Réussissez un test de Vitesse (-1) pour éviter une masse monstrueuse. Si vous échouez, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    text: "Les couleurs vous aveuglent. Réussissez un test de Chance (-1) ou restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp003.jpg",
+        ),
+        (
+            id: "cp004",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Vous trébuchez sur une pierre affleurante qui ne devrait pas être là. Réussissez un test de Vitesse (-1) ou vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Le cri des goules dans les tunnels résonne dans vos oreilles. Réussissez un test de Volonté (-2) ou perdez 2 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -2, fail: [Lose(Sanity, 2)])],
+                ),
+                (
+                    text: "Un monstre sort des ténèbres !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/portail/cp004.jpg",
+        ),
+        (
+            id: "cp011",
+            color: Red,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "L'ombre essaye de forcer le passage entre vos lèvres. Réussissez un test de Vigueur (-2) ou perdez 2 Résistance et restez ici au prochain tour.",
+                    effects: [Check(skill: Fight, modifier: -2, fail: [Lose(Stamina, 2), Delayed])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Vous errez dans des bois phosphorescents et des zoogs affamés vous encerclent. Faites un test de Chance (-2). Si vous le réussissez, les zoogs vous apprécient et vous donnent du vin de l'arbre-lune. Gagnez 1 Santé Mentale et 1 pion Indice. Sinon, les zoogs vous cernent, les crocs luisants… Vous êtes perdu dans le temps et l'espace.",
+                    effects: [
+                        Check(
+                            skill: Luck,
+                            modifier: -2,
+                            pass: [Gain(Sanity, 1), Gain(Clues, 1)],
+                            fail: [LostInTimeAndSpace],
+                        ),
+                    ],
+                ),
+                (
+                    text: "Réussissez un test de Chance (-1) pour trouver un endroit où vous reposer. Gagnez 2 Résistance et 2 Santé Mentale.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Gain(Stamina, 2), Gain(Sanity, 2)])],
+                ),
+            ],
+            image: "cartes/portail/cp011.jpg",
+        ),
+        (
+            id: "cp050",
+            color: Blue,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Vous buvez de l'eau impure de la Rivière Kra. Réussissez un test de Chance (-1) ou perdez 1 Résistance et restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Lose(Stamina, 1), Delayed])],
+                ),
+                (
+                    world: "abyss",
+                    text: "Vous êtes perdu dans les ténèbres. Réussissez un test de Chance (-2) ou perdez 1 Santé Mentale et restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -2, fail: [Lose(Sanity, 1), Delayed])],
+                ),
+                (
+                    text: "Vous êtes perdu dans un labyrinthe de hautes murailles. Réussissez un test de Savoir (-1) ou restez ici au prochain tour.",
+                    effects: [Check(skill: Lore, modifier: -1, fail: [Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp050.jpg",
+        ),
+    ],
+)

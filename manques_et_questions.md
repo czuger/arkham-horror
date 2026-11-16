@@ -12,21 +12,21 @@ Depuis le 16/11/2026, les **images** de toutes les cartes et fiches du jeu de ba
 
 | # | Élément | Ce qu'on a | Ce qui manque | Priorité |
 |---|---|---|---|---|
-| M1 | Graphe du plateau | l'image `assets/plateau/arkham.jpg` (et l'agrandissement ×1,5), la liste des lieux par quartier, stable/instable | liaisons lieu↔rue et rue↔rue, flèches blanches et noires, icônes de rencontre, zones des Autres Mondes, **position en pixels** de chaque case pour l'affichage | 🔴 |
+| M1 | ~~Graphe du plateau~~ | **Fait le 16/11/2026** : `data/board.ron` (lieux, rues, liaisons, flèches, Autres Mondes, cases spéciales, positions approximatives). Relevé sur l'image : à vérifier sur ton plateau. Icônes de rencontre non saisies (inutiles au moteur). | — | 🟢 |
 | M2 | Cartes Lieu (63) | images dans `assets/cartes/lieu/` | texte des rencontres | 🔴 |
 | M3 | Cartes Portail (49) | images dans `assets/cartes/portail/` | texte des rencontres | 🔴 |
 | M4 | Cartes Mythe (67) | images dans `assets/cartes/mythe/` | type, lieu du portail, lieu de l'Indice, flèches de mouvement, effet | 🔴 |
-| M5 | Grands Anciens (8) | images dans `assets/fiches/grands_anciens/` + pages wiki partielles | fiches complètes en texte | 🔴 |
+| M5 | ~~Grands Anciens (8)~~ | **Fait le 16/11/2026** : `data/ancient_ones.ron`, transcrit des fiches. | à relire | 🟢 |
 | M6 | Objets uniques | images (27 cartes distinctes) | effet exact, et **nombre d'exemplaires** de chacune (39 cartes dans la boîte) | 🔴 |
 | M7 | Sorts | images (11 cartes distinctes) + tableau du wiki (coût, modificateur, mains, phase) | effet exact, nombre d'exemplaires (40 cartes) | 🔴 |
 | M8 | Compétences | images (10 cartes distinctes) | effet exact, nombre d'exemplaires (20 cartes) | 🔴 |
 | M9 | Objets communs | images (22 cartes distinctes) + pages wiki partielles | liste complète, nombre d'exemplaires (44 cartes) | 🔴 |
-| M10 | Investigateurs (16) | images des fiches + tableau du wiki | texte exact du pouvoir, les 4 crans de chaque curseur, possessions fixes et aléatoires | 🔴 |
+| M10 | ~~Investigateurs (16)~~ | **Fait le 16/11/2026** : `data/investigators.ron`, transcrit des fiches (pouvoirs, curseurs, possessions). | à relire | 🟢 |
 | M11 | Alliés (11) | images + tableau du wiki | texte exact | 🟠 |
 | M12 | Cartes spéciales | images dans `assets/cartes/speciales/` | règles exactes, nombres d'exemplaires | 🟠 |
-| M13 | Monstres | images (29 jetons distincts) + tableau du wiki | nombre d'exemplaires de chaque monstre dans la boîte, capacités hors mots-clés, les 5 Masques | 🟠 |
+| M13 | ~~Monstres~~ | **Fait le 16/11/2026** : `data/monsters.ron`, relu sur les 29 jetons. Le tableau du wiki avait des erreurs (Chien de Tindalos, Sombre Rejeton…), corrigées d'après les images. | à relire | 🟢 |
 | M14 | Errata | images dans `assets/errata/` | repérer quelles cartes de `assets/cartes/` doivent être remplacées par leur version corrigée | 🟠 |
-| M15 | Marqueurs Portail (16) | 8 images + page wiki | vérifier monde et modificateur de chacun, et combien de marqueurs par monde | 🟢 |
+| M15 | ~~Marqueurs Portail (16)~~ | **Fait le 16/11/2026** : `data/gate_markers.ron`, 2 par monde, modificateurs et symboles vérifiés sur les images. | — | 🟢 |
 
 Manques nouveaux, constatés en préparant le plan :
 
@@ -35,7 +35,7 @@ Manques nouveaux, constatés en préparant le plan :
 | M21 | ~~**Nombres d'exemplaires**~~ | **Comblé le 16/11/2026** : contenu de la boîte et répartition par carte des sorts, objets uniques et monstres fournis par l'utilisateur (voir ci-dessous). Seuls les objets communs restent supposés à 2 exemplaires chacun. | 🟢 |
 | M22 | **Symboles** | Icônes de rencontre, symboles de dimension, lieu stable/instable, récompenses et pénalités : absents de l'aspiration (voir `assets/inventaire_assets.md` « Manquants »). Le moteur peut s'en passer (ce sont des données, pas des images), mais l'interface devra les redessiner ou s'en passer. | 🟢 |
 | M23 | **Dos des cartes Mythe** et pions des investigateurs | absents. L'interface utilisera un rectangle de couleur à la place. | 🟢 |
-| M24 | **Texte des rencontres des Autres Mondes par couleur** | Les pages Autre Monde donnent les couleurs de rencontre de chaque monde ; à vérifier qu'elles sont complètes pour les 8 mondes du jeu de base. | 🟠 |
+| M24 | ~~Couleurs de rencontre des Autres Mondes~~ | **Vérifié le 16/11/2026** : les pages du wiki et le plateau concordent pour les 8 mondes. | — | 🟢 |
 
 ### Contenu de la boîte (fourni par l'utilisateur le 16/11/2026)
 
@@ -79,28 +79,41 @@ Pour M1, je peux proposer le graphe à partir de l'image du plateau et de ma con
 
 | # | Point | Pourquoi |
 |---|---|---|
-| T1 | SurrealDB embarquée avec `kv-surrealkv` fonctionne bien sous tokio **current_thread** | SurrealDB lance des tâches internes ; il faut confirmer qu'aucune n'exige un runtime multi-thread. |
-| T2 | Temps de compilation et taille de l'exécutable avec SurrealDB embarquée | SurrealDB est une grosse dépendance (plusieurs minutes de compilation à froid). À mesurer pour savoir si c'est supportable au quotidien. |
-| T3 | Maturité de surrealkv | C'est le moteur de stockage le plus récent de SurrealDB. Vérifier dans la version choisie qu'il est déclaré stable, et prévoir des sauvegardes régulières du fichier. |
-| T4 | Format de sérialisation de l'État dans SurrealDB | Stocker l'État comme un bloc JSON est le plus simple ; à vérifier que la taille (quelques dizaines de ko par partie) et les écritures à chaque coup ne posent pas de problème. |
+| T1 | La base embarquée fonctionne bien sous tokio **current_thread** | La base peut lancer des tâches internes ; il faut confirmer qu'aucune n'exige un runtime multi-thread. |
+| T2 | Temps de compilation et taille de l'exécutable avec la base embarquée | À mesurer pour savoir si c'est supportable au quotidien. |
+| T3 | Maturité du stockage | Vérifier que le format est stable, et prévoir des sauvegardes régulières. |
+| T4 | Format de sérialisation de l'État dans la base | Stocker l'État comme un bloc JSON est le plus simple ; à vérifier que la taille (quelques dizaines de ko par partie) et les écritures à chaque coup ne posent pas de problème. |
 | T5 | Choix du moteur de gabarits | askama (gabarits dans des fichiers, vérifiés à la compilation) ou maud (HTML écrit en Rust). Les deux conviennent ; voir Q3. |
 | T6 | Plateau cliquable sans JS | Des liens positionnés en absolu sur l'image, avec les coordonnées de M1. À vérifier sur petit écran (le plateau est haut : 1064×1576). |
 
 Toutes ces vérifications se font **sans rien télécharger d'autre que les crates Rust** via cargo. Si même cela doit être évité, dis-le (Q2).
 
+### Résultats du jalon J0 (16/11/2026)
+
+Première version faite avec SurrealDB 4.0.1, puis **remplacée par PoloDB 5.3.0** à ta demande le même jour (SurrealDB : 23 threads, licence BSL 1.1, compilation à froid de 6 à 7 min, exécutable de 117 Mo, deux alertes de sécurité sans correctif). Mesures ci-dessous avec PoloDB, sur ton Mac (10 cœurs), axum 0.8.9, askama 0.16.1, tokio 1.54, Rust 1.100.0.
+
+- **T1 — fait.** PoloDB tourne sans problème sous tokio current_thread : écriture, lecture, arrêt, redémarrage avec les données conservées. Le processus compte **4 threads** : 1 pour le jeu et le serveur web, 3 threads d'appoint du stockage (RocksDB). Les appels à PoloDB sont bloquants mais très courts ; la base se ferme et s'écrit sur disque toute seule à l'arrêt du serveur.
+- **T2 — fait.** Compilation à froid : **2 min 25** (debug), dont l'essentiel pour RocksDB, écrit en C++. Exécutable release : **12 Mo**.
+- **T3 — fait.** PoloDB 5 range ses données avec RocksDB, un moteur de stockage très éprouvé. Licence Apache-2.0. Sauvegarde : copier le dossier de base, serveur arrêté. Point d'attention : PoloDB est maintenu par une petite équipe ; comme la base ne contient que les parties sauvegardées, en changer plus tard resterait facile.
+- **T4 — fait.** État stocké comme un texte JSON : 200 écritures de 50 ko prennent **6 ms** au total. Aucun problème.
+- **T5 — fait : askama** (ta réponse du 16/11/2026 à Q3).
+- **T6 — reporté au jalon J5** : il faut d'abord les coordonnées des lieux sur l'image du plateau (M1).
+
 ---
 
-## 3. Règles non tranchées
+## 3. Règles à trancher (tranchées)
 
-Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2. Chaque réponse sera consignée dans `regles/decisions.md`.
+Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2.
+
+**Toutes tranchées le 16/11/2026** : tu as accepté chaque recommandation. Le détail (décision et raison) est dans `regles/decisions.md`, qui fait foi.
 
 - **R1** Monstres à l'ouverture d'un portail : 2 monstres à partir de **5 joueurs ou plus** (règle VO) ? *(Recommandé : oui.)*
 - **R2** Le « nombre de joueurs » (limite de monstres, Périphérie, réveil, trophées, Bataille finale) compte **tous les investigateurs**, humain et IA ? *(Recommandé : oui.)*
-- **R3** Monstre volant sans investigateur à portée : il reste sur place ? *(Recommandé : oui.)*
+- **R3** Monstre volant sans investigateur à portée : il reste sur place ? *(Recommandé : oui.)* → **Corrigée par la FAQ officielle** : il part dans le Ciel (voir `regles/decisions.md`).
 - **R4** Le marqueur Premier Joueur tourne normalement entre l'humain et les IA ? *(Recommandé : oui. Quand une IA est premier joueur, c'est elle qui tranche les arbitrages, avec une règle fixe : le choix le pire pour les investigateurs, conformément à la règle d'or.)*
 - **R5** Échanges d'équipement : les Alliés et Compétences ne sont pas échangeables (le livret ne les cite pas) ? *(Recommandé : oui, non échangeables.)*
 - **R6** Points de victoire (règle optionnelle §10.3) : calculés et affichés en fin de partie ? *(Recommandé : oui, à titre indicatif.)*
-- **R7** FAQ officielle (`FAQ_Officiel_032017_V2.pdf`) : je l'intègre dans `regles/base.md` avant de coder le moteur ? *(Recommandé : oui, au jalon J1.)*
+- **R7** FAQ officielle (`FAQ_Officiel_032017_V2.pdf`) : je l'intègre dans `regles/base.md` avant de coder le moteur ? *(Recommandé : oui, au jalon J1.)* → **Fait le 16/11/2026** : `regles/base.md` §23.
 - **R8** Réserves de pions (Argent, Santé Mentale, Résistance, Indices, Signes des Anciens…) : limitées aux quantités de la boîte, ou illimitées ? *(Recommandé : illimitées, sauf les 20 pions Destin et les 6 Signes des Anciens nécessaires à la victoire ; c'est l'usage courant et cela évite des cas limites.)*
 
 ---
@@ -109,14 +122,18 @@ Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2. Chaque r�
 
 ### Technique
 
-- **Q1** Version de SurrealDB visée : la dernière version stable au moment de J0, ou une version précise que tu as déjà en tête ?
+- ~~**Q1** Version de SurrealDB visée ?~~
+  → **Réponse (16/11/2026) : SurrealDB abandonnée, remplacée par PoloDB** (dernière version, 5.3.0).
 - **Q2** Les dépendances Rust (crates) peuvent être téléchargées par cargo ? *(Je pars du principe que oui : l'interdiction de téléchargement concerne les données du jeu.)*
   → **Réponse (16/11/2026) : oui.**
 - **Q3** Moteur de gabarits : askama (fichiers HTML séparés) ou maud (HTML dans le code Rust) ? *(Recommandé : askama, plus facile à relire pour quelqu'un qui ne code pas.)*
-- **Q4** « Mono thread » : tokio en current_thread suffit ? Ou veux-tu aussi interdire les threads d'appoint de tokio et SurrealDB pour les écritures disque (ce qui n'est pas toujours possible) ?
+  → **Réponse (16/11/2026) : askama.**
+- **Q4** « Mono thread » : tokio en current_thread suffit ? Ou veux-tu aussi interdire les threads d'appoint de la base pour les écritures disque (ce qui n'est pas toujours possible) ?
+  → **Constat (16/11/2026)** : avec PoloDB, 3 threads d'appoint seulement (voir T1). Le jeu tourne en current_thread.
 - **Q5** Le JS « quand c'est nécessaire » : uniquement des scripts maison de quelques lignes, ou une petite bibliothèque comme htmx est acceptable ? *(Recommandé : scripts maison, aucune bibliothèque.)*
   → **Réponse (16/11/2026) : une bibliothèque est acceptée, et même préférable ; Vue est possible si c'est mieux.** Choix retenu : **htmx** (voir `plan_creation_jeu.md` §6.4). Vue reste en réserve si le plateau demande une interaction trop riche pour htmx.
 - **Q6** Édition Rust 2024 et version stable la plus récente ?
+  → **Réponse (16/11/2026) : oui, la dernière version.** Édition 2024, Rust 1.100.0, épinglé dans `rust-toolchain.toml`.
 
 ### Données
 

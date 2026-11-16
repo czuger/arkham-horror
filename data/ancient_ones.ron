@@ -1,0 +1,130 @@
+// Grands Anciens (jeu de base) : 8 fiches.
+//
+// Relevé le 16/11/2026 sur les images des fiches (assets/fiches/grands_anciens/).
+// Fautes de frappe évidentes corrigées (accords, majuscules).
+// Errata de la FAQ appliqués : l'Attaque d'Ithaqua est un test de Vigueur ;
+// celle de Shub-Niggurath un test de Discrétion (déjà corrigé sur l'image).
+// Précisions de la FAQ (regles/base.md §23.11) : « tant qu'il est plongé dans son
+// sommeil » vaut toute la partie, Bataille finale comprise ; Yog-Sothoth demande
+// 2 succès pour fermer un portail, le scellement coûte toujours 5 Indices.
+#![enable(implicit_some)]
+AncientOnes(
+    version: 1,
+    ancient_ones: [
+        (
+            id: "azathoth",
+            name: "Azathoth",
+            combat_rating: Infinite,
+            worshippers: "Comme Azathoth ne promet rien hormis la destruction, seuls les fous le vénèrent. Mais leur fanatisme les rend plus forts. La force des Maniaques est augmentée de 1.",
+            power: (
+                name: "Héraut de la Fin des Temps",
+                text: "Si Azathoth se réveille, le jeu est terminé et les investigateurs ont perdu.",
+            ),
+            attack: "C'est la fin ! Azathoth a détruit le monde.",
+            doom_track: 14,
+            image: "fiches/grands_anciens/azathoth.jpg",
+        ),
+        (
+            id: "cthulhu",
+            name: "Cthulhu",
+            combat_rating: Fixed(-6),
+            defenses_note: "Spécial (voir Attaque)",
+            worshippers: "Les adorateurs de Cthulhu ont souvent la Tête d'Innsmouth, une marque de leurs monstrueux ancêtres. Les Cultistes ont une valeur d'horreur de -2 et des dégâts d'horreur de 2.",
+            power: (
+                name: "Rêves Terrifiants",
+                text: "Tant que Cthulhu est plongé dans son sommeil, le maximum de Santé Mentale et de Résistance des investigateurs est réduit de 1.",
+            ),
+            attack: "Chaque investigateur diminue de 1 son maximum de Santé Mentale ou de Résistance (à son choix). Après les attaques de Cthulhu, on met 1 pion destin sur son échelle de destin si elle n'est pas déjà remplie.",
+            doom_track: 13,
+            image: "fiches/grands_anciens/cthulhu.jpg",
+        ),
+        (
+            id: "hastur",
+            name: "Hastur",
+            combat_rating: MinusTerror,
+            defenses: [PhysicalResistance],
+            worshippers: "Les adorateurs d'Hastur chevauchent des Byakhee qu'ils appellent avec des sifflets enchantés. Les Cultistes sont des monstres volants et leur valeur de combat est -2.",
+            power: (
+                name: "Le Roi en Jaune",
+                text: "Tant qu'Hastur est plongé dans son sommeil, le coût pour sceller un portail est de 8 pions Indice au lieu de 5.",
+            ),
+            start_of_battle: "X prend la valeur de terreur actuelle.",
+            attack: "Chaque investigateur doit réussir un test de Chance (+1) ou perdre 2 Santé Mentale. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
+            doom_track: 13,
+            image: "fiches/grands_anciens/hastur.jpg",
+        ),
+        (
+            id: "ithaqua",
+            name: "Ithaqua",
+            combat_rating: Fixed(-3),
+            worshippers: "Les adorateurs d'Ithaqua mangent la chair de leurs semblables, ce sombre rituel leur conférant des pouvoirs surnaturels. Les Cultistes voient leur force augmentée de 2.",
+            power: (
+                name: "Vents Glacés",
+                text: "Tant qu'Ithaqua est plongé dans son sommeil, tout investigateur dans une zone de rues à la fin d'une phase de Mythe perd 1 Résistance. De plus, toutes les cartes Temps sont défaussées sans que leurs effets ne se produisent.",
+            ),
+            start_of_battle: "Les investigateurs doivent lancer un dé pour chaque objet possédé. Un échec entraîne la défausse de l'objet.",
+            attack: "Chaque investigateur doit réussir un test de Vigueur (+1) ou perdre 2 Résistance. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
+            doom_track: 11,
+            image: "fiches/grands_anciens/ithaqua.jpg",
+        ),
+        (
+            id: "nyarlathotep",
+            name: "Nyarlathotep",
+            combat_rating: Fixed(-4),
+            defenses: [MagicalResistance],
+            worshippers: "Nyarlathotep a un nombre incalculable d'adorateurs à travers le monde. Les Cultistes ont la capacité Inépuisable.",
+            power: (
+                name: "Un Millier de Masques",
+                text: "Au début du jeu, on ajoute 5 monstres Masque à la tasse. Il peut y avoir plusieurs monstres Masque en jeu au même moment.",
+            ),
+            start_of_battle: "Un investigateur sans pion Indice est dévoré.",
+            attack: "Chaque investigateur doit réussir un test de Savoir (+1) ou perdre 1 pion Indice. Un investigateur qui se retrouve sans pion Indice est dévoré. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
+            doom_track: 11,
+            image: "fiches/grands_anciens/nyarlathotep.jpg",
+        ),
+        (
+            id: "shub_niggurath",
+            name: "Shub-Niggurath",
+            combat_rating: Fixed(-5),
+            defenses: [PhysicalImmunity],
+            worshippers: "Les adorateurs de Shub-Niggurath sont innombrables. Les Sombres Rejetons sont Inépuisables.",
+            power: (
+                name: "La Chèvre Noire des Bois",
+                text: "Tant que Shub-Niggurath est plongé dans son sommeil, tous les monstres ont leur force augmentée de 1.",
+            ),
+            start_of_battle: "Tout investigateur sans trophée de monstre est dévoré.",
+            attack: "Chaque investigateur doit réussir un test de Discrétion (+1) ou perdre 1 trophée de monstre. Un investigateur qui se retrouve sans trophée de monstre est dévoré. Le modificateur décroît de 1 à chaque tour.",
+            doom_track: 12,
+            image: "fiches/grands_anciens/shub_niggurath.jpg",
+        ),
+        (
+            id: "yig",
+            name: "Yig",
+            combat_rating: Fixed(-3),
+            worshippers: "Les adorateurs de Yig sont en réalité des membres du Peuple Serpent déguisés. Leur morsure est très venimeuse. Les Cultistes ont une valeur de combat de +0 et des dégâts de combat de 4 Résistance.",
+            power: (
+                name: "La Colère de Yig",
+                text: "Tant que Yig est plongé dans son sommeil, il gagne un pion destin quand un Cultiste est battu ou quand un investigateur est perdu dans le temps et l'espace.",
+            ),
+            start_of_battle: "Chaque investigateur est Maudit. Un investigateur qui est déjà Maudit est dévoré.",
+            attack: "Chaque investigateur doit réussir un test de Vitesse (+1) ou perdre 1 Santé Mentale et 1 Résistance. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
+            doom_track: 10,
+            image: "fiches/grands_anciens/yig.jpg",
+        ),
+        (
+            id: "yog_sothoth",
+            name: "Yog-Sothoth",
+            combat_rating: Fixed(-5),
+            defenses: [MagicalImmunity],
+            worshippers: "Les adorateurs de Yog-Sothoth ont des capacités magiques puissantes. Les Cultistes ont l'Immunité Magique et une valeur de combat de -1.",
+            power: (
+                name: "La Clé et la Porte",
+                text: "Tant que Yog-Sothoth est plongé dans son sommeil, la difficulté pour fermer ou sceller un portail est augmentée de 1. De plus, tout investigateur perdu dans le temps et l'espace est dévoré.",
+            ),
+            start_of_battle: "Un investigateur sans trophée de portail est dévoré.",
+            attack: "Chaque investigateur doit réussir un test de Volonté (+1) ou perdre 1 trophée de portail. Un investigateur qui se retrouve sans trophée de portail est dévoré. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
+            doom_track: 12,
+            image: "fiches/grands_anciens/yog_sothoth.jpg",
+        ),
+    ],
+)

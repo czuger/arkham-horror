@@ -1,0 +1,18 @@
+// Marqueurs Portail (jeu de base) : 16 marqueurs, 2 par Autre Monde.
+//
+// Vérifié le 16/11/2026 sur les images (assets/marqueurs/portails/) et la page
+// « Portails » du wiki. Le modificateur s'applique au test pour fermer le portail.
+GateMarkers(
+    version: 1,
+    back_image: "marqueurs/portails/portailback.jpg",
+    markers: [
+        (world: "rlyeh", close_modifier: -3, symbol: Cross, copies: 2, image: "marqueurs/portails/portail2.jpg"),
+        (world: "abyss", close_modifier: -2, symbol: Hexagon, copies: 2, image: "marqueurs/portails/portail7.jpg"),
+        (world: "yuggoth", close_modifier: -2, symbol: Circle, copies: 2, image: "marqueurs/portails/portail1.jpg"),
+        (world: "great_hall_of_celeano", close_modifier: -1, symbol: Star, copies: 2, image: "marqueurs/portails/portail6.jpg"),
+        (world: "plateau_of_leng", close_modifier: -1, symbol: Diamond, copies: 2, image: "marqueurs/portails/portail8.jpg"),
+        (world: "another_dimension", close_modifier: 0, symbol: Square, copies: 2, image: "marqueurs/portails/portail4.jpg"),
+        (world: "city_of_the_great_race", close_modifier: 0, symbol: Triangle, copies: 2, image: "marqueurs/portails/portail18.jpg"),
+        (world: "dreamlands", close_modifier: 1, symbol: Slash, copies: 2, image: "marqueurs/portails/portail5.jpg"),
+    ],
+)

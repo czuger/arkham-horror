@@ -1,0 +1,107 @@
+// Cartes Mythe (jeu de base) : échantillon de 6 cartes sur 67.
+//
+// Relevé le 16/11/2026 sur les images (assets/cartes/mythe/). Vocabulaire des
+// effets : voir vocabulaire_cartes.md.
+// Lieu du portail : image en bas à gauche. Déplacements : case claire du haut =
+// flèches blanches, case sombre du bas = flèches noires.
+// Un exemplaire de chaque carte.
+#![enable(implicit_some)]
+MythosCards(
+    version: 1,
+    cards: [
+        (
+            id: "planetary_alignment",
+            name: "Alignement Planétaire",
+            kind: Environment(Mystic),
+            text: "Grâce à l'énergie mystique générée par l'alignement des planètes, tous les sorts ont un coût en Santé Mentale de 0.",
+            clue: "black_cave",
+            gate: "witch_house",
+            white_moves: [Square, Diamond],
+            black_moves: [Circle],
+            ongoing: [SpellSanityCost(0)],
+            image: "cartes/mythe/alignement_planetaire.jpg",
+        ),
+        (
+            id: "south_side_strangler",
+            name: "Un Étrangleur dans le Quartier Sud ?",
+            kind: Headline,
+            text: "Cependant la presse s'est trompée, les meurtres ont été causés par 2 monstres qui sont lâchés dans les rues du Quartier Sud.",
+            clue: "historical_society",
+            gate: "woods",
+            white_moves: [Circle],
+            black_moves: [Square, Diamond],
+            effects: [MonstersInStreet(street: "southside", count: 2)],
+            image: "cartes/mythe/etrangleur_sud.jpg",
+        ),
+        (
+            id: "the_great_ritual",
+            name: "Le Grand Rituel",
+            kind: Rumor,
+            text: "Effet continu : les cultistes, sorciers, grands prêtres et sorcières ont leur force augmentée de 2 tant que cette carte est en jeu. Placez 1 pion Indice sur cette carte à la fin de chaque phase de mythe (en commençant au tour suivant son entrée en jeu). Réussite : si un joueur seul défausse 3 sorts (4 s'il y a 5 joueurs ou plus) quand il est dans les rues du Quartier de French Hill lors de la phase rencontre à Arkham, on remet cette carte dans la boîte et chaque joueur gagne 2 pions Indice. Échec : s'il y a 5 pions Indice sur cette carte, on la remet dans la boîte. À partir de maintenant, on pioche 2 cartes mythe à chaque phase de mythe. On ignore la première carte à l'exception des ouvertures de portail.",
+            gate: "graveyard",
+            white_moves: [Slash, Triangle, Star],
+            black_moves: [Hexagon],
+            ongoing: [MonsterToughness(monsters: ["cultist", "warlock", "high_priest", "witch"], amount: 2)],
+            rumor: (
+                activity: "french_hill",
+                each_mythos: [AddTokensToThis(1)],
+                pass: (
+                    condition: Special("great_ritual_spells_discarded"),
+                    effects: [EachInvestigator(effects: [Gain(Clues, 2)])],
+                ),
+                fail: (
+                    condition: TokensAtLeast(5),
+                    effects: [Special("two_mythos_cards_each_turn")],
+                ),
+            ),
+            image: "cartes/mythe/grand_rituel.jpg",
+        ),
+        (
+            id: "raining_cats_and_dogs",
+            name: "Il Pleut des Cordes",
+            kind: Environment(Weather),
+            text: "Les tests de vitesse à Arkham ont une pénalité de -1 et les joueurs reçoivent 1 point de mouvement en moins lors de la phase de mouvement. Les tests de discrétion à Arkham ont un bonus de +1. Les Vampires de Feu en jeu retournent dans la tasse. Si un Vampire de Feu entre en jeu, on le remet dans la tasse et on pioche un monstre différent.",
+            clue: "independence_square",
+            gate: "hibbs_roadhouse",
+            white_moves: [Cross],
+            black_moves: [Moon],
+            ongoing: [
+                CheckBonus(check: Speed, amount: -1, scope: Arkham),
+                MovementPoints(-1),
+                CheckBonus(check: Sneak, amount: 1, scope: Arkham),
+                MonsterBanned("fire_vampire"),
+            ],
+            image: "cartes/mythe/pleut_cordes.jpg",
+        ),
+        (
+            id: "curfew_enforced",
+            name: "Le Couvre-feu est Renforcé !",
+            kind: Environment(Urban),
+            text: "Un investigateur qui finit son mouvement dans les rues doit réussir un test de Volonté (+0) ou être arrêté et emmené au Poste de Police.",
+            clue: "science_building",
+            gate: "unvisited_isle",
+            white_moves: [Cross],
+            black_moves: [Moon],
+            ongoing: [
+                Trigger(
+                    when: EndOfMovement,
+                    only: InStreets,
+                    effects: [Check(skill: Will, modifier: 0, fail: [Arrested])],
+                ),
+            ],
+            image: "cartes/mythe/couvre_feu_renforce.jpg",
+        ),
+        (
+            id: "the_missing_people_return",
+            name: "Des Disparus Reviennent !",
+            kind: Headline,
+            text: "Tous les investigateurs actuellement perdus dans le temps et l'espace reviennent immédiatement à Arkham dans la rue ou le lieu de leur choix.",
+            clue: "woods",
+            gate: "the_unnamable",
+            white_moves: [Slash, Triangle, Star],
+            black_moves: [Hexagon],
+            effects: [EachInvestigator(only: LostInTimeAndSpace, effects: [MoveAnywhereInArkham])],
+            image: "cartes/mythe/disparus_reviennent.jpg",
+        ),
+    ],
+)
