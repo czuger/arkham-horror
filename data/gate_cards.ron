@@ -1,8 +1,12 @@
-// Cartes Portail (jeu de base) : échantillon de 4 cartes sur 49.
+// Cartes Portail (jeu de base) : les 49 cartes (48 rencontres et « Les Astres sont Propices »).
 //
 // Relevé le 16/11/2026 sur les images (assets/cartes/portail/). Vocabulaire des
 // effets : voir vocabulaire_cartes.md. La couleur est celle du bord de la carte.
-// Errata de la FAQ appliqué : « test de Combat » se lit « test de Vigueur » (cp011).
+// Errata de la FAQ appliqués : « test de Combat » se lit « test de Vigueur » (13 cartes) ;
+// cp003 Autre est un test de Savoir ; cp021 Celeano donne aussi 2 Santé Mentale ;
+// cp046 « énorme montagne » se passe dans les Abysses ; cp066 « marchands » sur le
+// Plateau de Leng. R18 (cp036 « votre repas ») et R19 (cp116 « perdez connaissance »)
+// sont dans regles/decisions.md.
 // Un exemplaire de chaque carte.
 #![enable(implicit_some)]
 GateCards(
@@ -23,8 +27,8 @@ GateCards(
                     effects: [Check(skill: Speed, modifier: -1, fail: [LostInTimeAndSpace])],
                 ),
                 (
-                    text: "Les couleurs vous aveuglent. Réussissez un test de Chance (-1) ou restez ici au prochain tour.",
-                    effects: [Check(skill: Luck, modifier: -1, fail: [Delayed])],
+                    text: "Les couleurs vous aveuglent. Réussissez un test de Savoir (-1) ou restez ici au prochain tour.",
+                    effects: [Check(skill: Lore, modifier: -1, fail: [Delayed])],
                 ),
             ],
             image: "cartes/portail/cp003.jpg",
@@ -79,6 +83,344 @@ GateCards(
             image: "cartes/portail/cp011.jpg",
         ),
         (
+            id: "cp012",
+            color: Blue,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "La caverne offre une bifurcation. Réussissez un test de Chance (+1) et consultez la table suivante : Nombre de succès : 0-1) Allez à la Caverne Noire. 2) : Allez aux Contrées du Rêve 3+) : Vous entrez dans un temple noir. Réussissez un test de Chance (-1) pour piocher un objet unique.",
+                    effects: [CheckTable(skill: Luck, modifier: 1, rows: [(from: 0, effects: [MoveTo("black_cave")]), (from: 2, effects: [VisitOtherWorld("dreamlands")]), (from: 3, effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)])])])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Le grand livre s'ouvre sans bruit à votre approche. Si vous le désirez, vous pouvez le lire, dans ce cas vous devez réussir un test de Vigueur (-1) [2] pour battre son gardien. Si vous y arrivez, piochez 3 Sorts et gardez-en 2. Sinon, perdez 3 Résistance.",
+                    effects: [Optional((label: "Lire le livre", effects: [Check(skill: Fight, modifier: -1, successes: 2, pass: [Draw(deck: Spell, count: 3, keep: 2)], fail: [Lose(Stamina, 3)])]))],
+                ),
+                (
+                    text: "Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/portail/cp012.jpg",
+        ),
+        (
+            id: "cp016",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Vous courez vers le bateau. Réussissez un test de Vitesse (-1) [2] pour l'attraper à temps. Si vous y arrivez, vous vous échappez avec des informations vitales. Gagnez 5 pions Indice. Si vous échouez, restez ici au prochain tour, à vous cacher de vos poursuivants.",
+                    effects: [Check(skill: Speed, modifier: -1, successes: 2, pass: [Gain(Clues, 5)], fail: [Delayed])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "Le souffle court, vous restez blotti contre le rocher jusqu'à ce que vous n'entendiez plus les bruits de vos poursuivants. Pas de rencontre.",
+                ),
+                (
+                    text: "Votre esprit est submergé de savoir. Faites un test de Savoir (-2). Si vous le réussissez, piochez 1 Sort mais perdez 1 Santé Mentale.",
+                    effects: [Check(skill: Lore, modifier: -2, pass: [Draw(deck: Spell), Lose(Sanity, 1)])],
+                ),
+            ],
+            image: "cartes/portail/cp016.jpg",
+        ),
+        (
+            id: "cp018",
+            color: Blue,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Vous errez dans le désert glacé. Pas de rencontre.",
+                ),
+                (
+                    world: "abyss",
+                    text: "Vous vous reposez à côté d'un bassin rempli de poissons noirs et aveugles. Réussissez un test de Chance (-1) pour remarquer un objet inhabituel dans l'eau. Vous le récupérez et piochez 1 Objet unique et gagnez 3$.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem), Gain(Money, 3)])],
+                ),
+                (
+                    text: "Réussissez un test de Chance (-1) pour découvrir une cache pleine de papiers anciens contenant des informations sur le Mythe. Gagnez 1 pion Indice pour chaque succès obtenu au test de chance.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [GainAmount(Clues, Successes(1))])],
+                ),
+            ],
+            image: "cartes/portail/cp018.jpg",
+        ),
+        (
+            id: "cp021",
+            color: Blue,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Aux portes sud de Thran, vous êtes arrêté par une sentinelle en robe rouge à qui vous devez raconter trois rêves incroyables. Réussissez un test de Chance (-1) pour visiter les flèches dorées de Thran, afin de gagner 2 pions Indice. Sinon vous restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Gain(Clues, 2)], fail: [Delayed])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Le symbole au dessus de la porte luit. Faites un test de Chance (-1). Si vous le réussissez, gagnez 2 Résistance et 2 Santé Mentale. Si vous échouez, défaussez 2 objets de votre choix.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Gain(Stamina, 2), Gain(Sanity, 2)], fail: [Discard(cards: Items, count: 2)])],
+                ),
+                (
+                    text: "Si vous réussissez un test de Vigueur (-2), vous soulevez le couvercle du coffre de pierre. À l'intérieur, vous trouvez 8$. Si vous échouez, vous perdez 1 Résistance.",
+                    effects: [Check(skill: Fight, modifier: -2, pass: [Gain(Money, 8)], fail: [Lose(Stamina, 1)])],
+                ),
+            ],
+            image: "cartes/portail/cp021.jpg",
+        ),
+        (
+            id: "cp027",
+            color: Red,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Vous êtes empêtré dans les algues humides. Réussissez un test de Chance (-1) pour vous en libérer avant que quelque chose ne vous trouve alors que vous êtes sans défense. Si vous échouez, lancez un dé et perdez autant de Résistance.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [LoseRolled(Stamina)])],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Vous êtes emmené à un monastère préhistorique où un grand prêtre portant un masque jaune vous questionne. Réussissez un test de Savoir (-2) pour lui répondre et le satisfaire, auquel cas vous êtes libre et vous gagnez 1 Sort. Sinon, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Lore, modifier: -2, pass: [Draw(deck: Spell)], fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    text: "Réussissez un test de Chance (-1) pour découvrir un objet utile. Piochez un Objet Unique.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)])],
+                ),
+            ],
+            image: "cartes/portail/cp027.jpg",
+        ),
+        (
+            id: "cp030",
+            text: "Les Astres sont Propices. Mélangez le paquet Portail et continuez à piocher tant que vous n'avez pas une rencontre de la bonne couleur.",
+            image: "cartes/portail/cp030.jpg",
+        ),
+        (
+            id: "cp034",
+            color: Blue,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "La lueur et la faible chaleur de votre chandelle vous font du bien. Gagnez 1 Résistance.",
+                    effects: [Gain(Stamina, 1)],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "L'étreinte de la créature est comme l'acier. Réussissez un test de Vigueur (-2) pour vous libérer et vous échapper. Si vous échouez, la poigne de la créature se resserre et vous écrase. Vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Fight, modifier: -2, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    text: "Vous avez accompli votre tâche et vous devez maintenant vous échapper avant la fermeture du portail ! Réussissez un test de Vitesse (-2) pour revenir à Arkham. Si vous échouez, vous êtes perdu dans le temps et l'espace. Quoiqu'il arrive, vous avez automatiquement fermé le portail par lequel vous êtes entré.",
+                    effects: [CloseEntryGate, Check(skill: Speed, modifier: -2, pass: [ReturnToArkham], fail: [LostInTimeAndSpace])],
+                ),
+            ],
+            image: "cartes/portail/cp034.jpg",
+        ),
+        (
+            id: "cp035",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "yuggoth",
+                    text: "Votre seul espoir est de voler un byakhee et un peu de breuvage de l'espace. Réussissez un test de Discrétion (-2) pour vous échapper. Retournez à Arkham et gagnez 2 pions Indice. Si vous échouez, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Sneak, modifier: -2, pass: [ReturnToArkham, Gain(Clues, 2)], fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "La ville dorée de vos rêves devient une obsession. Réussissez un test de Chance (-1) ou restez ici au prochain tour à la recherche de cette cité.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Delayed])],
+                ),
+                (
+                    text: "Vous faites face à la folie. Lancez 1 dé pour chacun de vos points de Santé Mentale. Perdez 1 Santé Mentale pour chaque dé qui n'est pas un succès. Si vous ne devenez pas fou, gagnez 1 pion Indice pour chaque succès.",
+                    effects: [RollPerPoint(resource: Sanity), GainAmount(Clues, Successes(1))],
+                ),
+            ],
+            image: "cartes/portail/cp035.jpg",
+        ),
+        (
+            id: "cp036",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "La puanteur de cet endroit est insupportable. Réussissez un test de Volonté (-1) ou perdez 1 Résistance, 1 Santé Mentale, et votre repas.",
+                    effects: [Check(skill: Will, modifier: -1, fail: [Lose(Stamina, 1), Lose(Sanity, 1)])],
+                ),
+                (
+                    world: "city_of_the_great_race",
+                    text: "Dans un éclair de lucidité, vous comprenez l'usage de cet objet aiguisé. Frissonnant, vous le reposez où vous l'avez trouvé. Perdez 1 Santé Mentale mais gagnez 1 pion Indice.",
+                    effects: [Lose(Sanity, 1), Gain(Clues, 1)],
+                ),
+                (
+                    text: "Il y a une distorsion du temps et de l'espace autour de vous. Faites un test de Chance (-1). Si vous le réussissez, retournez à Arkham. Sinon restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [ReturnToArkham], fail: [Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp036.jpg",
+        ),
+        (
+            id: "cp037",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "En jetant un coup d'oeil derrière vous, vous voyez que les bêtes continuent à vous poursuivre. Réussissez un test de Vitesse (-1) ou vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "La surface de la pierre vous révèle un des plus sombres secrets des Contrées du Rêve. Réussissez un test de Savoir (-1) [2] pour gagner 4 pions Indice. Si vous échouez, cette vision vous fait perdre vos derniers lambeaux de raison. Perdez toute votre Santé Mentale.",
+                    effects: [Check(skill: Lore, modifier: -1, successes: 2, pass: [Gain(Clues, 4)], fail: [LoseAll(Sanity)])],
+                ),
+                (
+                    text: "Vous remarquez brusquement quelque chose que vous aviez précédemment raté. Gagnez 1 pion Indice.",
+                    effects: [Gain(Clues, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp037.jpg",
+        ),
+        (
+            id: "cp039",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "Vous errez dans les rues vides de la Cité. Pas de rencontre.",
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Vous traversez une carrière d'onyx abandonnée dont l'immensité fait vaciller votre esprit. Faites un test de Savoir (-1) pour éviter de réveiller quelque chose, ou perdez 3 Santé Mentale.",
+                    effects: [Check(skill: Lore, modifier: -1, fail: [Lose(Sanity, 3)])],
+                ),
+                (
+                    text: "Les ténèbres sans fin vous terrifient. Faites un test de Volonté (-1) ou perdez 1 Santé Mentale et 1 Résistance à cause de la peur et de la fatigue.",
+                    effects: [Check(skill: Will, modifier: -1, fail: [Lose(Sanity, 1), Lose(Stamina, 1)])],
+                ),
+            ],
+            image: "cartes/portail/cp039.jpg",
+        ),
+        (
+            id: "cp040",
+            color: Green,
+            encounters: [
+                (
+                    world: "plateau_of_leng",
+                    text: "Votre corps et votre esprit sont endurcis par vos expériences. Réussissez un test de Volonté (+0) [2] pour piocher 1 Compétence.",
+                    effects: [Check(skill: Will, modifier: 0, successes: 2, pass: [Draw(deck: Skill)])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Réussissez un test de Chance (-2) pour trouver un livre utile. Prenez le premier Tome que vous trouvez dans le paquet d'objets uniques.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [TakeFirst(deck: UniqueItem, cards: Tomes)])],
+                ),
+                (
+                    text: "Sous une pierre se trouve un parchemin. Piochez 1 Sort.",
+                    effects: [Draw(deck: Spell)],
+                ),
+            ],
+            image: "cartes/portail/cp040.jpg",
+        ),
+        (
+            id: "cp041",
+            color: Green,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Réussissez un test de Chance (-1) pour chevaucher un zèbre et raccourcir votre voyage. Si vous êtes dans la première zone des contrées du Rêve, allez dans la seconde. Si vous êtes dans la seconde zone, retournez à Arkham.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [AdvanceInOtherWorld])],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Le pont branlant s'écroule quand vous passez dessus. Réussissez un test de Vigueur (-1) pour vous accrocher et trouver une relique de l'autre côté. Piochez 1 Objet Unique. Si vous échouez, vous sombrez dans les ténèbres. Vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Fight, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    text: "Vous tombez sur une créature massacrée. Réussissez un test de Chance (-1) pour réclamer un trophée de monstre de la tasse (même s'il est Inépuisable) et gagner 2 Pions Indice.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [TrophyFromCup, Gain(Clues, 2)])],
+                ),
+            ],
+            image: "cartes/portail/cp041.jpg",
+        ),
+        (
+            id: "cp043",
+            color: Green,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Faites un test de Chance (-1). Si vous le réussissez, vous dites au revoir aux villageois qui vous offrent un cadeau de départ. Piochez un Objet Commun.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: CommonItem)])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Réussissez un test de Chance (-2) pour trouver un livre suffisamment petit pour être emporté. Prenez le premier Tome que vous trouvez dans le paquet d'objets uniques.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [TakeFirst(deck: UniqueItem, cards: Tomes)])],
+                ),
+                (
+                    text: "Vous trouvez un lieu tranquille pour vous reposer. Gagnez 1 Résistance.",
+                    effects: [Gain(Stamina, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp043.jpg",
+        ),
+        (
+            id: "cp046",
+            color: Red,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Réussissez un test de Vitesse (-1) ou vous glissez sur une surface rugueuse qui vous entaille. Perdez 3 Résistance.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Stamina, 3)])],
+                ),
+                (
+                    world: "abyss",
+                    text: "Réussissez un test de Chance (-1) ou faites face à une énorme montagne avec un étrange symbole qui semble gravé par les griffes d'une gigantesque créature. Le monde tourne autour de vous et vous perdez 3 Santé Mentale.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Lose(Sanity, 3)])],
+                ),
+                (
+                    text: "La porte d'obsidienne refuse de s'ouvrir. Réussissez un test de Vigueur (-1) ou restez ici au prochain tour.",
+                    effects: [Check(skill: Fight, modifier: -1, fail: [Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp046.jpg",
+        ),
+        (
+            id: "cp047",
+            color: Green,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Réussissez un test de Chance (-1) pour croiser un des petits oiseaux rouges de Celephais. Son chant amène du réconfort et de la force à votre cœur. Restaurez votre Santé Mentale et votre Résistance à leurs valeurs maximales.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [RestoreToMax(Sanity), RestoreToMax(Stamina)])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Vous tombez sur une vieille créature desséchée et devisez avec elle un moment. Si vous réussissez un test de Savoir (-1), la créature est amusée par votre discussion et vous êtes Béni.",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [TakeCard(card: "blessing")])],
+                ),
+                (
+                    text: "Réussissez un test de Vigueur (-2) pour forcer une grille construite dans le mur. Derrière, vous trouvez quelque chose de fascinant. Piochez 1 Objet Unique.",
+                    effects: [Check(skill: Fight, modifier: -2, pass: [Draw(deck: UniqueItem)])],
+                ),
+            ],
+            image: "cartes/portail/cp047.jpg",
+        ),
+        (
+            id: "cp048",
+            color: Blue,
+            encounters: [
+                (
+                    world: "yuggoth",
+                    text: "La peur et le froid affaiblissent votre esprit. Réussissez un test de Volonté (-2) ou vous devez perdre 2 Sorts de votre choix ou 2 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -2, fail: [Choice([(label: "Perdre 2 Sorts", effects: [Discard(cards: Deck(Spell), count: 2)]), (label: "Perdre 2 Santé Mentale", effects: [Lose(Sanity, 2)])])])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Un monstre tapi apparaît !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    text: "Il y a des monstres tapis partout. Réussissez un test de Discrétion (-2) ou restez ici au prochain tour.",
+                    effects: [Check(skill: Sneak, modifier: -2, fail: [Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp048.jpg",
+        ),
+        (
             id: "cp050",
             color: Blue,
             encounters: [
@@ -98,6 +440,592 @@ GateCards(
                 ),
             ],
             image: "cartes/portail/cp050.jpg",
+        ),
+        (
+            id: "cp054",
+            color: Green,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Voyageant dans les jungles odorantes de Kied, vous tombez sur un antique palais d'ivoire. Réussissez un test de Chance (-1) pour l'explorer sans être pris. Piochez 1 Sort. Si vous échouez, perdez 1 objet de votre choix.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: Spell)], fail: [Discard(cards: Items, count: 1)])],
+                ),
+                (
+                    world: "city_of_the_great_race",
+                    text: "Parfois, la violence est la solution. Réussissez un test de Vigueur (-1) pour vous libérer de vos ravisseurs et revenir à Arkham.",
+                    effects: [Check(skill: Fight, modifier: -1, pass: [ReturnToArkham])],
+                ),
+                (
+                    text: "Précautionneusement, vous évitez le regard d'un œil gigantesque surveillant un autel. Vous pouvez essayer de réussir un test de Discrétion (-1) pour voler un parchemin de l'estrade. Piochez 1 Sort. Si vous échouez, vous êtes tordu par la douleur qui vous fait perdre 3 Santé Mentale.",
+                    effects: [Optional((label: "Voler le parchemin", effects: [Check(skill: Sneak, modifier: -1, pass: [Draw(deck: Spell)], fail: [Lose(Sanity, 3)])]))],
+                ),
+            ],
+            image: "cartes/portail/cp054.jpg",
+        ),
+        (
+            id: "cp055",
+            color: Green,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Vous croisez les chats parlant d'Ulthar. Réussissez un test de Volonté (+0) pour piocher 1 Sort.",
+                    effects: [Check(skill: Will, modifier: 0, pass: [Draw(deck: Spell)])],
+                ),
+                (
+                    world: "city_of_the_great_race",
+                    text: "Réussissez un test de Chance (-1) pour trouver quelque chose d'utile parmi les reliques incompréhensibles. Piochez un Objet Unique.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)])],
+                ),
+                (
+                    text: "Un coup d'œil sur votre monde vous donne de l'espoir. Gagnez 1 Santé Mentale.",
+                    effects: [Gain(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp055.jpg",
+        ),
+        (
+            id: "cp058",
+            color: Blue,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Réussissez un test de Savoir (+0) pour lutter contre l'assoupissement. Si vous échouez, vous êtes frigorifié dans la nuit. Vous êtes perdu dans le temps et l'espace. Si vous réussissez, revenez à Arkham.",
+                    effects: [Check(skill: Lore, modifier: 0, pass: [ReturnToArkham], fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "La créature de pierre vous poursuit. Réussissez un test de Vitesse (-1) pour lui échapper avec la statue. Gagnez 5$ et 2 pions Indice. Si vous échouez, la créature vous expulse violemment de la falaise. Vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Speed, modifier: -1, pass: [Gain(Money, 5), Gain(Clues, 2)], fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    text: "La chance est avec vous. Vous trouvez une cache d'équipements. Piochez 1 Objet Commun.",
+                    effects: [Draw(deck: CommonItem)],
+                ),
+            ],
+            image: "cartes/portail/cp058.jpg",
+        ),
+        (
+            id: "cp064",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Un visage horrible attire votre regard. Réussissez un test de Volonté (+0) pour regarder ailleurs ou perdez 1 Résistance et restez ici au prochain tour.",
+                    effects: [Check(skill: Will, modifier: 0, fail: [Lose(Stamina, 1), Delayed])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Réussissez un test de Chance (+0) ou tombez dans la toile d'une araignée. Perdez 2 Santé Mentale et restez ici au prochain tour en vous débattant pour vous libérer.",
+                    effects: [Check(skill: Luck, modifier: 0, fail: [Lose(Sanity, 2), Delayed])],
+                ),
+                (
+                    text: "Soudain, les choses que vous avez vues semblent logiques ! Gagnez 1 pion Indice.",
+                    effects: [Gain(Clues, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp064.jpg",
+        ),
+        (
+            id: "cp066",
+            color: Green,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "Vous devez obtenir cette machine si vous voulez vous échapper de cette cité maudite. Réussissez un test de Discrétion (-1) [2] pour piocher 1 Objet Unique et revenir à Arkham. Si vous échouez, vos ravisseurs sont loin d'être aimables. Perdez 3 Santé Mentale et 1 Résistance.",
+                    effects: [Check(skill: Sneak, modifier: -1, successes: 2, pass: [Draw(deck: UniqueItem), ReturnToArkham], fail: [Lose(Sanity, 3), Lose(Stamina, 1)])],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Les marchands de ce pays sont riches mais dangereux. Vous pouvez faire un test de Savoir (-2) pour commercer avec eux. Si vous réussissez, gagnez 6$. Si vous échouez, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Optional((label: "Commercer", effects: [Check(skill: Lore, modifier: -2, pass: [Gain(Money, 6)], fail: [LostInTimeAndSpace])]))],
+                ),
+                (
+                    text: "Réussissez un test de Chance (-1) pour découvrir un document vital. Gagnez 2 pions Indice.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Gain(Clues, 2)])],
+                ),
+            ],
+            image: "cartes/portail/cp066.jpg",
+        ),
+        (
+            id: "cp070",
+            color: Blue,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "Vous voyez une faible lumière devant vous. Faites un test de Chance (-1). Si vous le réussissez, la lueur est le chemin du retour. Revenez à Arkham. Si vous échouez, la lueur est un piège installé par l'une des créatures qui habitent ici. Un monstre apparaît !",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [ReturnToArkham], fail: [MonsterAppears])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Ça y est ! C'est le document recherché ! Vous le récupérez doucement, sans déranger son gardien. Faites un test de Discrétion (-2). Si vous le réussissez, prenez le Sort de votre choix dans le paquet des sorts. Si vous échouez, perdez 2 Résistance.",
+                    effects: [Check(skill: Sneak, modifier: -2, pass: [SearchDeck(Spell)], fail: [Lose(Stamina, 2)])],
+                ),
+                (
+                    text: "Réussissez un test de Vigueur (-1) pour tenir votre récompense malgré le vent. Piochez un Sort.",
+                    effects: [Check(skill: Fight, modifier: -1, pass: [Draw(deck: Spell)])],
+                ),
+            ],
+            image: "cartes/portail/cp070.jpg",
+        ),
+        (
+            id: "cp071",
+            color: Red,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "Affamé, vous êtes résigné à manger des champignons lumineux. Si vous le faites, faites un test de Chance (-1). Si vous échouez, lancez un dé et perdez autant de Résistance. Si vous réussissez, lancez un dé et gagnez autant de Résistance.",
+                    effects: [Optional((label: "Manger les champignons", effects: [Check(skill: Luck, modifier: -1, pass: [GainRolled(Stamina)], fail: [LoseRolled(Stamina)])]))],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    text: "Les rayons rosâtres sont proches de vous. Réussissez un test de Discrétion (+0) ou perdez 2 Résistance.",
+                    effects: [Check(skill: Sneak, modifier: 0, fail: [Lose(Stamina, 2)])],
+                ),
+            ],
+            image: "cartes/portail/cp071.jpg",
+        ),
+        (
+            id: "cp073",
+            color: Green,
+            encounters: [
+                (
+                    world: "plateau_of_leng",
+                    text: "Vous errez dans des paysages gelés. Pas de rencontre.",
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Un vieux professeur de la Terre vous apprend une ou deux choses. Réussissez un test de Chance (-1) [2], pour piocher 1 Compétence.",
+                    effects: [Check(skill: Luck, modifier: -1, successes: 2, pass: [Draw(deck: Skill)])],
+                ),
+                (
+                    text: "Vous tombez sur une horreur endormie avec un tentacule entourant une petite idole en or. Silencieusement, vous essayez doucement de prendre cette idole. Faites un test de Discrétion (-1). Si vous le réussissez, gagnez 3$. Sinon, perdez 2 Résistance.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [Gain(Money, 3)], fail: [Lose(Stamina, 2)])],
+                ),
+            ],
+            image: "cartes/portail/cp073.jpg",
+        ),
+        (
+            id: "cp074",
+            color: Green,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "Vous pouvez choisir d'infiltrer une des structures anguleuses. Si oui, faites un test de Discrétion (-1). Si vous le réussissez, piochez 2 Objets Uniques et gardez-en un. Si vous échouez, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Optional((label: "Infiltrer une structure", effects: [Check(skill: Sneak, modifier: -1, pass: [Draw(deck: UniqueItem, count: 2, keep: 1)], fail: [LostInTimeAndSpace])]))],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Le danger libère votre esprit. Réussissez un test de Volonté (+0) pour restaurer votre Santé Mentale à sa valeur maximale.",
+                    effects: [Check(skill: Will, modifier: 0, pass: [RestoreToMax(Sanity)])],
+                ),
+                (
+                    text: "Vous commencez à comprendre les étranges créatures de cet endroit. Gagnez 1 pion Indice.",
+                    effects: [Gain(Clues, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp074.jpg",
+        ),
+        (
+            id: "cp076",
+            color: Green,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Réussissez un test de Volonté (-1) pour convaincre les Ducs de Rokol de partager leur richesse avec vous. En cas de réussite, lancez 2 dés et gagnez le total des deux dés en argent.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [RollDice(2), GainAmount(Money, X)])],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Réussissez un test de Chance (-2) pour trouver quelque chose d'utile parmi les ossements. En cas de réussite, piochez un Objet Commun et 1 Sort.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [Draw(deck: CommonItem), Draw(deck: Spell)])],
+                ),
+                (
+                    text: "Réussissez un test de Chance (-1) pour retrouver le portail. En cas de réussite, retournez immédiatement à Arkham.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [ReturnToArkham])],
+                ),
+            ],
+            image: "cartes/portail/cp076.jpg",
+        ),
+        (
+            id: "cp087",
+            color: Blue,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Au moment où vous grimpez les falaises du monde souterrain, vos poches sont accrochées et se déchirent. Réussissez un test de Vitesse (-1) ou perdez tout votre argent.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [LoseAll(Money)])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Au moment où vous lisez la page, vous réalisez que vous êtes tombés dans un piège écrit. Réussissez un test de Savoir (-1) ou vous êtes Maudit.",
+                    effects: [Check(skill: Lore, modifier: -1, fail: [TakeCard(card: "curse")])],
+                ),
+                (
+                    text: "Un monstre hideux apparaît !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/portail/cp087.jpg",
+        ),
+        (
+            id: "cp090",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "yuggoth",
+                    text: "La peur s'empare de vous quand des entités bourdonnantes approchent. Réussissez un test de Volonté (-1) ou perdez 2 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -1, fail: [Lose(Sanity, 2)])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Vous voyez les montagnes bouger. L'effroi vous fait perdre 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+                (
+                    text: "Une onde passe au-dessus de votre tête. Réussissez un test de Savoir (-1) ou perdez 1 sort de votre choix alors qu'il est arraché de votre esprit.",
+                    effects: [Check(skill: Lore, modifier: -1, fail: [Discard(cards: Deck(Spell), count: 1)])],
+                ),
+            ],
+            image: "cartes/portail/cp090.jpg",
+        ),
+        (
+            id: "cp099",
+            color: Blue,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "Vous êtes perplexe. Réussissez un test de Savoir (-1) ou restez ici au prochain tour.",
+                    effects: [Check(skill: Lore, modifier: -1, fail: [Delayed])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "Réussissez un test de Discrétion (-1) ou les créatures vous capturent et font des expériences sur vous. Perdez la moitié de vos objets, puis retournez immédiatement à Arkham sans vous souvenir de quoique ce soit.",
+                    effects: [Check(skill: Sneak, modifier: -1, fail: [DiscardHalf(cards: Items), ReturnToArkham])],
+                ),
+                (
+                    text: "La démence de cet endroit finit par vous heurter. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp099.jpg",
+        ),
+        (
+            id: "cp101",
+            color: Red,
+            encounters: [
+                (
+                    world: "plateau_of_leng",
+                    text: "Les villageois sont rassemblés autour d'un grand feu dans la plaine. Réussissez un test de Discrétion (-1) ou vous êtes capturé et soumis à de terribles rites. Perdez 3 Santé Mentale et 3 Résistance, puis restez ici au prochain tour.",
+                    effects: [Check(skill: Sneak, modifier: -1, fail: [Lose(Sanity, 3), Lose(Stamina, 3), Delayed])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Dans la vallée de Pnoth, où les dholes rampent et fouissent frénétiquement, vous entendez un glissement dans les montagnes d'ossements. Faites un test de Discrétion (-1). Si vous le réussissez, gagnez 3 pions Indice et retournez immédiatement à Arkham. Sinon, vous êtes dévoré.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [Gain(Clues, 3), ReturnToArkham], fail: [Devoured])],
+                ),
+                (
+                    text: "Réussissez un test de Vitesse (-1) pour attraper la sculpture avant qu'elle ne tombe. Piochez 1 Sort.",
+                    effects: [Check(skill: Speed, modifier: -1, pass: [Draw(deck: Spell)])],
+                ),
+            ],
+            image: "cartes/portail/cp101.jpg",
+        ),
+        (
+            id: "cp103",
+            color: Red,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "L'arche de pierre se brise ! Réussissez un test de Vitesse (-1) pour l'éviter ou lancez un dé et perdez autant de Résistance.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [LoseRolled(Stamina)])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Le pont de glace commence à craquer. Réussissez un test de Chance (-1) ou tombez dans les profondeurs glacées. Si vous tombez, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    text: "L'humidité et la chaleur vous épuisent. Perdez 1 Résistance.",
+                    effects: [Lose(Stamina, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp103.jpg",
+        ),
+        (
+            id: "cp104",
+            color: Red,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Vous glissez sur des roches mouillées et tombez dans une fosse. Réussissez un test de Chance (+0) pour en sortir. Si vous échouez, perdez 1 Santé Mentale et restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: 0, fail: [Lose(Sanity, 1), Delayed])],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Une grande secousse fait trembler le plateau. Réussissez un test de Discrétion (+0) ou lancez 1 dé et perdez autant de Résistance.",
+                    effects: [Check(skill: Sneak, modifier: 0, fail: [LoseRolled(Stamina)])],
+                ),
+                (
+                    text: "Il n'y a rien d'autre que des étendues dévastées. Pas de rencontre.",
+                ),
+            ],
+            image: "cartes/portail/cp104.jpg",
+        ),
+        (
+            id: "cp106",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "Vous commencez à comprendre le langage étrange de vos ravisseurs. Gagnez 2 pions Indice. Puis vous devez passer un test de Chance (-1) pour éviter d'entendre les origines de l'humanité et perdre 2 Santé Mentale.",
+                    effects: [Gain(Clues, 2), Check(skill: Luck, modifier: -1, fail: [Lose(Sanity, 2)])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "La tête en forme de cylindre se moque de vous. « Vous ne retournerez jamais chez vous ! » glousse-t-elle. Réussissez un test de volonté (-2) ou perdez 2 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -2, fail: [Lose(Sanity, 2)])],
+                ),
+                (
+                    text: "Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/portail/cp106.jpg",
+        ),
+        (
+            id: "cp107",
+            color: Red,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "Vous êtes perturbé par des échos inquiétants. Réussissez un test de Discrétion (-1) ou perdez 2 Santé Mentale.",
+                    effects: [Check(skill: Sneak, modifier: -1, fail: [Lose(Sanity, 2)])],
+                ),
+                (
+                    world: "plateau_of_leng",
+                    text: "Les villageois envoient leur meilleur guerrier vous combattre au corps à corps. Réussissez un test de Vigueur (-1) [2] pour le battre et piochez 1 objet unique et 1 pion Indice. Sinon, perdez 1 Santé Mentale et 2 Résistance.",
+                    effects: [Check(skill: Fight, modifier: -1, successes: 2, pass: [Draw(deck: UniqueItem), Gain(Clues, 1)], fail: [Lose(Sanity, 1), Lose(Stamina, 2)])],
+                ),
+                (
+                    text: "Vous dépassez vos limites. Lancez 1 dé pour chacun de vos points de Résistance. Perdez 1 Résistance pour chaque dé qui n'est pas un succès. Si vous ne tombez pas inconscient, gagnez 1 pion Indice pour chaque dé qui est un succès.",
+                    effects: [RollPerPoint(resource: Stamina), GainAmount(Clues, Successes(1))],
+                ),
+            ],
+            image: "cartes/portail/cp107.jpg",
+        ),
+        (
+            id: "cp108",
+            color: Red,
+            encounters: [
+                (
+                    world: "plateau_of_leng",
+                    text: "Alors que vous grimpez le long d'une falaise, vous commencez à glisser. Réussissez un test de Vitesse (-1) ou tombez de la montagne et perdez 2 Résistance.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Stamina, 2)])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Avalanche ! Réussissez un test de Vitesse (-1) ou perdez 3 Résistance.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Stamina, 3)])],
+                ),
+                (
+                    text: "La créature d'ombres abandonne la poursuite. Perdez 1 Résistance à cause de la fatigue.",
+                    effects: [Lose(Stamina, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp108.jpg",
+        ),
+        (
+            id: "cp109",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "Une plante étrange vous a agrippé. Réussissez un test de Vigueur (-1) pour vous libérer. Si vous échouez, perdez 1 Résistance et 1 Santé Mentale alors qu'elle commence à vous digérer.",
+                    effects: [Check(skill: Fight, modifier: -1, fail: [Lose(Stamina, 1), Lose(Sanity, 1)])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "Un esprit étranger s'immisce dans votre corps. Réussissez un test de Chance (-2) pour trouver une façon de vous en débarrasser, gagnant ainsi 2 pions Indice ou restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [Gain(Clues, 2)], fail: [Delayed])],
+                ),
+                (
+                    text: "Vous trouvez un peu d'or. Gagnez 2$.",
+                    effects: [Gain(Money, 2)],
+                ),
+            ],
+            image: "cartes/portail/cp109.jpg",
+        ),
+        (
+            id: "cp110",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "La ville est remplie d'angles étranges et non-euclidiens. Réussissez un test de vitesse (-1) pour éviter de les toucher ou perdez 1 Santé Mentale.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Sanity, 1)])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "Une étrange créature vous fixe de ses yeux incandescents. C'est comme si son regard vous volait votre âme. Réussissez un test de Chance (-1) ou lancez un dé et retirez 2 (pour un minimum de 0), et perdez autant de Résistance et de Santé Mentale.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [RollDice(1), LoseAmount([Stamina, Sanity], XMinus(2))])],
+                ),
+                (
+                    text: "Vous n'êtes pas en sécurité ici. Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/portail/cp110.jpg",
+        ),
+        (
+            id: "cp114",
+            color: Green,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "Vous vous trouvez dans un ancien temple abandonné. Réussissez un test de Chance (-1) pour trouver une statue dorée valant 10$. Mais si vous la prenez, vous êtes Maudit.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Optional((label: "Prendre la statue", effects: [Gain(Money, 10), TakeCard(card: "curse")]))])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Le reflet de votre œil rougi dans le miroir vous captive. Restez ici au prochain tour.",
+                    effects: [Delayed],
+                ),
+                (
+                    text: "La corde semble monter sans fin, mais c'est le seul moyen de sortir de la crevasse dans laquelle vous vous trouvez. Faites un test de Vigueur (-1) pour grimper et retourner à Arkham. Si vous échouez, vous tombez et vous perdez 2 Résistance. Restez ici au prochain tour.",
+                    effects: [Check(skill: Fight, modifier: -1, pass: [ReturnToArkham], fail: [Lose(Stamina, 2), Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp114.jpg",
+        ),
+        (
+            id: "cp116",
+            color: Yellow,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Les étoiles nocturnes changent et les portes du temple de cuivre s'ouvrent pour laisser passer une énorme masse noire. Lancez un dé et perdez autant de Santé Mentale.",
+                    effects: [LoseRolled(Sanity)],
+                ),
+                (
+                    world: "city_of_the_great_race",
+                    text: "Vous entendez de monstrueux murmures. Réussissez un test de Volonté (-1) ou perdez 2 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -1, fail: [Lose(Sanity, 2)])],
+                ),
+                (
+                    text: "Le ciel est tournoyant. Réussissez un test de Volonté (-2) ou perdez connaissance et restez ici au prochain tour.",
+                    effects: [Check(skill: Will, modifier: -2, fail: [Delayed])],
+                ),
+            ],
+            image: "cartes/portail/cp116.jpg",
+        ),
+        (
+            id: "cp117",
+            color: Blue,
+            encounters: [
+                (
+                    world: "yuggoth",
+                    text: "Un monstre surgit des ténèbres !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Réussissez un test de Chance (-1) ou le livre est une prison. Si vous échouez, lancez un dé. Un monstre apparaît du livre en cas d'échec. Sur un succès, vous êtes aspiré temporairement dans le livre. Restez ici au prochain tour.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [RollEach(success: [Delayed], failure: [MonsterAppears])])],
+                ),
+                (
+                    text: "Réussissez un test de Chance (-1) pour trouver quelque chose pour vous défendre. Prenez la première Arme du paquet d'objets communs.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [TakeFirst(deck: CommonItem, cards: Weapons)])],
+                ),
+            ],
+            image: "cartes/portail/cp117.jpg",
+        ),
+        (
+            id: "cp118",
+            color: Red,
+            encounters: [
+                (
+                    world: "abyss",
+                    text: "Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Le shantak essaye de vous griffer en passant au-dessus de vous. Réussissez un test de Vitesse (-2) ou perdez 2 Résistance alors que ses griffes labourent votre poitrine.",
+                    effects: [Check(skill: Speed, modifier: -2, fail: [Lose(Stamina, 2)])],
+                ),
+                (
+                    text: "Vous dormez tranquillement, quand vous êtes réveillé par le son de votre propre voix chantant quelque chose. Faites un test de Chance (-2). Si vous le réussissez, vous êtes capable de vous souvenir de vos paroles : piochez 1 Sort et recevez 2 pions Indice. Si vous échouez, votre chant attire quelque chose. Un monstre apparaît !",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [Draw(deck: Spell), Gain(Clues, 2)], fail: [MonsterAppears])],
+                ),
+            ],
+            image: "cartes/portail/cp118.jpg",
+        ),
+        (
+            id: "cp122",
+            color: Blue,
+            encounters: [
+                (
+                    world: "dreamlands",
+                    text: "Un brigand essaye de vous voler. Réussissez un test de Discrétion (+0) pour le remarquer. Si vous échouez, perdez la moitié de vos objets (à votre choix) et la moitié de votre argent (arrondi au supérieur).",
+                    effects: [Check(skill: Sneak, modifier: 0, fail: [DiscardHalf(cards: Items), LoseAmount([Money], HalfUp(Money))])],
+                ),
+                (
+                    world: "yuggoth",
+                    text: "Le rayon étrange vous donne le vertige. Réussissez un test de Volonté (-2) ou perdez 1 objet de votre choix.",
+                    effects: [Check(skill: Will, modifier: -2, fail: [Discard(cards: Items, count: 1)])],
+                ),
+                (
+                    text: "La tension est trop forte pour votre esprit. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/portail/cp122.jpg",
+        ),
+        (
+            id: "cp124",
+            color: Red,
+            encounters: [
+                (
+                    world: "rlyeh",
+                    text: "Les vents de la tornade vous jettent contre les roches cyclopéennes. Réussissez un test de Vigueur (-1) ou perdez 3 Résistance.",
+                    effects: [Check(skill: Fight, modifier: -1, fail: [Lose(Stamina, 3)])],
+                ),
+                (
+                    world: "dreamlands",
+                    text: "Le vent augmente et vos jambes sont engourdies. Réussissez un test de Vigueur (-1) ou perdez 2 Résistance.",
+                    effects: [Check(skill: Fight, modifier: -1, fail: [Lose(Stamina, 2)])],
+                ),
+                (
+                    text: "Un monstre menaçant apparaît !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/portail/cp124.jpg",
+        ),
+        (
+            id: "cp129",
+            color: Green,
+            encounters: [
+                (
+                    world: "city_of_the_great_race",
+                    text: "L'entité conique essaye de vous enseigner la magie. Réussissez un test de Savoir (-2) [2] pour piocher 2 Sorts.",
+                    effects: [Check(skill: Lore, modifier: -2, successes: 2, pass: [Draw(deck: Spell, count: 2)])],
+                ),
+                (
+                    world: "great_hall_of_celeano",
+                    text: "Vous trouvez un savoir secret caché dans les mosaïques du mur. Faites un test de Savoir (+2) pour gagner autant de pions Indice que de succès obtenus.",
+                    effects: [Check(skill: Lore, modifier: 2, pass: [GainAmount(Clues, Successes(1))])],
+                ),
+                (
+                    text: "Vous trouvez des objets que vous pouvez revendre à Arkham. Gagnez 3$.",
+                    effects: [Gain(Money, 3)],
+                ),
+            ],
+            image: "cartes/portail/cp129.jpg",
         ),
     ],
 )

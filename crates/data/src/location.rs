@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::ids::{LocationId, StreetId};
-use crate::named_text::NamedText;
+use crate::location_ability::LocationAbility;
 use crate::position::Position;
 
 /// Whether gates can open at a location.
@@ -32,7 +32,7 @@ pub struct Location {
     pub stability: Stability,
     /// Special ability printed under the location, if any.
     #[serde(default)]
-    pub ability: Option<NamedText>,
+    pub ability: Option<LocationAbility>,
     /// Terror level at which the location closes for good, if any.
     #[serde(default)]
     pub closes_at_terror: Option<u8>,

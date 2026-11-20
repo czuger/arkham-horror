@@ -46,13 +46,21 @@ impl Game<'_> {
 
     /// Whether the investigator may receive this card at all.
     pub fn may_receive(&self, seat: usize, card: &CardId) -> bool {
-        !(card.as_str() == BANK_LOAN && self.inv(seat).no_more_bank_loans)
+        let inv = self.inv(seat);
+        !(card.as_str() == BANK_LOAN && (inv.no_more_bank_loans || inv.holds(card)))
+    }
+
+    /// Whether a card is still in its deck.
+    pub fn in_deck(&self, card: &CardId) -> Flow<bool> {
+        let deck = self.card(card)?.deck;
+        Ok(self.state.decks.get(deck).contains(card))
     }
 
     /// Gives a card taken out of its deck to an investigator. Special cards
     /// are held once at most: a second copy only refreshes the first (FAQ),
     /// and a Blessing cancels a Curse (and back).
     pub fn give_card(&mut self, seat: usize, card: CardId) -> Flow<()> {
+        self.covered.insert(crate::coverage::received_key(&card));
         let printed = self.card(&card)?;
         let deck = printed.deck;
         if deck == Deck::Special && self.inv(seat).holds(&card) {
@@ -86,6 +94,7 @@ impl Game<'_> {
             .iter()
             .filter(|ability| ability.timing == Timing::OnTake)
         {
+            self.covered.insert(crate::coverage::used_key(&card));
             self.apply_effects(seat, &ability.effects, Some(&card))?;
         }
         Ok(())
@@ -104,7 +113,12 @@ impl Game<'_> {
 
     /// Draws a card from a deck and gives it. Returns whether one was drawn.
     pub fn draw_and_give(&mut self, seat: usize, deck: Deck) -> Flow<bool> {
-        let Some(card) = self.draw_from(deck) else {
+        if self.draw_bonus(seat, deck) > 0 {
+            let any = !self.state.decks.get(deck).is_empty();
+            self.draw_and_keep(seat, deck, 1, Some(1))?;
+            return Ok(any);
+        }
+        let Some(card) = self.draw_for(seat, deck)? else {
             self.log("Le paquet est vide.");
             return Ok(false);
         };

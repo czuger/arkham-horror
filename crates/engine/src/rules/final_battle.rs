@@ -1,11 +1,16 @@
 //! The final battle against the Ancient One (§17).
 
-use data::{CheckKind, CombatRating};
+use data::{CardId, CheckKind, CombatRating, Ongoing};
+
+use crate::decision::DecisionKind;
 
 use crate::game::Game;
 use crate::halt::{Flow, Halt};
 use crate::rules::combat::Gear;
 use crate::state::{BattleState, Ending, Phase, Place};
+
+/// The Warding Statue card.
+const WARDING_STATUE: &str = "warding_statue";
 
 impl Game<'_> {
     /// From the awakening to the end of the game.
@@ -30,6 +35,7 @@ impl Game<'_> {
             if self.inv(seat).place == Place::LostInTimeAndSpace {
                 self.devour(seat)?;
             }
+            self.discard_on_awakening(seat)?;
         }
         self.check_all_devoured()?;
         self.start_of_battle()?;
@@ -37,6 +43,47 @@ impl Game<'_> {
         loop {
             self.battle_round()?;
         }
+    }
+
+    /// Before the Ancient One attacks: any holder of the Warding Statue may
+    /// discard it to stop the attack this round. Returns whether one did.
+    fn warding_statue(&mut self) -> Flow<bool> {
+        let statue = CardId::new(WARDING_STATUE);
+        for seat in self.state.seat_order() {
+            if !self.inv(seat).holds(&statue) {
+                continue;
+            }
+            let prompt = "Défausser la Statue de Garde pour empêcher l'attaque du Grand Ancien ?";
+            if self.ask_yes_no(seat, DecisionKind::UseAbility, prompt)? {
+                self.covered.insert(crate::coverage::used_key(&statue));
+                self.discard_card(seat, &statue)?;
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    /// Cards that do not survive the awakening are discarded.
+    fn discard_on_awakening(&mut self, seat: usize) -> Flow<()> {
+        let mut gone = Vec::new();
+        for held in &self.inv(seat).cards {
+            if self
+                .card(&held.card)?
+                .ongoing
+                .contains(&Ongoing::DiscardOnAwakening)
+            {
+                gone.push(held.card.clone());
+            }
+        }
+        for card in gone {
+            self.log(format!(
+                "{} défausse {}.",
+                self.name(seat),
+                self.card_name(&card)
+            ));
+            self.discard_card(seat, &card)?;
+        }
+        Ok(())
     }
 
     /// One round: refresh, investigators attack, the Ancient One attacks.
@@ -54,8 +101,12 @@ impl Game<'_> {
         for seat in self.state.seat_order() {
             self.catch_knock_out(seat, |game| game.attack_ancient_one(seat))?;
         }
-        for seat in self.state.seat_order() {
-            self.catch_knock_out(seat, |game| game.ancient_one_attacks(seat, round))?;
+        if self.warding_statue()? {
+            self.log("La Statue de Garde empêche le Grand Ancien d'attaquer ce round.");
+        } else {
+            for seat in self.state.seat_order() {
+                self.catch_knock_out(seat, |game| game.ancient_one_attacks(seat, round))?;
+            }
         }
         if self.state.ancient_one.as_str() == "cthulhu" {
             self.add_doom()?;
@@ -85,9 +136,10 @@ impl Game<'_> {
             .map_or(0, |battle| battle.successes);
         let needed = (u32::from(self.state.doom) * players).saturating_sub(kept);
         let needed = u8::try_from(needed).unwrap_or(u8::MAX);
-        let result = self.check(seat, CheckKind::Combat, rating + gear.bonus(), needed)?;
+        self.gear_check(seat, CheckKind::Combat, rating, &gear, needed)?;
+        let rolled = self.scratch.successes;
         self.discard_used_weapons(seat, &mut gear)?;
-        let mut successes = kept + result.successes;
+        let mut successes = kept + rolled;
         while successes >= players && self.state.doom > 0 {
             successes -= players;
             self.state.doom -= 1;

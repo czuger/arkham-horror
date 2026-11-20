@@ -130,6 +130,21 @@ Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2.
 - **R16** Un bonus « aux tests de Discrétion » (Il Pleut des Cordes) compte aussi pour les tests d'Évasion, qui sont des tests de Discrétion (§11.6). Un bonus aux tests d'Évasion ne compte pas pour la Discrétion. *(Recommandé : oui.)*
 - **R17** Chien de Tindalos : s'il n'y a aucun investigateur dans un lieu où il peut aller, il ne bouge pas. *(Recommandé : oui.)*
 
+### Points apparus en transcrivant toutes les cartes (J3, 20/11/2026)
+
+**Tous tranchés le 20/11/2026** (détail dans `regles/decisions.md`) :
+
+- **R18** cp036 « … et votre repas » : texte d'ambiance.
+- **R19** cp116 « perdez connaissance et restez ici » : simple retard.
+- **R20** clacv14 : un portail s'ouvre et aspire l'investigateur, sans monstre.
+- **R21** Restaurant de Velma : exactement 6 $ pour 6 points.
+- **R22** « Allez à l'endroit inscrit sur cette carte » : lieu du portail de la carte Mythe piochée.
+- **R23** Boule de cristal : la carte réservée sert au prochain investigateur qui fait une rencontre dans le quartier.
+- **R24** R'lyeh Émerge : fermeture vers R'lyeh à −1 de plus ; scellement inchangé.
+- **R25** Une Rumeur terminée retourne dans la boîte (texte de la carte).
+- **R26** Lier un Monstre raté = test de Combat raté.
+- **R27** « Combat sans issue » (FAQ) étendu au cas où la fuite est permise mais impossible.
+
 ---
 
 ## 4. Questions

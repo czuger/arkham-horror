@@ -38,8 +38,8 @@ fn shape_problem(card: &InvestigatorCard) -> Option<&'static str> {
     if is_item != card.price.is_some() {
         return Some("seuls les Objets ont un prix");
     }
-    if card.weapon.is_some() && !is_item {
-        return Some("seuls les Objets peuvent être des armes");
+    if card.weapon.is_some() && !is_item && card.deck != Deck::Special {
+        return Some("seuls les Objets (et le Révolver de l'Adjoint) peuvent être des armes");
     }
     if !is_spell && card.abilities.iter().any(|ability| ability.cast) {
         return Some("seul un Sort se lance");

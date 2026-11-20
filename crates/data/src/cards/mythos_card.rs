@@ -28,6 +28,9 @@ pub enum MythosKind {
     Environment(EnvironmentKind),
     /// Rumeur: stays in play until passed or failed.
     Rumor,
+    /// « L'Histoire Continue… » : the deck is reshuffled with the card in it,
+    /// and another card is drawn.
+    Reshuffle,
 }
 
 /// A Mythos card.
@@ -57,9 +60,13 @@ pub struct MythosCard {
     /// Immediate effects (Gros Titre).
     #[serde(default)]
     pub effects: Vec<Effect>,
-    /// Lasting effects while in play (Environnement, Rumeur).
+    /// Lasting effects while in play (Environnement, Rumeur, and a Gros Titre
+    /// that lingers).
     #[serde(default)]
     pub ongoing: Vec<Ongoing>,
+    /// A Gros Titre that stays in play until the end of the next turn.
+    #[serde(default)]
+    pub lingers: bool,
     /// Rumor parts, for a Rumeur.
     #[serde(default)]
     pub rumor: Option<Rumor>,

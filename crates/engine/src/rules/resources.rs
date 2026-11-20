@@ -42,6 +42,15 @@ impl Game<'_> {
         if amount == 0 || (frozen && self.state.battle.is_some()) {
             return Ok(());
         }
+        if !self.scratch.care
+            && self.mythos_has(|effect| *effect == data::Ongoing::NoGain(resource))
+        {
+            self.log(format!(
+                "Personne ne peut gagner de {}.",
+                resource_name(resource)
+            ));
+            return Ok(());
+        }
         let value = self.amount(seat, resource) + amount;
         self.set_amount(seat, resource, value)?;
         self.log(format!(
@@ -105,7 +114,8 @@ impl Game<'_> {
     }
 
     /// Offers the cards that reduce a loss of this resource.
-    fn reduce_loss(&mut self, seat: usize, resource: Resource, mut amount: u32) -> Flow<u32> {
+    fn reduce_loss(&mut self, seat: usize, resource: Resource, amount: u32) -> Flow<u32> {
+        let mut amount = amount.saturating_sub(self.sheet_reduction(seat, resource));
         while amount > 0 {
             self.scratch.reduce_loss = 0;
             let prompt = format!("Vous allez perdre {amount} {}.", resource_name(resource));

@@ -1,6 +1,6 @@
 //! One investigator during the game.
 
-use data::{CardId, InvestigatorId, MonsterId};
+use data::{CardId, InvestigatorId, LocationId, MonsterId};
 use serde::{Deserialize, Serialize};
 
 use crate::state::held_card::HeldCard;
@@ -49,6 +49,15 @@ pub struct InvestigatorState {
     pub no_more_bank_loans: bool,
     /// Out of the game (devoured during the final battle).
     pub eliminated: bool,
+    /// Bonus to every check until the end of the turn.
+    #[serde(default)]
+    pub turn_bonus: i8,
+    /// Location of the gate the investigator last went through.
+    #[serde(default)]
+    pub entered_gate: Option<LocationId>,
+    /// Once-per-turn sheet ability already used this turn (Mandy).
+    #[serde(default)]
+    pub power_used: bool,
 }
 
 impl InvestigatorState {

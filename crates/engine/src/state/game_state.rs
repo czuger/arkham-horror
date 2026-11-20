@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use data::{AncientOneId, CardId, InvestigatorId, LocationId, MonsterId};
+use data::{AncientOneId, CardId, InvestigatorId, LocationId, MonsterId, StreetId};
 use serde::{Deserialize, Serialize};
 
 use crate::rng::Rng;
@@ -66,6 +66,14 @@ pub struct GameState {
     pub environment: Option<CardId>,
     /// Rumor card in play.
     pub rumor: Option<ActiveRumor>,
+    /// Headlines left in play until the end of the next turn, with whether
+    /// they came out this turn.
+    #[serde(default)]
+    pub lingering: Vec<(CardId, bool)>,
+    /// Location card set aside by the crystal ball for the next encounter in
+    /// that district (R23).
+    #[serde(default)]
+    pub reserved_location_card: Option<(StreetId, CardId)>,
     /// Two Mythos cards are drawn each Mythos phase (Le Grand Rituel failed).
     pub two_mythos_cards: bool,
     /// Final battle progress, once the Ancient One is awake.

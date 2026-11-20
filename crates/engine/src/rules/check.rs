@@ -33,6 +33,19 @@ impl Game<'_> {
         modifier: i32,
         difficulty: u8,
     ) -> Flow<CheckResult> {
+        if self.offer_pass(seat, kind)? {
+            self.log(format!(
+                "{} réussit d'office le test {}.",
+                self.name(seat),
+                of_check(kind)
+            ));
+            let successes = u32::from(difficulty.max(1));
+            self.scratch.successes = successes;
+            return Ok(CheckResult {
+                passed: true,
+                successes,
+            });
+        }
         let dice = self.check_dice(seat, kind, modifier)?;
         let dice = u32::try_from(dice.max(0)).unwrap_or(0);
         let mut roll = Roll {
@@ -50,15 +63,9 @@ impl Game<'_> {
             dice,
             roll.successes
         ));
-        loop {
-            self.spend_clues(seat, &mut roll)?;
-            if roll.successes >= roll.difficulty || !self.offer_reroll(seat, kind)? {
-                break;
-            }
-            roll.successes = self.roll_dice(seat, roll.dice);
-            self.log(format!("Relance : {} succès.", roll.successes));
-        }
+        self.improve(seat, &mut roll)?;
         let passed = roll.successes >= roll.difficulty;
+        self.scratch.successes = roll.successes;
         self.log(if passed { "Réussi." } else { "Raté." });
         Ok(CheckResult {
             passed,
@@ -66,13 +73,45 @@ impl Game<'_> {
         })
     }
 
+    /// While the check fails: clue tokens, then cards that reroll, then
+    /// Mandy's Research.
+    fn improve(&mut self, seat: usize, roll: &mut Roll) -> Flow<()> {
+        loop {
+            self.spend_clues(seat, roll)?;
+            if roll.successes >= roll.difficulty {
+                return Ok(());
+            }
+            self.scratch.reroll_one_die = false;
+            if self.offer_reroll(seat, roll.kind)? {
+                roll.successes = self.roll_dice(seat, roll.dice);
+                self.log(format!("Relance : {} succès.", roll.successes));
+            } else if std::mem::take(&mut self.scratch.reroll_one_die) && roll.dice > roll.successes
+            {
+                let gained = self.roll_dice(seat, 1);
+                roll.successes += gained;
+                self.log(format!("Un dé raté est relancé : {gained} succès de plus."));
+            } else if roll.dice > roll.successes && self.mandy_research(seat)? {
+                let gained = self.roll_dice(seat, roll.dice - roll.successes);
+                roll.successes += gained;
+                self.log(format!("Dés ratés relancés : {gained} succès de plus."));
+            } else {
+                return Ok(());
+            }
+        }
+    }
+
     /// Rolls dice and counts successes.
     pub fn roll_dice(&mut self, seat: usize, dice: u32) -> u32 {
         let face = self.success_face(seat);
+        let six = if self.scratch.sixes_double { 2 } else { 1 };
         (0..dice)
             .map(|_| self.die())
-            .filter(|&value| value >= face)
-            .fold(0, |count, _| count + 1)
+            .map(|value| match value {
+                6 => six,
+                value if value >= face => 1,
+                _ => 0,
+            })
+            .sum()
     }
 
     /// Offers clue tokens one at a time while the check fails.

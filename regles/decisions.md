@@ -109,3 +109,63 @@ Si la FAQ officielle (`FAQ_Officiel_032017_V2.pdf`, voir R7) contredit une déci
 **Décision (16/11/2026)** : s'il n'y a aucun investigateur dans un lieu où il peut aller (hors Hôpital et Asile), il **ne bouge pas**.
 
 **Raison** : son texte ne prévoit pas d'autre déplacement.
+
+## R18 — « … et votre repas » (cp036, R'lyeh)
+
+**Décision (20/11/2026)** : texte d'ambiance. On perd seulement 1 Résistance et 1 Santé Mentale ; aucune Nourriture n'est défaussée.
+
+**Raison** : aucune carte n'est nommée.
+
+## R19 — « Perdez connaissance et restez ici » (cp116, Autre)
+
+**Décision (20/11/2026)** : **simple retard** (restez ici au prochain tour) ; ce n'est pas la règle de l'inconscience.
+
+**Raison** : le texte dit « restez ici », pas « allez à l'Hôpital ».
+
+## R20 — « Un portail s'ouvre et vous aspire » (clacv14, Square)
+
+**Décision (20/11/2026)** : un portail s'ouvre ici et aspire l'investigateur, **sans monstre**.
+
+**Raison** : choix de l'utilisateur ; le texte ne parle pas de monstre.
+
+## R21 — Restaurant de Velma (claqe04)
+
+**Décision (20/11/2026)** : payer **exactement 6 $** pour gagner 6 points, répartis entre Résistance et Santé Mentale.
+
+**Raison** : on suit le texte français.
+
+## R22 — « Allez à l'endroit inscrit sur cette carte » (claqn21)
+
+**Décision (20/11/2026)** : c'est le **lieu du portail** de la carte Mythe piochée ; si elle n'en a pas, on en pioche une autre.
+
+**Raison** : c'est le seul lieu imprimé en grand sur une carte Mythe.
+
+## R23 — Boule de cristal (claqre15)
+
+**Décision (20/11/2026)** : la carte mise de côté sert au **prochain investigateur, quel qu'il soit**, qui fait une rencontre dans ce quartier.
+
+**Raison** : la carte est placée sur le quartier, pas donnée à un investigateur.
+
+## R24 — R'lyeh Émerge (Environnement)
+
+**Décision (20/11/2026)** : « difficulté pour fermer ou sceller augmentée de 1 » = le test de fermeture d'un portail vers R'lyeh se fait avec **1 dé de moins** (modificateur −1 de plus). Le scellement coûte toujours 5 Indices.
+
+**Raison** : le modificateur de fermeture imprimé sur le marqueur est la « difficulté » du portail ; la FAQ fixe le coût du scellement à 5 Indices dans un cas voisin (Yog-Sothoth).
+
+## R25 — Fin d'une Rumeur
+
+**Décision (20/11/2026)** : une Rumeur réussie ou ratée est **remise dans la boîte**, comme le dit son texte, et non sous le paquet Mythe comme le dit le livret.
+
+**Raison** : le texte de la carte, plus précis, l'emporte sur la règle générale.
+
+## R26 — Lier un Monstre raté
+
+**Décision (20/11/2026)** : si le test de Sort de **Lier un Monstre** échoue, cela compte comme un **test de Combat raté** : le monstre inflige ses dégâts de combat.
+
+**Raison** : le sort remplace le test de Combat ; règle d'or, on choisit le pire pour l'investigateur.
+
+## R27 — Combat sans issue, fuite permise mais impossible
+
+**Décision (20/11/2026)** : la règle FAQ « Combat sans issue » (Santé Mentale à 0, l'investigateur devient fou, le combat s'arrête) s'applique aussi quand la fuite est **permise mais impossible** : 0 dé pour fuir et pas assez de dés pour gagner, Indices compris.
+
+**Raison** : sinon le combat peut ne jamais finir (Michael McGlen et sa perte de Résistance réduite de 1 contre un monstre qui fait 1 dégât).

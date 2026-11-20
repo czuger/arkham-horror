@@ -1,6 +1,6 @@
 //! Derived values: skills, maximums, lasting bonuses.
 
-use data::{CardId, CheckKind, Ongoing, Resource, Scope};
+use data::{CardId, CheckKind, MonsterTrait, Ongoing, Resource, Scope};
 
 use crate::game::Game;
 use crate::halt::Flow;
@@ -77,6 +77,23 @@ impl<'a> Game<'a> {
         found
     }
 
+    /// Whether a lasting effect held by the investigator, or in play, matches.
+    pub fn has_ongoing(&self, seat: usize, test: impl Fn(&Ongoing) -> bool) -> bool {
+        self.ongoing_for(seat)
+            .into_iter()
+            .any(|(_, effect)| test(effect))
+    }
+
+    /// Whether the investigator holds a card that ignores this monster ability.
+    pub fn ignores(&self, seat: usize, ability: MonsterTrait) -> bool {
+        self.has_ongoing(seat, |effect| *effect == Ongoing::Ignore(ability))
+    }
+
+    /// Whether a lasting effect of the Mythos cards in play matches.
+    pub fn mythos_has(&self, test: impl Fn(&Ongoing) -> bool) -> bool {
+        self.mythos_ongoing().into_iter().any(test)
+    }
+
     /// Lasting effects of the Environment and Rumor in play.
     pub fn mythos_ongoing(&self) -> Vec<&'a Ongoing> {
         let data = self.data;
@@ -87,6 +104,7 @@ impl<'a> Game<'a> {
         in_play
             .into_iter()
             .flatten()
+            .chain(self.state.lingering.iter().map(|(card, _)| card))
             .filter_map(|id| data.mythos_cards.cards.iter().find(|card| &card.id == id))
             .flat_map(|card| card.ongoing.iter())
             .collect()
@@ -166,7 +184,7 @@ impl<'a> Game<'a> {
             .into_iter()
             .filter(|(_, effect)| matches!(effect, Ongoing::ExtraClueDie(bonus) if *bonus == skill))
             .count();
-        1 + u32::try_from(extra).unwrap_or(0)
+        1 + u32::try_from(extra).unwrap_or(0) + self.sheet_clue_dice(seat)
     }
 
     /// Current maximum of Sanity or Stamina (never below 0).

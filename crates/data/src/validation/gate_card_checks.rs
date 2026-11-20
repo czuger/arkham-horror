@@ -8,11 +8,20 @@ use crate::validation::effect_refs::check_effects;
 use crate::validation::issue::Issue;
 
 /// Worlds exist and appear once, the « Autre » entry is present and last, and
-/// effects refer to existing things.
+/// effects refer to existing things. A card without colour has no encounter.
 pub(crate) fn check_gate_cards(data: &GameData, issues: &mut Vec<Issue>) {
     for card in &data.gate_cards.cards {
         let context = format!("carte Portail « {} »", card.id);
         check_worlds(card, &context, data, issues);
+        if card.color.is_none() {
+            if !card.encounters.is_empty() || card.text.is_none() {
+                issues.push(Issue::Mismatch {
+                    context: context.clone(),
+                    reason: "une carte sans couleur a un texte et aucune rencontre",
+                });
+            }
+            continue;
+        }
         if !other_entry_is_single_and_last(card) {
             issues.push(Issue::Mismatch {
                 context: context.clone(),

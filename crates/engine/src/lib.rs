@@ -5,6 +5,7 @@
 //! of answers; [`play`] replays it from the start each time.
 #![deny(missing_docs)]
 
+mod coverage;
 mod decision;
 mod engine_error;
 mod game;
@@ -17,6 +18,7 @@ mod state;
 #[cfg(test)]
 mod tests;
 
+pub use coverage::coverage_keys;
 pub use decision::{
     Choice, Decision, DecisionKind, DecisionOption, FirstOption, Replay, Responder, Waiting,
 };

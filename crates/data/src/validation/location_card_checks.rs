@@ -27,6 +27,12 @@ pub(crate) fn check_location_cards(data: &GameData, issues: &mut Vec<Issue>) {
             check_effects(&context, &encounter.effects, data, issues);
         }
     }
+    for location in &data.board.locations {
+        if let Some(ability) = &location.ability {
+            let context = format!("capacité du lieu « {} »", location.id);
+            check_effects(&context, &ability.effects, data, issues);
+        }
+    }
 }
 
 /// Every encounter is for an existing location of the card's district.

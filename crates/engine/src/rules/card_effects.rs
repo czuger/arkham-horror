@@ -1,14 +1,14 @@
 //! Effect primitives that draw, buy, sell or discard investigator cards.
 
-use data::{CardFilter, CardId, Deck};
+use data::{CardFilter, CardId, Deck, InvestigatorCard, Ongoing};
 
 use crate::decision::{Choice, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 
 impl Game<'_> {
-    /// Draws `count` cards and keeps `keep` of them (all when `None`); the
-    /// others go to the bottom of the deck.
+    /// Draws `count` cards (plus the sheet's extra card) and keeps `keep` of
+    /// them (`count` when `None`); the others go to the bottom of the deck.
     pub fn draw_and_keep(
         &mut self,
         seat: usize,
@@ -16,8 +16,12 @@ impl Game<'_> {
         count: u8,
         keep: Option<u8>,
     ) -> Flow<()> {
-        let mut drawn: Vec<CardId> = (0..count).filter_map(|_| self.draw_from(deck)).collect();
-        let keep = usize::from(keep.unwrap_or(count)).min(drawn.len());
+        let keep = keep.unwrap_or(count);
+        let mut drawn: Vec<CardId> = Vec::new();
+        for _ in 0..count + self.draw_bonus(seat, deck) {
+            drawn.extend(self.draw_for(seat, deck)?);
+        }
+        let keep = usize::from(keep).min(drawn.len());
         for _ in 0..keep {
             let options = self.card_options(&drawn);
             let prompt = "Quelle carte gardez-vous ?";
@@ -118,7 +122,7 @@ impl Game<'_> {
     /// match (all of them if fewer).
     pub fn discard_some(&mut self, seat: usize, filter: &CardFilter, count: u8) -> Flow<()> {
         for _ in 0..count {
-            let matching = self.matching_cards(seat, filter)?;
+            let matching = self.losable_cards(seat, filter)?;
             if matching.is_empty() {
                 return Ok(());
             }
@@ -142,16 +146,40 @@ impl Game<'_> {
 
     /// Discards every held card that matches.
     pub fn discard_all(&mut self, seat: usize, filter: &CardFilter) -> Flow<()> {
-        for card in self.matching_cards(seat, filter)? {
+        for card in self.losable_cards(seat, filter)? {
             self.discard_card(seat, &card)?;
         }
         Ok(())
     }
 
+    /// Matching held cards that an effect can take away: not those that
+    /// « cannot be lost or stolen ».
+    pub fn losable_cards(&self, seat: usize, filter: &CardFilter) -> Flow<Vec<CardId>> {
+        let mut found = Vec::new();
+        for card in self.matching_cards(seat, filter)? {
+            if !self.card(&card)?.ongoing.contains(&Ongoing::CannotBeLost) {
+                found.push(card);
+            }
+        }
+        Ok(found)
+    }
+
     /// Held cards matching a filter.
-    fn matching_cards(&self, seat: usize, filter: &CardFilter) -> Flow<Vec<CardId>> {
+    pub fn matching_cards(&self, seat: usize, filter: &CardFilter) -> Flow<Vec<CardId>> {
         match filter {
             CardFilter::Items => self.held_items(seat),
+            CardFilter::Weapons | CardFilter::Tomes => {
+                let mut found = Vec::new();
+                for card in self.held_items(seat)? {
+                    if self
+                        .card(&card)
+                        .is_ok_and(|printed| filter_accepts(printed, filter))
+                    {
+                        found.push(card);
+                    }
+                }
+                Ok(found)
+            }
             CardFilter::Deck(deck) => {
                 let mut found = Vec::new();
                 for held in &self.inv(seat).cards {
@@ -170,5 +198,15 @@ impl Game<'_> {
             .iter()
             .map(|card| option(Choice::Card(card.clone()), self.card_name(card)))
             .collect()
+    }
+}
+
+/// Whether a printed card matches a filter (for cards still in a deck).
+pub(crate) fn filter_accepts(card: &InvestigatorCard, filter: &CardFilter) -> bool {
+    match filter {
+        CardFilter::Items => matches!(card.deck, Deck::CommonItem | Deck::UniqueItem | Deck::Spell),
+        CardFilter::Weapons => card.weapon.is_some(),
+        CardFilter::Tomes => card.subtitle.as_deref() == Some("Tome"),
+        CardFilter::Deck(deck) => card.deck == *deck,
     }
 }

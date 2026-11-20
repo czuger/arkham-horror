@@ -16,6 +16,9 @@ pub(crate) const POLICE_STATION: &str = "police_station";
 /// The Retainer card, lost when knocked out.
 pub(crate) const RETAINER: &str = "retainer";
 
+/// Special cards that count as items (FAQ): the Deputy's gear.
+const DEPUTY_ITEMS: [&str; 2] = ["deputys_revolver", "patrol_wagon"];
+
 impl Game<'_> {
     /// Moves an investigator. Leaving a location drops the explored marker.
     pub fn move_to(&mut self, seat: usize, place: Place) {
@@ -61,6 +64,7 @@ impl Game<'_> {
         if delayed {
             self.inv_mut(seat).delayed = true;
         }
+        self.inv_mut(seat).entered_gate = Some(location.clone());
         Ok(())
     }
 
@@ -77,7 +81,8 @@ impl Game<'_> {
         self.lose_half_belongings(seat)?;
         let inv = self.inv_mut(seat);
         inv.encounters_over = true;
-        if matches!(inv.place, Place::OtherWorld { .. }) {
+        let mary = inv.id.as_str() == crate::rules::investigator_powers::SISTER_MARY;
+        if matches!(inv.place, Place::OtherWorld { .. }) && !mary {
             inv.sanity = 1;
             inv.stamina = 1;
             return self.lose_in_time_and_space(seat);
@@ -132,7 +137,8 @@ impl Game<'_> {
         let mut items = Vec::new();
         for held in &self.inv(seat).cards {
             let deck = self.card(&held.card)?.deck;
-            if matches!(deck, Deck::CommonItem | Deck::UniqueItem | Deck::Spell) {
+            let deputy_item = DEPUTY_ITEMS.contains(&held.card.as_str());
+            if deputy_item || matches!(deck, Deck::CommonItem | Deck::UniqueItem | Deck::Spell) {
                 items.push(held.card.clone());
             }
         }
@@ -141,6 +147,9 @@ impl Game<'_> {
 
     /// Lost in time and space: delayed on the special area.
     pub fn lose_in_time_and_space(&mut self, seat: usize) -> Flow<()> {
+        if self.guardian_angel(seat)? {
+            return Ok(());
+        }
         self.log(format!(
             "{} est perdu dans le temps et l'espace.",
             self.name(seat)

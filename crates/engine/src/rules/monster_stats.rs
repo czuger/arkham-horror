@@ -50,17 +50,32 @@ impl Game<'_> {
             });
             stats.abilities.push(MonsterAbility::Endless);
         }
+        self.apply_mythos_to_monster(id, &mut stats);
+        Ok(stats)
+    }
+
+    /// The Ancient One's toughness bonus and the Mythos cards in play.
+    fn apply_mythos_to_monster(&self, id: &MonsterId, stats: &mut MonsterStats) {
         let mut toughness =
             i32::try_from(stats.toughness).unwrap_or(1) + self.power_toughness_bonus();
         for effect in self.mythos_ongoing() {
-            if let Ongoing::MonsterToughness { monsters, amount } = effect
-                && monsters.contains(id)
-            {
-                toughness += i32::from(*amount);
+            match effect {
+                Ongoing::MonsterToughness { monsters, amount } if monsters.contains(id) => {
+                    toughness += i32::from(*amount);
+                }
+                Ongoing::UndeadToughness(amount) if stats.has(MonsterAbility::Undead) => {
+                    toughness += i32::from(*amount);
+                }
+                Ongoing::FlyingDontMove if stats.movement == Movement::Flying => {
+                    stats.movement = Movement::Stationary;
+                }
+                Ongoing::FastMoveNormally if stats.movement == Movement::Fast => {
+                    stats.movement = Movement::Normal;
+                }
+                _ => {}
             }
         }
         stats.toughness = u32::try_from(toughness.max(1)).unwrap_or(1);
-        Ok(stats)
     }
 
     /// Whether a Mythos card in play bans this monster from play.

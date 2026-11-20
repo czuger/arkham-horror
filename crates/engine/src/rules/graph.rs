@@ -2,10 +2,26 @@
 
 use std::collections::VecDeque;
 
+use data::{LocationId, Ongoing};
+
 use crate::game::Game;
 use crate::state::Place;
 
 impl Game<'_> {
+    /// Whether a location is closed, for good or by a Mythos card in play.
+    pub fn is_closed(&self, id: &LocationId) -> bool {
+        self.state.is_closed(id)
+            || self.mythos_has(|effect| *effect == Ongoing::LocationClosed(id.clone()))
+    }
+
+    /// Whether investigators may not enter or leave this street area.
+    pub fn street_closed(&self, place: &Place) -> bool {
+        let Place::Street(street) = place else {
+            return false;
+        };
+        self.mythos_has(|effect| *effect == Ongoing::StreetClosed(street.clone()))
+    }
+
     /// Places one step away in Arkham. Closed locations are left out.
     pub fn neighbours(&self, place: &Place) -> Vec<Place> {
         match place {
@@ -20,7 +36,7 @@ impl Game<'_> {
                     .data
                     .board
                     .locations_of(id)
-                    .filter(|location| !self.state.is_closed(&location.id))
+                    .filter(|location| !self.is_closed(&location.id))
                     .map(|location| Place::Location(location.id.clone()))
                     .collect();
                 if let Some(street) = self.data.board.street(id) {
@@ -56,7 +72,7 @@ impl Game<'_> {
         let locations = board
             .locations
             .iter()
-            .filter(|location| !self.state.is_closed(&location.id))
+            .filter(|location| !self.is_closed(&location.id))
             .map(|location| Place::Location(location.id.clone()));
         let streets = board
             .streets

@@ -2,6 +2,7 @@
 
 mod args;
 mod bulk;
+mod coverage_report;
 mod interactive;
 mod random_responder;
 
@@ -32,7 +33,11 @@ fn main() -> ExitCode {
             Ok(())
         }
         Command::Play(setup) => interactive::run(&data, &setup),
-        Command::Bulk { games, setup } => bulk::run(&data, &setup, games),
+        Command::Bulk {
+            games,
+            setup,
+            missing_file,
+        } => bulk::run(&data, &setup, games, missing_file.as_deref()),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,

@@ -1,9 +1,10 @@
-// Cartes Lieu (jeu de base) : échantillon de 9 cartes (une par quartier) sur 63.
+// Cartes Lieu (jeu de base) : les 63 cartes (7 par quartier).
 //
 // Relevé le 16/11/2026 sur les images (assets/cartes/lieu/). Vocabulaire des
 // effets : voir vocabulaire_cartes.md.
 // Errata de la FAQ appliqué (regles/base.md §23) : « test de Combat » hors
-// combat se lit « test de Vigueur » (Square de l'Indépendance, Cimetière).
+// combat se lit « test de Vigueur ». R20 (clacv14), R21 (Velma, claqe04), R22
+// (claqn21) et R23 (boule de cristal, claqre15) sont dans regles/decisions.md.
 // Un exemplaire de chaque carte.
 #![enable(implicit_some)]
 LocationCards(
@@ -46,33 +47,136 @@ LocationCards(
             image: "cartes/lieu/centre_ville/clacv02.jpg",
         ),
         (
-            id: "claqri01",
-            district: "rivertown",
+            id: "clacv04",
+            district: "downtown",
             encounters: [
                 (
-                    location: "black_cave",
-                    text: "Des chauves-souris ! Par centaines ! Faites un test de Vitesse (-1) pour sortir de la caverne. Si vous échouez, perdez 1 Résistance.",
-                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Stamina, 1)])],
+                    location: "arkham_asylum",
+                    text: "Vous entendez un cri. Quand vous ouvrez la porte d'une cellule pour enquêter, une forme sombre se jette sur vous ! C'est un fou dans sa camisole balbutiant à propos d'horreurs invisibles. Faites un test de Savoir (-2) pour glaner des informations auprès de lui. Si vous le réussissez, vous gagnez 2 pions Indice. Si vous le ratez, vous perdez 1 Résistance quand il vous attaque.",
+                    effects: [Check(skill: Lore, modifier: -2, pass: [Gain(Clues, 2)], fail: [Lose(Stamina, 1)])],
                 ),
                 (
-                    location: "general_store",
-                    text: "Le gérant remarque l'un des objets que vous portez et son visage s'illumine. « Dites, j'en recherche un depuis longtemps. Vous ne le vendriez pas par hasard ? Je suis prêt à mettre le prix ! » Vous pouvez vendre un de vos Objets Communs à deux fois le prix indiqué.",
-                    effects: [Sell(deck: CommonItem, multiplier: 2)],
+                    location: "bank_of_arkham",
+                    text: "Une vielle dame est juste devant vous, comptant une à une ses piécettes pour faire un dépôt. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
                 ),
                 (
-                    location: "graveyard",
-                    text: "En descendant dans un mausolée sombre, vous découvrez un vampire qui se lève pour se nourrir. Vous vous retrouvez rapidement à combattre pour votre vie. Faites un test de Vigueur (-2). Si vous le réussissez, vous battez le vampire et gagnez 1 pion Indice et piochez 1 Objet Unique. Si vous le ratez, lancez un dé et perdez autant de Résistance.",
-                    effects: [
-                        Check(
-                            skill: Fight,
-                            modifier: -2,
-                            pass: [Gain(Clues, 1), Draw(deck: UniqueItem)],
-                            fail: [LoseRolled(Stamina)],
-                        ),
-                    ],
+                    location: "independence_square",
+                    text: "Des gitans campent dans le parc. Faites un test de Chance (-1) si vous souhaitez interagir avec eux. En cas de réussite, un vieil homme étale des objets à vendre sur une couverture. Piochez 1 Objet Unique et vous pouvez l'acheter pour 1$ de moins que le prix indiqué. En cas d'échec, une vieille femme vient vers vous et vous dit que la mort rôde autour de vous. Vous vous moquez d'elle et elle vous griffe le visage jusqu'au sang. Perdez 1 Résistance et vous êtes Maudit.",
+                    effects: [Optional((label: "Aller voir les gitans", effects: [Check(skill: Luck, modifier: -1, pass: [Buy(draw: [UniqueItem], price: Minus(1))], fail: [Lose(Stamina, 1), TakeCard(card: "curse")])]))],
                 ),
             ],
-            image: "cartes/lieu/quartier_de_la_riviere/claqri01.jpg",
+            image: "cartes/lieu/centre_ville/clacv04.jpg",
+        ),
+        (
+            id: "clacv11",
+            district: "downtown",
+            encounters: [
+                (
+                    location: "arkham_asylum",
+                    text: "Dans le bureau du docteur, vous trouvez un livre de notes, une compilation d'entretiens avec des patients. Faites un test de Savoir (+0) et consultez la table suivante : Nombre de succès : 0) Leurs histoires vous terrifient mais vous permettent d'apprendre des choses. Perdez 1 Santé Mentale et gagnez 1 pion Indice. 1-2) Vous trouvez des éléments intéressants. Gagnez 2 pions Indice. 3+) Un des entretiens contient des informations vitales. Gagnez 3 pions Indice.",
+                    effects: [CheckTable(skill: Lore, modifier: 0, rows: [(from: 0, effects: [Lose(Sanity, 1), Gain(Clues, 1)]), (from: 1, effects: [Gain(Clues, 2)]), (from: 3, effects: [Gain(Clues, 3)])])],
+                ),
+                (
+                    location: "bank_of_arkham",
+                    text: "L'un des autres clients de la banque vous reconnaît et propose de vous déposer quelque part. Allez dans un lieu ou une zone de rues de votre choix à Arkham. Si vous allez dans un endroit, faites-y immédiatement une rencontre.",
+                    effects: [MoveAnywhereInArkham],
+                ),
+                (
+                    location: "independence_square",
+                    text: "De sympathiques pique-niqueurs partagent leur déjeuner avec vous. Gagnez 1 Résistance.",
+                    effects: [Gain(Stamina, 1)],
+                ),
+            ],
+            image: "cartes/lieu/centre_ville/clacv11.jpg",
+        ),
+        (
+            id: "clacv14",
+            district: "downtown",
+            encounters: [
+                (
+                    location: "arkham_asylum",
+                    text: "L'infirmière Heather vous injecte par erreur un somnifère. Vous pouvez faire un test de Vigueur (-2) pour résister au sommeil. Si vous échouez ou choisissez de ne pas résister, vous perdez votre prochain tour mais ce repos forcé vous fait gagner 2 Santé Mentale. Sinon, rien ne se passe.",
+                    effects: [Choice([(label: "Résister au sommeil", effects: [Check(skill: Fight, modifier: -2, fail: [LoseNextTurn, Gain(Sanity, 2)])]), (label: "Ne pas résister", effects: [LoseNextTurn, Gain(Sanity, 2)])])],
+                ),
+                (
+                    location: "bank_of_arkham",
+                    text: "Une guichetière que vous n'avez jamais vue vous affirme qu'elle vous a vu faire un dépôt hier. Elle vous le prouve en vous montrant le document signé de votre main. Gagnez 5$ mais perdez 1 Santé Mentale.",
+                    effects: [Gain(Money, 5), Lose(Sanity, 1)],
+                ),
+                (
+                    location: "independence_square",
+                    text: "Vous touchez la Pierre du Fondateur. Faites un test de Chance (-1). En cas de réussite, il y a un choc électrique qui ouvre votre esprit à des êtres anciens d'une époque lointaine. Perdez 1 Résistance, mais gagnez 2 pions Indice et piochez 1 Sort. En cas d'échec, vous trouvez une étrange gravure. Au moment où vous la touchez, un portail s'ouvre et vous aspire.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Lose(Stamina, 1), Gain(Clues, 2), Draw(deck: Spell)], fail: [GateAppears])],
+                ),
+            ],
+            image: "cartes/lieu/centre_ville/clacv14.jpg",
+        ),
+        (
+            id: "clacv21",
+            district: "downtown",
+            encounters: [
+                (
+                    location: "arkham_asylum",
+                    text: "Vous trouvez d'étranges médicaments étiquetés « Améliorations Oniriques » dans un cabinet poussiéreux. Si vous choisissez de les prendre, faites un test de Savoir (-1). En cas de réussite, vos visions vous montrent comment faire un rituel. Piochez 1 Sort. Sinon, rien ne se passe.",
+                    effects: [Optional((label: "Prendre les médicaments", effects: [Check(skill: Lore, modifier: -1, pass: [Draw(deck: Spell)])]))],
+                ),
+                (
+                    location: "bank_of_arkham",
+                    text: "Vous trouvez une pièce avec une étrange gravure dessus. Amusé, vous la lancez en l'air mais suffoquez soudain, saisi par la brusque concentration de forces magiques autour de vous. Faites un test de Chance (-2). En cas de réussite, la pièce tombe sur face et vous êtes Béni. Sinon, la pièce tombe sur pile et vous êtes Maudit.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [TakeCard(card: "blessing")], fail: [TakeCard(card: "curse")])],
+                ),
+                (
+                    location: "independence_square",
+                    text: "Des gitans campent dans le parc. Ce sont des voleurs hors pairs et vous êtes leur cible. Réussissez un test de Chance (-2) ou perdez 1 objet de votre choix.",
+                    effects: [Check(skill: Luck, modifier: -2, fail: [Discard(cards: Items, count: 1)])],
+                ),
+            ],
+            image: "cartes/lieu/centre_ville/clacv21.jpg",
+        ),
+        (
+            id: "clacv22",
+            district: "downtown",
+            encounters: [
+                (
+                    location: "arkham_asylum",
+                    text: "L'infirmière Heather arrive ! Faites un test de Vitesse (-1) pour vous cacher à temps. Si vous le réussissez, vous la voyez perdre un objet alors qu'elle passe devant vous. Piochez 1 Objet Unique. Sinon, elle vous jette dehors. Allez dans la rue.",
+                    effects: [Check(skill: Speed, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [MoveToStreet])],
+                ),
+                (
+                    location: "bank_of_arkham",
+                    text: "Un homme portant des vêtements sales et rapiécés traîne aux abords de la banque. Il propose de vous vendre sa dernière possession afin d'acheter de la nourriture pour lui et sa famille. Si vous acceptez, payez 2$ et faites un test de Chance (-1). En cas de réussite, piochez 1 Objet Unique. Sinon piochez 1 Objet Commun.",
+                    effects: [Optional((label: "Acheter sa dernière possession (2 $)", effects: [Pay(Money, 2), Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [Draw(deck: CommonItem)])]))],
+                ),
+                (
+                    location: "independence_square",
+                    text: "Faites un test de Volonté (-1). En cas de réussite, Anna Kaslow, la diseuse de bonne aventure, propose de vous accompagner dans votre enquête. Prenez cette carte Allié si elle est disponible. Sinon, gagnez 2 pions Indice. En cas d'échec, rien ne se passe.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [TakeCard(card: "anna_kaslow", otherwise: [Gain(Clues, 2)])])],
+                ),
+            ],
+            image: "cartes/lieu/centre_ville/clacv22.jpg",
+        ),
+        (
+            id: "clacv23",
+            district: "downtown",
+            encounters: [
+                (
+                    location: "arkham_asylum",
+                    text: "Les gardes du sanatorium sont au courant qu'il y a un cambrioleur. Faites un test de Discrétion (-1) pour vous échapper. En cas de réussite, allez dans la rue. Sinon, vous êtes arrêté et emmené au Poste de Police.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [MoveToStreet], fail: [Arrested])],
+                ),
+                (
+                    location: "bank_of_arkham",
+                    text: "« Haut les mains ! Personne ne bouge ! » Trois hommes armés de mitraillettes dévalisent la banque alors que vous faites la queue. Faites un test de Vigueur (-1). En cas de réussite, ils s'enfuient et rien ne se passe. Sinon, vous perdez tout votre argent.",
+                    effects: [Check(skill: Fight, modifier: -1, fail: [LoseAll(Money)])],
+                ),
+                (
+                    location: "independence_square",
+                    text: "Une ombre surgie de nulle part tombe sur vous. Vous frissonnez de peur. Réussissez un test de Volonté (-1) ou perdez 1 Résistance et 1 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -1, fail: [Lose(Stamina, 1), Lose(Sanity, 1)])],
+                ),
+            ],
+            image: "cartes/lieu/centre_ville/clacv23.jpg",
         ),
         (
             id: "clafh10",
@@ -102,6 +206,304 @@ LocationCards(
                 ),
             ],
             image: "cartes/lieu/french_hill/clafh10.jpg",
+        ),
+        (
+            id: "clafh13",
+            district: "french_hill",
+            encounters: [
+                (
+                    location: "silver_twilight_lodge",
+                    text: "« Vous voulez rejoindre l'Ordre ? » vous demandent Carl Sanford et plusieurs de ses acolytes. Si vous acceptez, payez 3$ et prenez une carte Membre de la Loge du Crépuscule d'Argent. Si vous refusez, réussissez un test de Volonté (-1), ou perdez 3 Résistance quand les acolytes vous jettent dehors. Que vous ayez réussi ou non, allez dans la rue.",
+                    effects: [Choice([(label: "Rejoindre l'Ordre (3 $)", effects: [Pay(Money, 3), TakeCard(card: "silver_twilight_membership")]), (label: "Refuser", effects: [Check(skill: Will, modifier: -1, fail: [Lose(Stamina, 3)]), MoveToStreet])])],
+                ),
+                (
+                    location: "silver_twilight_lodge",
+                    requires: HasCard("silver_twilight_membership"),
+                    text: "Cœur de la Loge. Vous assistez à une cérémonie au cours de laquelle un portail est ouvert et un monstre en sort avant que le portail ne se referme. Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    location: "witch_house",
+                    text: "Dans un vieux journal intime, vous apprenez de terribles secrets. Lancez un dé. Perdez ce montant de Santé Mentale et gagnez autant de pions Indice.",
+                    effects: [RollDice(1), LoseAmount([Sanity], X), GainAmount(Clues, X)],
+                ),
+            ],
+            image: "cartes/lieu/french_hill/clafh13.jpg",
+        ),
+        (
+            id: "clafh14",
+            district: "french_hill",
+            encounters: [
+                (
+                    location: "silver_twilight_lodge",
+                    text: "« Vous voulez rejoindre l'Ordre ? » vous demandent Carl Sanford et plusieurs de ses acolytes. Si vous acceptez, payez 3$ et prenez une carte Membre de la Loge du Crépuscule d'Argent. Si vous refusez, réussissez un test de Volonté (-1), ou perdez 3 Résistance quand les acolytes vous jettent dehors. Que vous ayez réussi ou non, allez dans la rue.",
+                    effects: [Choice([(label: "Rejoindre l'Ordre (3 $)", effects: [Pay(Money, 3), TakeCard(card: "silver_twilight_membership")]), (label: "Refuser", effects: [Check(skill: Will, modifier: -1, fail: [Lose(Stamina, 3)]), MoveToStreet])])],
+                ),
+                (
+                    location: "silver_twilight_lodge",
+                    requires: HasCard("silver_twilight_membership"),
+                    text: "Cœur de la Loge. Payez votre cotisation mensuelle de 3$ ou perdez 2 Santé Mentale à cause des rêves étranges que vous envoie Carl Sanford quand il vous exclut de l'Ordre. Si vous êtes renvoyé, perdez votre carte de Membre de la Loge du Crépuscule d'Argent.",
+                    effects: [Choice([(label: "Payer la cotisation (3 $)", effects: [Pay(Money, 3)]), (label: "Ne pas payer", effects: [Lose(Sanity, 2), DiscardCard("silver_twilight_membership")])])],
+                ),
+                (
+                    location: "witch_house",
+                    text: "Vous avez l'impression que la maison respire et prononce votre nom. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/lieu/french_hill/clafh14.jpg",
+        ),
+        (
+            id: "clafh15",
+            district: "french_hill",
+            encounters: [
+                (
+                    location: "silver_twilight_lodge",
+                    text: "Faites un test de Discrétion (-2). Si vous réussissez, vous vous glissez dans le temple de la Loge et trouvez 2 objets dignes d'intérêt. Lancez un dé pour chaque objet. En cas de réussite, piochez un Objet Unique, sinon piochez un Objet Commun.",
+                    effects: [Check(skill: Sneak, modifier: -2, pass: [RollEach(dice: 2, success: [Draw(deck: UniqueItem)], failure: [Draw(deck: CommonItem)])])],
+                ),
+                (
+                    location: "silver_twilight_lodge",
+                    requires: HasCard("silver_twilight_membership"),
+                    text: "Cœur de la Loge. Vous êtes invité à participer à une cérémonie de Portail. Si vous êtes d'accord, dépensez 2 pions Indice et 1 Santé Mentale pour faire un test de Savoir (-2). Si vous réussissez, fermez le portail de votre choix. Sinon, rien ne se passe.",
+                    effects: [Optional((label: "Participer à la cérémonie (2 pions Indice et 1 Santé Mentale)", effects: [Pay(Clues, 2), Lose(Sanity, 1), Check(skill: Lore, modifier: -2, pass: [CloseGateOfChoice])]))],
+                ),
+                (
+                    location: "witch_house",
+                    text: "Vous êtes submergé par les chants des sorcières disparues qui ont vécu et qui sont mortes ici - vous vous évanouissez. Faites un test de Volonté (-2). Si vous réussissez, vous apprenez un sort ancien dans vos rêves. Piochez 1 sort. Si vous échouez, il vous manque la moitié de vos objets quand vous vous réveillez. Défaussez la moitié (arrondi à l'inférieur) de vos objets (ceux de votre choix).",
+                    effects: [Check(skill: Will, modifier: -2, pass: [Draw(deck: Spell)], fail: [DiscardHalf(cards: Items)])],
+                ),
+            ],
+            image: "cartes/lieu/french_hill/clafh15.jpg",
+        ),
+        (
+            id: "clafh20",
+            district: "french_hill",
+            encounters: [
+                (
+                    location: "silver_twilight_lodge",
+                    text: "En effleurant un objet étrange dans le hall, vous vous sentez flétri et mince, comme si votre peau était trop serrée. Réussissez un test de Chance (-1) ou vous êtes Maudit.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [TakeCard(card: "curse")])],
+                ),
+                (
+                    location: "silver_twilight_lodge",
+                    requires: HasCard("silver_twilight_membership"),
+                    text: "Cœur de la Loge. En participant à la cérémonie mensuelle, vous voyez à l'œuvre de grands pouvoirs et de grands maléfices. Perdez jusqu'à 3 Santé Mentale et gagnez autant de pions Indice.",
+                    effects: [ChooseUpTo(3), LoseAmount([Sanity], X), GainAmount(Clues, X)],
+                ),
+                (
+                    location: "witch_house",
+                    text: "Vous trouvez un banquet dans la salle à manger et vous vous sentez obligé de vous asseoir et de manger. Faites un test de Chance (+0) et consultez la table suivante : Nombre de succès : 0) Vous réalisez subitement ce que vous venez de manger. Perdez 3 Santé Mentale. 1) Vous vous gavez, incapable d'arrêter de manger. Restez ici au prochain tour. 2) La nourriture vous rend malade. Perdez 1 Résistance. 3+) La nourriture vous requinque! Gagnez 3 Résistance.",
+                    effects: [CheckTable(skill: Luck, modifier: 0, rows: [(from: 0, effects: [Lose(Sanity, 3)]), (from: 1, effects: [Delayed]), (from: 2, effects: [Lose(Stamina, 1)]), (from: 3, effects: [Gain(Stamina, 3)])])],
+                ),
+            ],
+            image: "cartes/lieu/french_hill/clafh20.jpg",
+        ),
+        (
+            id: "clafh21",
+            district: "french_hill",
+            encounters: [
+                (
+                    location: "silver_twilight_lodge",
+                    text: "Carl Sanford vous amène à l'étude pour discuter et vous vous sentez mal à l'aise en l'écoutant. Faites un test de Savoir (-1). Si vous le réussissez, votre volonté vous permet de résister à cet ancien sorcier et vous apprenez même quelque chose. Gagnez 3 pions Indice. Si vous le ratez, son ton hypnotique vous met en transe. La conversation vous semble courte, mais quand vous quittez l'étude, il s'est passé beaucoup de temps et vos pensées sont confuses. Perdez tous vos pions Indice et allez dans la rue.",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Gain(Clues, 3)], fail: [LoseAll(Clues), MoveToStreet])],
+                ),
+                (
+                    location: "silver_twilight_lodge",
+                    requires: HasCard("silver_twilight_membership"),
+                    text: "Cœur de la Loge. Carl Sanford ne vous fait pas confiance et au point culminant de la cérémonie mensuelle il vous jette un sort. Réussissez un test de Chance (-2), sinon vous êtes Maudit.",
+                    effects: [Check(skill: Luck, modifier: -2, fail: [TakeCard(card: "curse")])],
+                ),
+                (
+                    location: "witch_house",
+                    text: "Un portail et un monstre apparaissent !",
+                    effects: [GateAndMonsterAppear],
+                ),
+            ],
+            image: "cartes/lieu/french_hill/clafh21.jpg",
+        ),
+        (
+            id: "clafh23",
+            district: "french_hill",
+            encounters: [
+                (
+                    location: "silver_twilight_lodge",
+                    text: "Vous entendez le bruit étouffé d'une intrusion. Si vous enquêtez, vous trouvez une femme habillée en noir. Elle vous attaque dès qu'elle vous voit. Réussissez un test de Vigueur (-1) pour la maîtriser assez longtemps et lui expliquer votre enquête. Vous découvrez qu'elle s'appelle Ruby Standish et qu'elle cambriolait la Loge. Après avoir écouté votre histoire, elle décide de se joindre à vous. Prenez sa carte Allié. Si elle n'est pas disponible, piochez une carte Objet Unique à la place.",
+                    effects: [Optional((label: "Enquêter", effects: [Check(skill: Fight, modifier: -1, pass: [TakeCard(card: "ruby_standish", otherwise: [Draw(deck: UniqueItem)])])]))],
+                ),
+                (
+                    location: "silver_twilight_lodge",
+                    requires: HasCard("silver_twilight_membership"),
+                    text: "Cœur de la Loge. L'Ordre du Crépuscule d'Argent lance un sort de bannissement au cours de sa cérémonie mensuelle. Dépensez 1 Santé Mentale pour faire un test de Chance (-1). Si vous réussissez, réclamez un monstre du plateau comme trophée. Si vous échouez, rien ne se passe.",
+                    effects: [Optional((label: "Dépenser 1 Santé Mentale", effects: [Lose(Sanity, 1), Check(skill: Luck, modifier: -1, pass: [TrophyFromBoard])]))],
+                ),
+                (
+                    location: "witch_house",
+                    text: "Réussissez un test de Chance (-1) pour trouver un objet d'apparence ancienne sur une étagère poussiéreuse. Piochez une carte Objet Unique",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)])],
+                ),
+            ],
+            image: "cartes/lieu/french_hill/clafh23.jpg",
+        ),
+        (
+            id: "claqri01",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Des chauves-souris ! Par centaines ! Faites un test de Vitesse (-1) pour sortir de la caverne. Si vous échouez, perdez 1 Résistance.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Stamina, 1)])],
+                ),
+                (
+                    location: "general_store",
+                    text: "Le gérant remarque l'un des objets que vous portez et son visage s'illumine. « Dites, j'en recherche un depuis longtemps. Vous ne le vendriez pas par hasard ? Je suis prêt à mettre le prix ! » Vous pouvez vendre un de vos Objets Communs à deux fois le prix indiqué.",
+                    effects: [Sell(deck: CommonItem, multiplier: 2)],
+                ),
+                (
+                    location: "graveyard",
+                    text: "En descendant dans un mausolée sombre, vous découvrez un vampire qui se lève pour se nourrir. Vous vous retrouvez rapidement à combattre pour votre vie. Faites un test de Vigueur (-2). Si vous le réussissez, vous battez le vampire et gagnez 1 pion Indice et piochez 1 Objet Unique. Si vous le ratez, lancez un dé et perdez autant de Résistance.",
+                    effects: [
+                        Check(
+                            skill: Fight,
+                            modifier: -2,
+                            pass: [Gain(Clues, 1), Draw(deck: UniqueItem)],
+                            fail: [LoseRolled(Stamina)],
+                        ),
+                    ],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri01.jpg",
+        ),
+        (
+            id: "claqri02",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Vous trouvez un vieux livre. Si vous le lisez, faites un test de Chance (+0) et consultez la table suivante : Nombre de succès : 0) Des forces maléfiques vous attaquent. Perdez 1 Santé Mentale et 1 Résistance. 1) Vous trouvez le journal d'une âme perdue, décédée il y a longtemps dans les cavernes. Perdez 1 Santé Mentale et gagnez 1 pion Indice en lisant son horrible histoire. 2+) Le livre est un livre de sorts. Prenez le premier Tome du paquet d'Objet Unique.",
+                    effects: [Optional((label: "Lire le livre", effects: [CheckTable(skill: Luck, modifier: 0, rows: [(from: 0, effects: [Lose(Sanity, 1), Lose(Stamina, 1)]), (from: 1, effects: [Lose(Sanity, 1), Gain(Clues, 1)]), (from: 2, effects: [TakeFirst(deck: UniqueItem, cards: Tomes)])])]))],
+                ),
+                (
+                    location: "general_store",
+                    text: "« Hé, vous venez de faire tomber ça ! » Un jeune galopin vous donne un objet et déguerpit. Vous ne reconnaissez pas cet objet, mais le gamin a déjà disparu. Piochez 1 Objet Commun.",
+                    effects: [Draw(deck: CommonItem)],
+                ),
+                (
+                    location: "graveyard",
+                    text: "Vous trouvez le corps à moitié enterré d'un être étrange. Piochez un monstre de la tasse et prenez-le comme trophée, même s'il a la capacité Inépuisable.",
+                    effects: [TrophyFromCup],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri02.jpg",
+        ),
+        (
+            id: "claqri05",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Vous êtes dans un labyrinthe de voies tortueuses. Réussissez un test de Savoir (-2), ou vous vous perdez. Si vous échouez, perdez 1 Résistance et restez ici au prochain tour.",
+                    effects: [Check(skill: Lore, modifier: -2, fail: [Lose(Stamina, 1), Delayed])],
+                ),
+                (
+                    location: "general_store",
+                    text: "Réussissez un test de Volonté (-2). Si vous le réussissez, vous avez l'oreille du gérant. Voyant votre cause courageuse, il vous emmène dans l'arrière boutique et vous propose du matériel spécial. Piochez 3 Objets Communs. Vous pouvez en prendre un gratuitement, pour vous aider dans votre lutte contre le mal qui ronge Arkham. Défaussez les deux autres cartes. Si vous échouez, rien ne se passe.",
+                    effects: [Check(skill: Will, modifier: -2, pass: [Draw(deck: CommonItem, count: 3, keep: 1)])],
+                ),
+                (
+                    location: "graveyard",
+                    text: "Réussissez un test de Chance (-2) pour trouver un indice important sur les inscriptions des pierres tombales. Gagnez 2 pions Indice et vous pouvez aller dans le lieu ou la zone de rues de votre choix dans Arkham. Si vous allez dans un lieu, faites-y immédiatement une rencontre.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [Gain(Clues, 2), Optional((label: "Se déplacer", effects: [MoveAnywhereInArkham]))])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri05.jpg",
+        ),
+        (
+            id: "claqri07",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Le vent soufflant dans la caverne murmure votre nom. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+                (
+                    location: "general_store",
+                    text: "Vous essayez de parler aux personnes âgées qui se sont rassemblées autour du poêle pour jouer aux dames mais, hormis quelques regards en biais et des grognements de dédains, vous n'en tirez rien. Apparemment, ils n'aiment pas les étrangers. Pas de rencontre.",
+                ),
+                (
+                    location: "graveyard",
+                    text: "Cooter Falwell, dit « Le Témoin », vous abreuve de paroles sur ses croyances spirituelles. Faites un test de Savoir (-1). Si vous le réussissez, vous arrivez à trouver un indice sur le Mythe dans le flot de paroles de Cooter. Gagnez 1 pion Indice mais perdez 1 Santé Mentale. Si vous le ratez, vous êtes saoulé par ce prêchi-prêcha et allez vous réfugier dans la rue.",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Gain(Clues, 1), Lose(Sanity, 1)], fail: [MoveToStreet])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri07.jpg",
+        ),
+        (
+            id: "claqri13",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Vous êtes attaqué par une ombre, mais un homme baraqué sort des ténèbres et la fait fuir. Il vous dit qu'il s'appelle Tom « Mountain » Murphy. Faites un test de Chance (-2), ou défaussez une carte Whisky pour le réussir automatiquement. Si vous le réussissez, il se joint à vous. Prenez cette carte Allié si elle est disponible, sinon il vous donne quelque chose pour vous aider à vous défendre. Prenez la première Arme du paquet d'Objet Communs. Si vous échouez, rien ne se passe.",
+                    effects: [Check(skill: Luck, modifier: -2, or_discard: "whiskey", pass: [TakeCard(card: "tom_mountain_murphy", otherwise: [TakeFirst(deck: CommonItem, cards: Weapons)])])],
+                ),
+                (
+                    location: "general_store",
+                    text: "Un pot sur le comptoir porte cette inscription : « Devinez combien de billes sont dans le pot pour gagner une récompense ! 1$ l'inscription ». Si vous le voulez, vous pouvez payer 1$ pour faire un test de Savoir (-2). Si vous le réussissez, vous gagnez 5$. Sinon, rien ne se passe.",
+                    effects: [Optional((label: "Payer 1 $", effects: [Pay(Money, 1), Check(skill: Lore, modifier: -2, pass: [Gain(Money, 5)])]))],
+                ),
+                (
+                    location: "graveyard",
+                    text: "En entrant dans une crypte, vous êtes surpris de trouver une magnifique fresque et des mots inspirés sur le mur. Il y a comme un calme magique dans cette salle. Gagnez 2 Santé Mentale.",
+                    effects: [Gain(Sanity, 2)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri13.jpg",
+        ),
+        (
+            id: "claqri18",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    location: "general_store",
+                    text: "Vous remarquez que certains habitants ont un étrange air de poisson qui vous fait grincer des dents. Le gérant aperçoit votre regard et acquiesce, « La famille Marsh, d'Innsmouth. Faites attention à eux ». Frissonnant, vous perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+                (
+                    location: "graveyard",
+                    text: "Vous trouvez un homme peignant le tableau d'une de ces horribles gargouilles alignées sur les murs du cimetière. En vous voyant, il se présente comme étant Richard Uptown Pickman, un peintre de Boston en visite. Si vous dépensez des trophées de monstre pour un total de 5 en force, Pickman vous apprécie. Prenez sa carte Allié. Si elle n'est pas disponible, il vous apprend une incantation à la place. Piochez 1 Sort.",
+                    effects: [Optional((label: "Dépenser 5 en trophées de monstre", effects: [SpendMonsterTrophies(5), TakeCard(card: "richard_upton_pickman", otherwise: [Draw(deck: Spell)])]))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri18.jpg",
+        ),
+        (
+            id: "claqri23",
+            district: "rivertown",
+            encounters: [
+                (
+                    location: "black_cave",
+                    text: "Dans les ténèbres vous tombez sur les restes d'un spéléologue. Faites un test de Chance (+0) et consultez la table suivante : Nombre de succès : 0) Le corps commence à se gonfler et se déchire, relâchant l'horreur cachée à l'intérieur. Perdez 1 Santé Mentale et un monstre apparaît ! 1) Le corps a été ouvert, comme déchiqueté par un monstre puissant. Perdez 1 Santé Mentale. 2+) En fouillant le corps, vous trouvez un objet. Piochez un Objet Commun.",
+                    effects: [CheckTable(skill: Luck, modifier: 0, rows: [(from: 0, effects: [Lose(Sanity, 1), MonsterAppears]), (from: 1, effects: [Lose(Sanity, 1)]), (from: 2, effects: [Draw(deck: CommonItem)])])],
+                ),
+                (
+                    location: "general_store",
+                    text: "Remarquant un éclat sur le sol, vous découvrez un dollar en argent. Gagnez 1$.",
+                    effects: [Gain(Money, 1)],
+                ),
+                (
+                    location: "graveyard",
+                    text: "Un monstre apparaît !",
+                    effects: [MonsterAppears],
+                ),
+            ],
+            image: "cartes/lieu/quartier_de_la_riviere/claqri23.jpg",
         ),
         (
             id: "claqe03",
@@ -136,6 +538,299 @@ LocationCards(
                 ),
             ],
             image: "cartes/lieu/quartier_est/claqe03.jpg",
+        ),
+        (
+            id: "claqe04",
+            district: "easttown",
+            encounters: [
+                (
+                    location: "hibbs_roadhouse",
+                    text: "« Alors, c'est quoi votre histoire, mon ami ? » Un homme souriant se renseigne sur votre aventure devant un verre de gin. Vous lui racontez votre histoire. Si vous dépensez 3 pions Indice, il se présente comme étant Ryan Dean et se propose de vous rejoindre. Prenez cette carte Allié. Si elle n'est pas disponible, il vous donne des objets utiles. Piochez 2 cartes Objet Commun.",
+                    effects: [Optional((label: "Dépenser 3 pions Indice", effects: [Pay(Clues, 3), TakeCard(card: "ryan_dean", otherwise: [Draw(deck: CommonItem, count: 2)])]))],
+                ),
+                (
+                    location: "police_station",
+                    text: "Un des hommes dans la cellule d'emprisonnement essaye de vous intimider avec des histoires sur les choses qu'il aurait vues. Faites un test de Volonté (-1). Si vous réussissez, gagnez 1 pion Indice. Sinon, allez dans la rue et perdez 1 Santé Mentale tandis que l'homme se moque de vous.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [Gain(Clues, 1)], fail: [MoveToStreet, Lose(Sanity, 1)])],
+                ),
+                (
+                    location: "velmas_diner",
+                    text: "« Qu'est-ce que vous prenez ? » Velma prend votre commande. Payez 6$ pour gagner autant de points répartis comme vous le voulez entre la Résistance et la Santé Mentale.",
+                    effects: [Optional((label: "Payer 6 $", effects: [Pay(Money, 6), GainSplit(Fixed(6))]))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_est/claqe04.jpg",
+        ),
+        (
+            id: "claqe06",
+            district: "easttown",
+            encounters: [
+                (
+                    location: "hibbs_roadhouse",
+                    text: "Un horrible monstre apparaît!",
+                    effects: [MonsterAppears],
+                ),
+                (
+                    location: "police_station",
+                    text: "Le shérif Engle remarque que vous portez beaucoup d'armes. Donnez-lui 5$ ou défaussez toutes vos Armes.",
+                    effects: [Choice([(label: "Donner 5 $", effects: [Pay(Money, 5)]), (label: "Défausser toutes vos Armes", effects: [DiscardAll(Weapons)])])],
+                ),
+                (
+                    location: "velmas_diner",
+                    text: "Velma lit les feuilles de thé dans votre tasse. Faites un test de Chance (-1). Si vous réussissez, la disposition des feuilles montre de l'espoir, vous êtes Béni. Si vous échouez, le futur semble sombre, vous êtes Maudit.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [TakeCard(card: "blessing")], fail: [TakeCard(card: "curse")])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_est/claqe06.jpg",
+        ),
+        (
+            id: "claqe09",
+            district: "easttown",
+            encounters: [
+                (
+                    location: "hibbs_roadhouse",
+                    text: "Joey « le rat » Vigil s'assoit à votre table et murmure « Psssst ! Vous voulez acheter quelque chose ? » Regardez les 3 premières cartes du paquet d'Objets Communs. Vous pouvez acheter tout ou partie de ces objets pour 1$ de plus que le prix indiqué. « Faut comprendre, j'ai des frais » vous explique Joey.",
+                    effects: [Buy(draw: [CommonItem, CommonItem, CommonItem], price: Plus(1))],
+                ),
+                (
+                    location: "police_station",
+                    text: "Si vous réussissez un Test de Chance (-1), l'adjoint au shérif Dingby vous laisse distraitement prendre son arme. Vous pouvez chercher dans le paquet d'Objets Communs la carte Revolver .38 et la prendre.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [TakeCard(card: "revolver_38")])],
+                ),
+                (
+                    location: "velmas_diner",
+                    text: "Vous repérez un rat qui sort de la cuisine. Réussissez un Test de Volonté (-2) pour convaincre Velma de vous donnez 5$ pour ne pas que vous le racontiez à tout le monde.",
+                    effects: [Check(skill: Will, modifier: -2, pass: [Gain(Money, 5)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_est/claqe09.jpg",
+        ),
+        (
+            id: "claqe13",
+            district: "easttown",
+            encounters: [
+                (
+                    location: "hibbs_roadhouse",
+                    text: "Vous faites une partie de cartes « amicale ». Faites un test de Chance (-1). Si vous réussissez, vous gagnez 5$, sinon vous perdez 3$. Si vous ne pouvez pas payer, les gars vous rossent et vous jettent dehors. Perdez 1 Résistance et allez dans la rue.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Gain(Money, 5)], fail: [If(condition: HasAtLeast(Money, 3), then: [Pay(Money, 3)], otherwise: [Lose(Stamina, 1), MoveToStreet])])],
+                ),
+                (
+                    location: "police_station",
+                    text: "L'adjoint au shérif Dingby nettoie son arme fébrilement, et tire une balle, restée dans la chambre du pistolet, dans votre direction. Faites un test de Chance (-1) pour éviter de recevoir la balle. Si vous échouez, perdez 2 Résistance.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Lose(Stamina, 2)])],
+                ),
+                (
+                    location: "velmas_diner",
+                    text: "Velma vous trouve trop maigre et vous donne un sandwich. Vous pouvez chercher dans le paquet Objet Communs une carte Nourriture et la prendre.",
+                    effects: [TakeCard(card: "food")],
+                ),
+            ],
+            image: "cartes/lieu/quartier_est/claqe13.jpg",
+        ),
+        (
+            id: "claqe14",
+            district: "easttown",
+            encounters: [
+                (
+                    location: "hibbs_roadhouse",
+                    text: "Malgré la Prohibition, l'alcool coule à flot chez Hibb. Vous buvez abondamment tout en questionnant les gens du coin sur les étranges histoires d'Arkham. Faites un test de Volonté (-1). Si vous le réussissez, vous tenez l'alcool et vous apprenez quelque chose. Gagnez 2 pions Indice. Si vous le ratez, vous tombez ivre mort. Allez dans la rue et perdez 1 objet de votre choix ou tout votre argent.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [Gain(Clues, 2)], fail: [MoveToStreet, Choice([(label: "Perdre 1 objet", effects: [Discard(cards: Items, count: 1)]), (label: "Perdre tout votre argent", effects: [LoseAll(Money)])])])],
+                ),
+                (
+                    location: "police_station",
+                    text: "Le shérif Engle vous fait confiance et vous demande de passer à son bureau pour parler des derniers événements étranges. Réussissez un test de Chance (-2) pour le convaincre de vous mettre dans la confidence et de vous donner un objet utile. Piochez un Objet Unique.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [Draw(deck: UniqueItem)])],
+                ),
+                (
+                    location: "velmas_diner",
+                    text: "La viande n'était pas fraîche; vous êtes intoxiqué. Réussissez un test de Chance (-1) ou perdez 2 Résistance.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Lose(Stamina, 2)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_est/claqe14.jpg",
+        ),
+        (
+            id: "claqe23",
+            district: "easttown",
+            encounters: [
+                (
+                    location: "hibbs_roadhouse",
+                    text: "Un étranger vous paye à boire. Vous pouvez chercher dans le paquet d'Objets Communs la carte Whisky pour la prendre.",
+                    effects: [TakeCard(card: "whiskey")],
+                ),
+                (
+                    location: "police_station",
+                    text: "Réussissez un test de Volonté (-1) pour convaincre l'adjoint au shérif Dingby de partager avec vous des informations intéressantes. Gagnez 2 pions Indice.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [Gain(Clues, 2)])],
+                ),
+                (
+                    location: "velmas_diner",
+                    text: "Si vous le désirez, payez 1$ pour savourer une part de tarte à la cerise. Si vous le faites, gagnez 2 Résistance.",
+                    effects: [Optional((label: "Payer 1 $", effects: [Pay(Money, 1), Gain(Stamina, 2)]))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_est/claqe23.jpg",
+        ),
+        (
+            id: "claqm01",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Marchant le long des quais, vous voyez quelque chose flotter dans l'eau. Vous tentez de l'attraper : faites un test de Chance (-1). Si vous le réussissez, vous récupérez quelque chose d'utile. Piochez un Objet Commun. Si vous échouez, vous ramenez à la surface un tentacule qui s'enroule immédiatement autour de votre cou et vous fait tomber à l'eau. Perdez 1 Santé Mentale et 3 Résistance avant d'arriver à vous libérer.",
+                    effects: [
+                        Check(
+                            skill: Luck,
+                            modifier: -1,
+                            pass: [Draw(deck: CommonItem)],
+                            fail: [Lose(Sanity, 1), Lose(Stamina, 3)],
+                        ),
+                    ],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "Réussissez un test de Chance (-1) pour trouver une cachette secrète dans le mur d'une chambre à l'étage. Piochez un Objet Unique.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)])],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Un groupe de cultistes encapuchonnés est réuni parmi les pierres dressées de l'île. Réussissez un test de Discrétion (-1) pour arriver à entendre ce qui se dit et gagner 2 pions Indice.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [Gain(Clues, 2)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm01.jpg",
+        ),
+        (
+            id: "claqm04",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Alors que vous regardez les vagues, il vous vient une envie irrésistible de vous jeter dans l'océan. Réussissez un test de Volonté (+1) ou vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Will, modifier: 1, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "Vous entendez les cris et raclements de pattes d'une horde de rats qui se déplace à l'intérieur des murs. Soudain, vous réalisez qu'ils essayent de vous encercler. Réussissez un test de Vitesse (-1) pour atteindre le premier la porte d'entrée. Si vous échouez, vous êtes perdu dans le temps et l'espace.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [LostInTimeAndSpace])],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Vous regardez le ciel nocturne et vous voyez des constellations que vous n'aviez jamais vues auparavant. Le ciel est totalement différent ici ! Perdez 1 Santé Mentale et gagnez 1 pion Indice.",
+                    effects: [Lose(Sanity, 1), Gain(Clues, 1)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm04.jpg",
+        ),
+        (
+            id: "claqm12",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Vous remarquez un morceau de bois flottant dans l'eau ; on peut y voir gravé le nom d'un navire coulé depuis longtemps. Au moment où vous le touchez, vous avez une vision des derniers instants des passagers se noyant. Réussissez un test de Vitesse (-1) pour le jeter loin de vous. Si vous échouez, vous tombez sur le sol en criant. Perdez 1 Santé Mentale.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Sanity, 1)])],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "Vous remarquez un reflet de lumière dans une fissure. Si vous y passez le bras, faites un test de Chance (-1). Si vous le réussissez, piochez 1 Objet Unique. Si vous le ratez, vous ressentez une grande douleur dans votre main qui vient d'être mordue. Vous arrivez à vous libérer mais vous perdez 2 Résistance et 1 Santé Mentale.",
+                    effects: [Optional((label: "Passer le bras", effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [Lose(Stamina, 2), Lose(Sanity, 1)])]))],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Les saules oscillent au gré d'un vent que vous ne sentez ni n'entendez et pendant un moment, la haine qu'éprouvent ces arbres pour ceux qui profanent leur île vous met à genoux. Réussissez un test de Volonté (-2) ou perdez 3 Santé Mentale.",
+                    effects: [Check(skill: Will, modifier: -2, fail: [Lose(Sanity, 3)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm12.jpg",
+        ),
+        (
+            id: "claqm13",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Vous ouvrez des caisses sur le quai. À l'intérieur vous trouvez des objets utiles. Piochez 2 Objet Communs. Puis faites un test de Chance (-1). Si vous le réussissez, vous partez sans être vu. Sinon, vous êtes arrêté par la police et emmené au Poste.",
+                    effects: [Draw(deck: CommonItem, count: 2), Check(skill: Luck, modifier: -1, fail: [Arrested])],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "Dans un bureau poussiéreux, vous trouvez un mystérieux manuscrit. Si vous le lisez, faites un test de Savoir (-1). Si vous le réussissez, piochez 1 Sort. Si vous échouez, le manuscrit n'est rien d'autre que les délires de l'esprit malade d'un ancien locataire. Restez ici à le lire au prochain tour et gagnez 2 pions Indice.",
+                    effects: [Optional((label: "Lire le manuscrit", effects: [Check(skill: Lore, modifier: -1, pass: [Draw(deck: Spell)], fail: [Delayed, Gain(Clues, 2)])]))],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Vous rencontrez un homme examinant de vieux os. Réussissez un test de Discrétion (-1) pour vous approcher afin de voir ce qu'il fait. Il finit par vous remarquer et est impressionné par vos compétences. Il se présente comme étant John Legrasse. Prenez cette carte Allié si elle est disponible sinon il partage son repas avec vous. Restaurez votre Santé Mentale et votre Résistance à leurs valeurs maximales.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [TakeCard(card: "john_legrasse", otherwise: [RestoreToMax(Sanity), RestoreToMax(Stamina)])])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm13.jpg",
+        ),
+        (
+            id: "claqm16",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Les dockers sont en sous-effectif et vous offrent un travail de débardeur pour la journée. Faites un test de Vigueur (+0). Si vous le réussissez, gagnez 3$ par succès obtenu. Si vous le ratez, le patron est fatigué de vous voir paresser et vous jette dehors. Perdez 1 Résistance et allez dans la rue.",
+                    effects: [Check(skill: Fight, modifier: 0, pass: [GainAmount(Money, Successes(3))], fail: [Lose(Stamina, 1), MoveToStreet])],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "Un monstre et un portail apparaissent !",
+                    effects: [GateAndMonsterAppear],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Un homme silencieux vous effleure en vous croisant sur le sentier. Vos bras s'engourdissent à ce contact. Vous vous retournez pour le voir mais il a disparu. Perdez 1 Résistance et réussissez un test de Volonté (-1) ou perdez aussi 1 Santé Mentale.",
+                    effects: [Lose(Stamina, 1), Check(skill: Will, modifier: -1, fail: [Lose(Sanity, 1)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm16.jpg",
+        ),
+        (
+            id: "claqm18",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Vous tombez sur Abner Weems, le poivrot local. Vous l'aidez à trouver un endroit pour passer la nuit et il vous marmonne sans cesse quelque chose. Faites un test de Chance (-1). Si vous le réussissez, vous comprenez que son marmonnement est un chant magique. Piochez 1 sort. Sinon c'est du baragouin et rien ne se passe.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: Spell)])],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "Vous tombez sur Eric Colt. Il vous raconte une histoire horrible sur le Mythe pour éprouver vos nerfs. Si vous écoutez, perdez 2 Santé Mentale. Si ça ne vous rend pas fou, prenez cette carte Allié si elle est disponible. Si ce n'est pas le cas, vous lui soutirez des informations à la place. Prenez 3 pions Indice.",
+                    effects: [Optional((label: "Écouter", effects: [Lose(Sanity, 2), TakeCard(card: "eric_colt", otherwise: [Gain(Clues, 3)])]))],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Vous arrivez sur un grand empilement d'os humains sous les branches d'un des saules de l'île. Perdez 1 Santé Mentale mais vous trouvez un parchemin parmi les os. Piochez 1 Sort.",
+                    effects: [Lose(Sanity, 1), Draw(deck: Spell)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm18.jpg",
+        ),
+        (
+            id: "claqm22",
+            district: "merchant_district",
+            encounters: [
+                (
+                    location: "river_docks",
+                    text: "Une puanteur nauséabonde attire votre attention vers le corps d'une créature marine bizarre pourrissant sur le bord des quais. Quand vous vous déplacez vers cette masse, votre estomac vous envoie des sensations désagréables. Faites un test de Volonté (-1). Si vous le réussissez, perdez 1 Santé Mentale. Sinon, perdez 2 Santé Mentale. Dans les deux cas, si vous n'êtes pas tombé à 0 en Santé Mentale, vous trouvez quelque chose agrippé dans ses mains palmés. Piochez un Objet Unique.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [Lose(Sanity, 1)], fail: [Lose(Sanity, 2)]), Draw(deck: UniqueItem)],
+                ),
+                (
+                    location: "the_unnamable",
+                    text: "La poutre du plafond cède soudainement. Faites un test de Vitesse (-1). Si vous le réussissez, allez dans la rue. Sinon, perdez 2 Résistance.",
+                    effects: [Check(skill: Speed, modifier: -1, pass: [MoveToStreet], fail: [Lose(Stamina, 2)])],
+                ),
+                (
+                    location: "unvisited_isle",
+                    text: "Au moment de monter dans votre canoë et de ramer vers le rivage, vous voyez une gigantesque forme sombre qui perturbe l'eau près de l'île. Des vagues d'intense panique s'emparent de vous et vous devez réussir un test de Volonté (-1) ou être Maudit.",
+                    effects: [Check(skill: Will, modifier: -1, fail: [TakeCard(card: "curse")])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_marchand/claqm22.jpg",
         ),
         (
             id: "claqn02",
@@ -180,67 +875,136 @@ LocationCards(
             image: "cartes/lieu/quartier_nord/claqn02.jpg",
         ),
         (
-            id: "clauv07",
-            district: "miskatonic_u",
+            id: "claqn07",
+            district: "northside",
             encounters: [
                 (
-                    location: "administration",
-                    text: "Réussissez un test de Volonté (-1) pour obtenir du Doyen un acompte afin d'écrire un manuscrit pour l'université. Prenez une carte Acompte.",
-                    effects: [Check(skill: Will, modifier: -1, pass: [TakeCard(card: "retainer")])],
+                    location: "curiositie_shoppe",
+                    text: "Vous examinez une statue obscène. Réussissez un test de Chance (-2) ou vous sentez un frisson de peur parcourir votre corps quand vous prenez la statue. Vous êtes Maudit.",
+                    effects: [Check(skill: Luck, modifier: -2, fail: [TakeCard(card: "curse")])],
                 ),
                 (
-                    location: "library",
-                    text: "Vous trouvez un livre étrange qui irradie de façon maléfique au toucher. Faites un test de Savoir (-2). En cas de réussite, vous récupérez un vaste savoir sur la menace. Lancez un dé et gagnez autant de pions Indice. En cas d'échec, le livre vous consume corps et âme. Perdez 2 Santé Mentale et 2 Résistance.",
-                    effects: [
-                        Check(
-                            skill: Lore,
-                            modifier: -2,
-                            pass: [GainRolled(Clues)],
-                            fail: [Lose(Sanity, 2), Lose(Stamina, 2)],
-                        ),
-                    ],
+                    location: "newspaper",
+                    text: "Votre article vous fait gagner un peu d'argent et une virée avec Doyle Jefferies, le rédacteur. Gagnez 2$ et allez dans le lieu ou la zone de rues de votre choix à Arkham. Si vous allez à un lieu, faites-y immédiatement une rencontre.",
+                    effects: [Gain(Money, 2), MoveAnywhereInArkham],
                 ),
                 (
-                    location: "science_building",
-                    text: "Un professeur d'Archéologie vous montre un objet qu'il a trouvé dans une pyramide égyptienne. Si vous avez 2 Sorts ou moins, il brille dans vos mains et vous vous retrouvez dehors à le tenir. Ne voulant pas revoir le professeur, vous décidez de garder l'objet. Gagnez 1 Objet Unique et allez dans la rue. Si vous avez plus de 2 sorts, rien ne se passe.",
-                    effects: [
-                        If(
-                            condition: CardCountAtMost(deck: Spell, count: 2),
-                            then: [Draw(deck: UniqueItem), MoveToStreet],
-                        ),
-                    ],
+                    location: "train_station",
+                    text: "Sur le quai de chargement vous fouillez une grande caisse avec des marques étranges. Faites un test de Discrétion (-1). Si vous le réussissez, vous y trouvez un objet inhabituel. Gagnez 1 Objet Unique. Si vous le ratez, l'adjoint au shérif Dingby vous surprend. Vous êtes arrêté et emmené au Poste de Police.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [Arrested])],
                 ),
             ],
-            image: "cartes/lieu/universite_miskatonic/clauv07.jpg",
+            image: "cartes/lieu/quartier_nord/claqn07.jpg",
         ),
         (
-            id: "claqm01",
-            district: "merchant_district",
+            id: "claqn14",
+            district: "northside",
             encounters: [
                 (
-                    location: "river_docks",
-                    text: "Marchant le long des quais, vous voyez quelque chose flotter dans l'eau. Vous tentez de l'attraper : faites un test de Chance (-1). Si vous le réussissez, vous récupérez quelque chose d'utile. Piochez un Objet Commun. Si vous échouez, vous ramenez à la surface un tentacule qui s'enroule immédiatement autour de votre cou et vous fait tomber à l'eau. Perdez 1 Santé Mentale et 3 Résistance avant d'arriver à vous libérer.",
-                    effects: [
-                        Check(
-                            skill: Luck,
-                            modifier: -1,
-                            pass: [Draw(deck: CommonItem)],
-                            fail: [Lose(Sanity, 1), Lose(Stamina, 3)],
-                        ),
-                    ],
+                    location: "curiositie_shoppe",
+                    text: "Un vide caché derrière une étagère de livres envoie des ondes de chaleur. Réussissez un test de Vigueur (-1) ou vous êtes aspiré dans les Abysses. Faites-y une rencontre, puis revenez immédiatement.",
+                    effects: [Check(skill: Fight, modifier: -1, fail: [VisitOtherWorld("abyss")])],
                 ),
                 (
-                    location: "the_unnamable",
-                    text: "Réussissez un test de Chance (-1) pour trouver une cachette secrète dans le mur d'une chambre à l'étage. Piochez un Objet Unique.",
-                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)])],
+                    location: "newspaper",
+                    text: "Gagnez 5$ grâce à une histoire.",
+                    effects: [Gain(Money, 5)],
                 ),
                 (
-                    location: "unvisited_isle",
-                    text: "Un groupe de cultistes encapuchonnés est réuni parmi les pierres dressées de l'île. Réussissez un test de Discrétion (-1) pour arriver à entendre ce qui se dit et gagner 2 pions Indice.",
-                    effects: [Check(skill: Sneak, modifier: -1, pass: [Gain(Clues, 2)])],
+                    location: "train_station",
+                    text: "Un homme bien habillé se tient sur le quai. Il se retourne et vous appelle par votre nom. Son visage vous semble familier mais vous ne vous souvenez pas l'avoir déjà rencontré. Il saute alors du quai juste devant un train. Faites un test de Vitesse (-2). Si vous le réussissez, il disparaît devant vous. Sur le sol, vous trouvez une feuille de papier. Gagnez 1 sort. Sinon, il est déchiqueté devant vos yeux. Lancez un dé et perdez autant de Santé Mentale.",
+                    effects: [Check(skill: Speed, modifier: -2, pass: [Draw(deck: Spell)], fail: [LoseRolled(Sanity)])],
                 ),
             ],
-            image: "cartes/lieu/quartier_marchand/claqm01.jpg",
+            image: "cartes/lieu/quartier_nord/claqn14.jpg",
+        ),
+        (
+            id: "claqn17",
+            district: "northside",
+            encounters: [
+                (
+                    location: "curiositie_shoppe",
+                    text: "Réussissez un test de Chance (-1) ou vous faites tomber accidentellement un objet. Défaussez un objet de votre choix. Si vous n'avez pas d'objet, piochez une nouvelle carte pour faire une autre rencontre.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [If(condition: HasAny(Items), then: [Discard(cards: Items, count: 1)], otherwise: [RedrawEncounter])])],
+                ),
+                (
+                    location: "newspaper",
+                    text: "Doyle Jefferies, le rédacteur en chef, vous offre un Acompte pour vos histoires fascinantes. Prenez une carte Acompte.",
+                    effects: [TakeCard(card: "retainer")],
+                ),
+                (
+                    location: "train_station",
+                    text: "Joey « le Rat » est blotti dans un coin de la gare et vous fait signe de vous approcher. Il a un objet à vendre. Piochez la première carte du paquet d'Objet Communs et si vous voulez acheter cet objet, payez-le 1$ de plus que le prix indiqué.",
+                    effects: [Buy(draw: [CommonItem], price: Plus(1))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_nord/claqn17.jpg",
+        ),
+        (
+            id: "claqn18",
+            district: "northside",
+            encounters: [
+                (
+                    location: "curiositie_shoppe",
+                    text: "Il y a une vente à laquelle tous les joueurs peuvent participer. Retournez les 3 premières cartes du paquet d'Objet Communs et la première carte du paquet d'Objet Unique. Tout joueur peut acheter un ou plusieurs de ces objets aux prix indiqués. Si les joueurs ne sont pas d'accord pour savoir qui achète quoi, c'est vous qui décidez. Les objets non achetés sont défaussés.",
+                    effects: [Buy(draw: [CommonItem, CommonItem, CommonItem, UniqueItem], everyone: true)],
+                ),
+                (
+                    location: "newspaper",
+                    text: "En feuilletant l'édition du matin, vous êtes surpris de voir que l'une des petites annonces commence par votre nom. En la lisant, vous réalisez qu'elle contient des indices codés sur la nature de la menace qui pèse sur Arkham. Réussissez un test de Savoir (-1) pour gagner 3 pions Indice.",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Gain(Clues, 3)])],
+                ),
+                (
+                    location: "train_station",
+                    text: "Bill Washington charge des bagages dans son coffre et vous propose une virée dans sa voiture. Si vous acceptez, allez dans le lieu ou la zone de rues de votre choix à Arkham. Si vous allez à un lieu, faites-y immédiatement une rencontre.",
+                    effects: [Optional((label: "Accepter la virée", effects: [MoveAnywhereInArkham]))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_nord/claqn18.jpg",
+        ),
+        (
+            id: "claqn21",
+            district: "northside",
+            encounters: [
+                (
+                    location: "curiositie_shoppe",
+                    text: "Vous trainez dans l'arrière boutique et vous entendez un bruit. Réussissez un test de Vitesse (-1) ou vous avez juste le temps de voir une matraque s'abattre sur votre crâne. Tout devient noir. Quand vous vous réveillez, vous êtes ailleurs. Piochez une carte mythe, allez à l'endroit inscrit sur cette carte et faites-y immédiatement une rencontre.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [MoveToMythosGate, EncounterHere(draw: 1)])],
+                ),
+                (
+                    location: "newspaper",
+                    text: "Vous renversez par inadvertance une bouteille d'encre et vous restez pantois devant la silhouette que forme l'encre sur le sol. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+                (
+                    location: "train_station",
+                    text: "Un étranger avec un turban et un regard fou descend du train de Boston. Faites un test de Chance (-1). Si vous le réussissez, l'homme sort un drôle d'objet de son manteau et vous le donne. Piochez 1 Objet Unique. Si vous le ratez, il sort une lame empoisonnée de son manteau et vous poignarde. Lancez un dé et perdez autant de Résistance.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [LoseRolled(Stamina)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_nord/claqn21.jpg",
+        ),
+        (
+            id: "claqn22",
+            district: "northside",
+            encounters: [
+                (
+                    location: "curiositie_shoppe",
+                    text: "Bingo ! Vous venez de trouver ce que vous recherchiez. Cherchez une carte dans le paquet Objet Commun ou le paquet Objet Unique pour acheter l'objet de votre choix au prix indiqué.",
+                    effects: [BuyAny([CommonItem, UniqueItem])],
+                ),
+                (
+                    location: "newspaper",
+                    text: "Doyle Jefferies, le rédacteur en chef, vous offre un Acompte pour vos histoires fascinantes. Prenez une carte Acompte.",
+                    effects: [TakeCard(card: "retainer")],
+                ),
+                (
+                    location: "train_station",
+                    text: "Le vieux bagagiste Bill Washington attend sur le quai le prochain train en jouant de la guitare. Alors que vous l'écoutez chanter, vous vous sentez beaucoup mieux. Gagnez 2 points à répartir comme vous voulez entre la Résistance et la Santé Mentale.",
+                    effects: [GainSplit(Fixed(2))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_nord/claqn22.jpg",
         ),
         (
             id: "claqre05",
@@ -276,6 +1040,138 @@ LocationCards(
                 ),
             ],
             image: "cartes/lieu/quartier_residentiel/claqre05.jpg",
+        ),
+        (
+            id: "claqre06",
+            district: "uptown",
+            encounters: [
+                (
+                    location: "st_marys_hospital",
+                    text: "Vous acceptez de servir de cobaye pour un traitement expérimental. Lancez un dé. De 1 à 3, gagnez autant de Résistance. De 4 à 6, il ne se passe rien.",
+                    effects: [RollDie(at_most: 3, effects: [GainAmount(Stamina, X)])],
+                ),
+                (
+                    location: "woods",
+                    text: "Vous trouvez un membre du Gang Sheldon endormi à côté de l'alambic. Faites un test de Discrétion (-2) pour essayer de voler le fusil à pompe qu'il a laissé tomber par terre. En cas de réussite, prenez le Fusil à pompe du paquet d'Objets Communs s'il y en a un. Si vous échouez, le garde se réveille. Vous êtes attrapé et tabassé. Vous perdez 2 Résistance mais vous vous échappez. Allez dans la rue.",
+                    effects: [Check(skill: Sneak, modifier: -2, pass: [TakeCard(card: "shotgun")], fail: [Lose(Stamina, 2), MoveToStreet])],
+                ),
+                (
+                    location: "ye_olde_magick_shoppe",
+                    text: "Il y a un vieux coffre fermé à vendre pour 5$. Si vous l'achetez, faites un test de Chance (+0) et consultez la table suivante : Nombre de succès : 0) Le coffre est vide ! 1) Des pièces d'or ! Lancez 2 dés et gagnez autant d'argent. 2+) Bingo ! Piochez 2 Objet Unique.",
+                    effects: [Optional((label: "Acheter le coffre (5 $)", effects: [Pay(Money, 5), CheckTable(skill: Luck, modifier: 0, rows: [(from: 0, effects: []), (from: 1, effects: [RollDice(2), GainAmount(Money, X)]), (from: 2, effects: [Draw(deck: UniqueItem, count: 2)])])]))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_residentiel/claqre06.jpg",
+        ),
+        (
+            id: "claqre07",
+            district: "uptown",
+            encounters: [
+                (
+                    location: "st_marys_hospital",
+                    text: "L'infirmière Sharon glisse quelque chose dans votre main quand le docteur ne regarde pas. Réussissez un test de Discrétion (-1) pour que personne ne vous remarque. En cas de réussite, vous découvrez plus tard que cet objet est un vieux parchemin décrivant un sort. Piochez 1 Sort. Si vous échouez, un aide infirmier vous le prend et vous ne gagnez rien.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [Draw(deck: Spell)])],
+                ),
+                (
+                    location: "woods",
+                    text: "Vous tombez sur un chien craintif. Réussissez un test de Vitesse (-2) pour l'attraper et le calmer. Si vous avez Nourriture, vous pouvez défausser cette carte pour réussir automatiquement le test. Vous voyez sur son collier qu'il s'appelle Duke. Prenez cette carte Allié. Si elle n'est pas disponible, gagnez 3$ comme récompense pour l'avoir rendu à son maître.",
+                    effects: [Check(skill: Speed, modifier: -2, or_discard: "food", pass: [TakeCard(card: "duke", otherwise: [Gain(Money, 3)])])],
+                ),
+                (
+                    location: "ye_olde_magick_shoppe",
+                    text: "Miriam Beecher vous parle pendant un moment, vous expliquant ses théories passionnantes sur le Mythe. Gagnez 1 pion Indice.",
+                    effects: [Gain(Clues, 1)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_residentiel/claqre07.jpg",
+        ),
+        (
+            id: "claqre11",
+            district: "uptown",
+            encounters: [
+                (
+                    location: "st_marys_hospital",
+                    text: "Vous jetez un œil aux dossiers médicaux d'une admission récente impliquée dans le rituel dune secte. Réussissez un test de Savoir (+0) pour apprendre quelque chose sur les méthodes de la secte. Gagnez 1 pion Indice.",
+                    effects: [Check(skill: Lore, modifier: 0, pass: [Gain(Clues, 1)])],
+                ),
+                (
+                    location: "woods",
+                    text: "Vous rencontrez un vieux sage dans le bosquet qui vous propose de partager sa sagesse. Si vous acceptez, perdez votre prochain tour et faites un test de Savoir (-2). Si vous le réussissez, vous pouvez piocher 1 Compétence, ou 2 sorts, ou gagner 4 pions Indice. Si vous échouez, rien ne se passe.",
+                    effects: [Optional((label: "Accepter", effects: [LoseNextTurn, Check(skill: Lore, modifier: -2, pass: [Choice([(label: "Piocher 1 Compétence", effects: [Draw(deck: Skill)]), (label: "Piocher 2 Sorts", effects: [Draw(deck: Spell, count: 2)]), (label: "Gagner 4 pions Indice", effects: [Gain(Clues, 4)])])])]))],
+                ),
+                (
+                    location: "ye_olde_magick_shoppe",
+                    text: "Miriam Beecher, la gérante, regarde attentivement votre visage puis s'exclame, « Ils vous ont marqué ! Sortez ! Sortez ! » et vous jette dehors. Allez dans la rue et perdez 1 Santé Mentale.",
+                    effects: [MoveToStreet, Lose(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_residentiel/claqre11.jpg",
+        ),
+        (
+            id: "claqre12",
+            district: "uptown",
+            encounters: [
+                (
+                    location: "st_marys_hospital",
+                    text: "Le docteur vous accompagne jusqu'au cadavre d'un investigateur malchanceux. Le corps est déchiqueté. Réussissez un test de Volonté (-1) ou perdez 1 Santé Mentale. En cas de succès, vous fouillez le cadavre et trouvez un objet. Piochez 1 Objet Unique. Si vous échouez, vous vous enfuyez en hurlant. Allez dans la rue.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [Draw(deck: UniqueItem)], fail: [Lose(Sanity, 1), MoveToStreet])],
+                ),
+                (
+                    location: "woods",
+                    text: "Un monstre et un portail apparaissent !",
+                    effects: [GateAndMonsterAppear],
+                ),
+                (
+                    location: "ye_olde_magick_shoppe",
+                    text: "Réussissez un test de Savoir (-1) pour reconnaître un objet que Miriam Beecher a sous-évalué. Si vous le faites, piochez 1 Objet Unique. Vous pouvez l'acheter à la moitié du prix indiqué (arrondi au supérieur).",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Buy(draw: [UniqueItem], price: Half)])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_residentiel/claqre12.jpg",
+        ),
+        (
+            id: "claqre14",
+            district: "uptown",
+            encounters: [
+                (
+                    location: "st_marys_hospital",
+                    text: "Un des médecins vous tient un discours cartésien plein de bon sens, vous faisant douter de certaines de vos convictions. Perdez 1 pion Indice.",
+                    effects: [Lose(Clues, 1)],
+                ),
+                (
+                    location: "woods",
+                    text: "Vous trébuchez sur un objet qui se trouve être un vieux coffre rouillé. Si vous l'ouvrez, faites un test de Chance (+0) et consultez la table suivante : Nombre de succès : 0) Un pied humain en décomposition. Perdez 1 Santé Mentale. 1) Piochez 1 Objet Commun. 2) Piochez 1 Objet Unique. 3+) 10$ en bijoux.",
+                    effects: [Optional((label: "Ouvrir le coffre", effects: [CheckTable(skill: Luck, modifier: 0, rows: [(from: 0, effects: [Lose(Sanity, 1)]), (from: 1, effects: [Draw(deck: CommonItem)]), (from: 2, effects: [Draw(deck: UniqueItem)]), (from: 3, effects: [Gain(Money, 10)])])]))],
+                ),
+                (
+                    location: "ye_olde_magick_shoppe",
+                    text: "En regardant de près une tête momifiée dans la boutique, vous êtes horrifié de voir qu'elle vous regarde ! Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_residentiel/claqre14.jpg",
+        ),
+        (
+            id: "claqre15",
+            district: "uptown",
+            encounters: [
+                (
+                    location: "st_marys_hospital",
+                    text: "Le cadavre que vous examinez n'est pas tout à fait mort. Il vous saisit à la gorge. Perdez 1 Santé Mentale. Vous devez maintenant le combattre. Si vous réussissez un test de Vigueur (-1), vous le battez et gagnez 1 pion Indice. Sinon, allez dans la rue.",
+                    effects: [Lose(Sanity, 1), Check(skill: Fight, modifier: -1, pass: [Gain(Clues, 1)], fail: [MoveToStreet])],
+                ),
+                (
+                    location: "woods",
+                    text: "Vous tombez sur un alambic détenu par le Gang Sheldon. Faites un test de Discrétion (-1). Si vous le réussissez, vous repartez sans être vu. Sinon, vous perdez 2 Résistance alors que le Gang Sheldon vous passe à tabac avant de vous raccompagner hors du bois. Dans les deux cas, allez dans la rue.",
+                    effects: [Check(skill: Sneak, modifier: -1, fail: [Lose(Stamina, 2)]), MoveToStreet],
+                ),
+                (
+                    location: "ye_olde_magick_shoppe",
+                    text: "En regardant dans une boule de cristal, vous avez une vision des événements à venir. Retournez la première carte du paquet lieu de votre choix. Le prochain investigateur qui fera une rencontre à ce lieu piochera cette carte.",
+                    effects: [Special("crystal_ball")],
+                ),
+            ],
+            image: "cartes/lieu/quartier_residentiel/claqre15.jpg",
         ),
         (
             id: "claqs02",
@@ -322,6 +1218,304 @@ LocationCards(
                 ),
             ],
             image: "cartes/lieu/quartier_sud/claqs02.jpg",
+        ),
+        (
+            id: "claqs10",
+            district: "southside",
+            encounters: [
+                (
+                    location: "historical_society",
+                    text: "Vous rencontrez Cindy Fleming, une jeune Professeur de géologie à l'Université. Elle vous propose de vous montrer des formations intéressantes à la Caverne Noire. Si vous acceptez, déplacez-vous à la Caverne Noire et piochez 2 cartes Lieu, vous suivez les effets de la carte de votre choix et vous défaussez l'autre.",
+                    effects: [Optional((label: "Suivre Cindy Fleming", effects: [MoveTo("black_cave"), EncounterHere(draw: 2)]))],
+                ),
+                (
+                    location: "mas_boarding_house",
+                    text: "Ma Mathison vous informe que la meilleure chambre de la pension est disponible pour la nuit. Si vous le désirez, dépensez 3$ pour y passer la nuit. Gagnez 4 points à répartir à votre choix entre la Résistance et la Santé Mentale.",
+                    effects: [Optional((label: "Payer 3 $", effects: [Pay(Money, 3), GainSplit(Fixed(4))]))],
+                ),
+                (
+                    location: "south_church",
+                    text: "Au moment d'entrer dans l'église, vous êtes attaqué par le Père Michael avec une croix géante, qui pense que vous êtes lié au démon. Faites un test de Vitesse (-1). Si vous réussissez, vous vous échappez. Si vous échouez, perdez 2 Résistance. Dans les deux cas, déplacez-vous dans la rue.",
+                    effects: [Check(skill: Speed, modifier: -1, fail: [Lose(Stamina, 2)]), MoveToStreet],
+                ),
+            ],
+            image: "cartes/lieu/quartier_sud/claqs10.jpg",
+        ),
+        (
+            id: "claqs14",
+            district: "southside",
+            encounters: [
+                (
+                    location: "historical_society",
+                    text: "À la lecture des procès verbaux du comté, vous découvrez quelque chose d'horrible à propos de votre arbre généalogique. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+                (
+                    location: "mas_boarding_house",
+                    text: "Le dernier occupant de votre chambre a dû partir précipitamment car il a oublié des affaires. Piochez une carte Objet Commun.",
+                    effects: [Draw(deck: CommonItem)],
+                ),
+                (
+                    location: "south_church",
+                    text: "Vous entre dans le confessionnal. « Pardonnez-moi mon Père, car j'ai péché ». Faites un test de Chance (+0) et consultez la table suivante : Nombre de succès : 0) « Mon Père ? Êtes-vous là ? » Vous entendez un hurlement dans la cabine adjacente ! Perdez 3 Santé Mentale et allez dans la rue. 1) « Mon Père ? » Pas de réponse. Vous soupirez et vous partez. Allez dans la rue. 2+) « Je ne me souviens pas de ma dernière confession. » Augmentez votre Santé Mentale à sa valeur maximale",
+                    effects: [CheckTable(skill: Luck, modifier: 0, rows: [(from: 0, effects: [Lose(Sanity, 3), MoveToStreet]), (from: 1, effects: [MoveToStreet]), (from: 2, effects: [RestoreToMax(Sanity)])])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_sud/claqs14.jpg",
+        ),
+        (
+            id: "claqs15",
+            district: "southside",
+            encounters: [
+                (
+                    location: "historical_society",
+                    text: "Vous rencontrez un vieux professeur amical de l'Université Miskatonic. Si vous dépensez 1 trophée de portail, il se présente comme étant le Professeur Armitage et vous propose de joindre ses forces aux vôtres. Prenez cette carte Allié si elle est disponible, sinon piochez un Objet Unique.",
+                    effects: [Optional((label: "Dépenser 1 trophée de portail", effects: [SpendGateTrophies(1), TakeCard(card: "professor_armitage", otherwise: [Draw(deck: UniqueItem)])]))],
+                ),
+                (
+                    location: "mas_boarding_house",
+                    text: "Des voisins éméchés vous empêchent de dormir. Réussissez un test de Chance (-1) ou perdez (à votre choix) 1 Résistance ou 1 Santé Mentale.",
+                    effects: [Check(skill: Luck, modifier: -1, fail: [Choice([(label: "Perdre 1 Résistance", effects: [Lose(Stamina, 1)]), (label: "Perdre 1 Santé Mentale", effects: [Lose(Sanity, 1)])])])],
+                ),
+                (
+                    location: "south_church",
+                    text: "Vous allez à la messe matinale. Dépensez 1 pion Indice pour demander une aide divine. Si vous le faites, lancez un dé. Sur un succès, vos prières ont été entendues. Retirez 1 pion destin de l'échelle du destin du Grand Ancien.",
+                    effects: [Optional((label: "Dépenser 1 pion Indice", effects: [Pay(Clues, 1), RollEach(success: [RemoveDoom])]))],
+                ),
+            ],
+            image: "cartes/lieu/quartier_sud/claqs15.jpg",
+        ),
+        (
+            id: "claqs16",
+            district: "southside",
+            encounters: [
+                (
+                    location: "historical_society",
+                    text: "Les membres de la Société observent des oiseaux dans les bois. Le portier vous propose de vous conduire. Si vous acceptez, déplacez-vous au Bois et piochez 2 cartes Lieu, vous suivez les effets de la carte de votre choix et vous défaussez l'autre.",
+                    effects: [Optional((label: "Accepter", effects: [MoveTo("woods"), EncounterHere(draw: 2)]))],
+                ),
+                (
+                    location: "mas_boarding_house",
+                    text: "En examinant minutieusement une peinture dans une des chambres, vous vous trouvez aspiré par celle-ci. Faites un test de Chance (+0). Si vous le réussissez, déplacez-vous aux Contrées du Rêve. Faites-y une rencontre et revenez immédiatement ici. Si vous échouez, déplacez-vous aux Abysses. Faites-y une rencontre et revenez immédiatement ici.",
+                    effects: [Check(skill: Luck, modifier: 0, pass: [VisitOtherWorld("dreamlands")], fail: [VisitOtherWorld("abyss")])],
+                ),
+                (
+                    location: "south_church",
+                    text: "Vous pourriez jurer qu'une gargouille en pierre a bougé. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+            ],
+            image: "cartes/lieu/quartier_sud/claqs16.jpg",
+        ),
+        (
+            id: "claqs18",
+            district: "southside",
+            encounters: [
+                (
+                    location: "historical_society",
+                    text: "Payez 3$ pour avoir accès à la bibliothèque privée. Si vous refusez, allez dans la rue. Si vous payez, faites un test de Chance (-1). Si vous le réussissez, vous apprenez un sort ancien. Piochez 1 sort. Si vous le ratez, vous vous endormez et entrez dans les Contrées du Rêve. Faites-y une rencontre puis revenez immédiatement ici.",
+                    effects: [Choice([(label: "Payer 3 $", effects: [Pay(Money, 3), Check(skill: Luck, modifier: -1, pass: [Draw(deck: Spell)], fail: [VisitOtherWorld("dreamlands")])]), (label: "Refuser", effects: [MoveToStreet])])],
+                ),
+                (
+                    location: "mas_boarding_house",
+                    text: "Vous trouvez un passage dans la cave qui mène à un tunnel venteux. Si vous vous y aventurez, vous arrivez à la Loge du Crépuscule d'Argent. Piochez 2 cartes Lieu, appliquez les effets de la carte de votre choix et défaussez l'autre.",
+                    effects: [Optional((label: "S'aventurer dans le tunnel", effects: [MoveTo("silver_twilight_lodge"), EncounterHere(draw: 2)]))],
+                ),
+                (
+                    location: "south_church",
+                    text: "Sachant que vous vous êtes engagé à travailler pour le Seigneur, le Père Michael vous Bénit.",
+                    effects: [TakeCard(card: "blessing")],
+                ),
+            ],
+            image: "cartes/lieu/quartier_sud/claqs18.jpg",
+        ),
+        (
+            id: "claqs23",
+            district: "southside",
+            encounters: [
+                (
+                    location: "historical_society",
+                    text: "Vous remarquez un homme louche qui vous observe alors que vous consultez un livre. Vous sentant mal à l'aise, vous essayez de vous éclipser sans être suivi. Faites un test de Discrétion (-1). Si vous réussissez, vous le semez. Gagnez 1 Santé Mentale. Si vous échouez, l'homme vous retrouve. C'est un sorcier qui vous lance un maléfice alors que vous fuyez. Perdez 2 Résistance et vous êtes Maudit.",
+                    effects: [Check(skill: Sneak, modifier: -1, pass: [Gain(Sanity, 1)], fail: [Lose(Stamina, 2), TakeCard(card: "curse")])],
+                ),
+                (
+                    location: "mas_boarding_house",
+                    text: "Ma Mathison a préparé sa fameuse soupe pour le dîner. Lancez un dé et gagnez autant de Résistance.",
+                    effects: [GainRolled(Stamina)],
+                ),
+                (
+                    location: "south_church",
+                    text: "Le Père Michael vous convainc que certains membres de sa congrégation sont plus nécessiteux que vous. Donnez aux pauvres, à votre choix, la moitié de votre argent (arrondi au supérieur) ou la moitié de vos objets (arrondi au supérieur).",
+                    effects: [Choice([(label: "La moitié de votre argent", effects: [LoseAmount([Money], HalfUp(Money))]), (label: "La moitié de vos objets", effects: [DiscardHalf(cards: Items, round_up: true)])])],
+                ),
+            ],
+            image: "cartes/lieu/quartier_sud/claqs23.jpg",
+        ),
+        (
+            id: "clauv07",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Réussissez un test de Volonté (-1) pour obtenir du Doyen un acompte afin d'écrire un manuscrit pour l'université. Prenez une carte Acompte.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [TakeCard(card: "retainer")])],
+                ),
+                (
+                    location: "library",
+                    text: "Vous trouvez un livre étrange qui irradie de façon maléfique au toucher. Faites un test de Savoir (-2). En cas de réussite, vous récupérez un vaste savoir sur la menace. Lancez un dé et gagnez autant de pions Indice. En cas d'échec, le livre vous consume corps et âme. Perdez 2 Santé Mentale et 2 Résistance.",
+                    effects: [
+                        Check(
+                            skill: Lore,
+                            modifier: -2,
+                            pass: [GainRolled(Clues)],
+                            fail: [Lose(Sanity, 2), Lose(Stamina, 2)],
+                        ),
+                    ],
+                ),
+                (
+                    location: "science_building",
+                    text: "Un professeur d'Archéologie vous montre un objet qu'il a trouvé dans une pyramide égyptienne. Si vous avez 2 Sorts ou moins, il brille dans vos mains et vous vous retrouvez dehors à le tenir. Ne voulant pas revoir le professeur, vous décidez de garder l'objet. Gagnez 1 Objet Unique et allez dans la rue. Si vous avez plus de 2 sorts, rien ne se passe.",
+                    effects: [
+                        If(
+                            condition: CardCountAtMost(deck: Spell, count: 2),
+                            then: [Draw(deck: UniqueItem), MoveToStreet],
+                        ),
+                    ],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv07.jpg",
+        ),
+        (
+            id: "clauv09",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Vos discussions sur le Mythe amènent la sécurité du campus à penser que vous avez totalement perdu la raison, et ils vous escortent hors du campus. Allez à l'Asile d'Arkham et faites-y une rencontre immédiatement.",
+                    effects: [MoveTo("arkham_asylum"), EncounterHere(draw: 1)],
+                ),
+                (
+                    location: "library",
+                    text: "Un livre dans un coin sombre commence à vous murmurer des choses terribles. Perdez 1 Santé Mentale.",
+                    effects: [Lose(Sanity, 1)],
+                ),
+                (
+                    location: "science_building",
+                    text: "Une préparation chimique bout sur un bec Bunsen et sent rudement bon. Si vous en buvez, faites un test de Chance (+0). Si vous le réussissez, l'étrange liquide vous fortifie. Lancez un dé et gagnez autant de points à répartir entre votre Résistance et votre Santé Mentale. Si vous échouez, le liquide est un simple café. Gagnez 1 Résistance.",
+                    effects: [Optional((label: "Boire", effects: [Check(skill: Luck, modifier: 0, pass: [RollDice(1), GainSplit(X)], fail: [Gain(Stamina, 1)])]))],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv09.jpg",
+        ),
+        (
+            id: "clauv10",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Vous essayez de vendre une monographie au Président de l'Université. Réussissez un test de Savoir (-1) pour faire la vente et gagner 5$.",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Gain(Money, 5)])],
+                ),
+                (
+                    location: "library",
+                    text: "Vous devez payer 4$ d'amende pour n'avoir pas rendu certains livres à temps. Payez ou allez dans la rue !",
+                    effects: [Choice([(label: "Payer 4 $", effects: [Pay(Money, 4)]), (label: "Aller dans la rue", effects: [MoveToStreet])])],
+                ),
+                (
+                    location: "science_building",
+                    text: "Un professeur d'occultisme vous demande de tenir une statue affreuse, qu'il pense détenir d'étranges pouvoirs, pendant qu'il lit un parchemin. De l'énergie traverse votre corps. Faites un test de Chance (-1). En cas de réussite, votre esprit sort de votre corps et vous sentez que vous avez le pouvoir d'échanger de corps avec un autre investigateur. Vous pouvez choisir un autre investigateur inutilisé et l'amener en jeu comme nouveau personnage. Vous défaussez votre personnage actuel avec ses objets, trophées, compétences… En cas d'échec, rien ne se passe.",
+                    effects: [Check(skill: Luck, modifier: -1, pass: [Optional((label: "Changer de corps", effects: [Special("body_swap")]))])],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv10.jpg",
+        ),
+        (
+            id: "clauv15",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Un étudiant vous prend pour l'intendant. Si vous voulez continuer la supercherie, faites un test de Volonté (-2). En cas de réussite, vous gagnez 8$ d'argent mal acquis pour des cours. En cas d'échec, vous êtes arrêté et emmené au Poste de Police.",
+                    effects: [Optional((label: "Continuer la supercherie", effects: [Check(skill: Will, modifier: -2, pass: [Gain(Money, 8)], fail: [Arrested])]))],
+                ),
+                (
+                    location: "library",
+                    text: "Réussissez un test de Chance (-2) pour trouver 5$ que quelqu'un utilisait comme marque page.",
+                    effects: [Check(skill: Luck, modifier: -2, pass: [Gain(Money, 5)])],
+                ),
+                (
+                    location: "science_building",
+                    text: "Vous trouvez un étudiant tapant sur un étrange appareil qu'il a branché sur une machinerie imposante. Il vous dit que c'est une machine à rayons dimensionnels. Si vous proposez de l'aider, faites un test de Savoir (-2). En cas de réussite, les rayons jaillissent dans toutes les directions, perturbant les portails ouverts sur le plateau. Lancez un dé pour chaque portail ouvert, un par un. Sur un succès, le portail est fermé mais vous ne pouvez pas le prendre comme trophée. Il retourne dans la réserve. En cas d'échec, la machine surchauffe et explose. Lancez un dé et perdez autant de Résistance, puis allez à l'Hôpital Sainte Marie.",
+                    effects: [Optional((label: "Aider l'étudiant", effects: [Check(skill: Lore, modifier: -2, pass: [Special("dimensional_ray")], fail: [LoseRolled(Stamina), MoveTo("st_marys_hospital")])]))],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv15.jpg",
+        ),
+        (
+            id: "clauv16",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Le Doyen vous présente à un Professeur d'Anthropologie qui vous donne des pistes pour votre enquête. Gagnez 1 pion Indice.",
+                    effects: [Gain(Clues, 1)],
+                ),
+                (
+                    location: "library",
+                    text: "Faites un test de Volonté (+0) et consultez la table suivante : Nombre de succès : 0) Abigail vous fait sortir. Allez dans la rue. 1) Abigail vous fait entrer dans une section privée de la bibliothèque où vous trouvez un tome ancien. Piochez 2 sorts et gardez-en un. 2+) Abigail vous prête un étrange objet exposé dans la vitrine de la bibliothèque. Piochez 1 Objet Unique.",
+                    effects: [CheckTable(skill: Will, modifier: 0, rows: [(from: 0, effects: [MoveToStreet]), (from: 1, effects: [Draw(deck: Spell, count: 2, keep: 1)]), (from: 2, effects: [Draw(deck: UniqueItem)])])],
+                ),
+                (
+                    location: "science_building",
+                    text: "Assistant un professeur dans ses recherches, vous trouvez un sort. Piochez 1 Sort. Cependant, vous devez réussir un test de Vigueur (-1) ou un étudiant kleptomane vient vous voler un objet. Perdez 1 objet de votre choix.",
+                    effects: [Draw(deck: Spell), Check(skill: Fight, modifier: -1, fail: [Discard(cards: Items, count: 1)])],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv16.jpg",
+        ),
+        (
+            id: "clauv18",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Vous pouvez choisir d'aider un Professeur d'Anthropologie et ses étudiants à déchiffrer une ancienne tablette de pierre. Si oui, faites un test de Savoir (-2). En cas de réussite, vous l'avez correctement interprété, piochez 1 Sort. En cas d'échec, vous avez mal prononcé un mot et vous êtes Maudit.",
+                    effects: [Optional((label: "Aider le professeur", effects: [Check(skill: Lore, modifier: -2, pass: [Draw(deck: Spell)], fail: [TakeCard(card: "curse")])]))],
+                ),
+                (
+                    location: "library",
+                    text: "Vous vous endormez et pénétrez dans les Contrées du Rêve. Fates-y une rencontre et revenez ici immédiatement.",
+                    effects: [VisitOtherWorld("dreamlands")],
+                ),
+                (
+                    location: "science_building",
+                    text: "Vous rencontrez un homme musclé à l'air las qui vous défie pour un bras de fer. Perdez 2 Résistance si vous acceptez. Si vous ne tombez pas inconscient, Sir William Brinton se met à rire et vous met une claque dans le dos. Il se propose de vous rejoindre. Prenez cette carte Allié. Si elle n'est pas disponible, gagnez 5$ à la place.",
+                    effects: [Optional((label: "Accepter le bras de fer", effects: [Lose(Stamina, 2), TakeCard(card: "sir_william_brinton", otherwise: [Gain(Money, 5)])]))],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv18.jpg",
+        ),
+        (
+            id: "clauv23",
+            district: "miskatonic_u",
+            encounters: [
+                (
+                    location: "administration",
+                    text: "Vous essayez de vendre une monographie au Président de l'Université. Réussissez un test de Savoir (-1) pour faire la vente et gagner 5$.",
+                    effects: [Check(skill: Lore, modifier: -1, pass: [Gain(Money, 5)])],
+                ),
+                (
+                    location: "library",
+                    text: "Vous levez la tête pour voir Abigail Foreman se pencher vers vous avec ses mains sur les hanches et un sourire crispé sur son visage. Faites un test de Volonté (-1). En cas de réussite, elle vous aide à trouver le livre que vous cherchiez. Prenez le premier Tome du paquet d'Objet Unique. En cas d'échec, vous avez fait trop de bruit. Elle vous raccompagne jusqu'à la porte. Allez dans la rue.",
+                    effects: [Check(skill: Will, modifier: -1, pass: [TakeFirst(deck: UniqueItem, cards: Tomes)], fail: [MoveToStreet])],
+                ),
+                (
+                    location: "science_building",
+                    text: "Quand vous entrez dans le département d'Alchimie, un professeur lève les yeux avec horreur. Il sort un ancien artefact d'un tiroir de son bureau et le tient devant votre visage en chantant et en faisant des gestes symboliques avec l'objet. Si vous êtes Maudit, défaussez la Malédiction. Si vous n'êtes pas Maudit, vous devenez Béni.",
+                    effects: [If(condition: HasCard("curse"), then: [DiscardCard("curse")], otherwise: [TakeCard(card: "blessing")])],
+                ),
+            ],
+            image: "cartes/lieu/universite_miskatonic/clauv23.jpg",
         ),
     ],
 )

@@ -15,6 +15,8 @@ pub(crate) enum Closing {
     SealedWithClues,
     /// Sealed with an Elder Sign card: one doom token leaves the track.
     SealedWithElderSign,
+    /// Closed by a card that gives no trophy: the marker goes back to the stack.
+    NoTrophy,
 }
 
 impl Game<'_> {
@@ -71,15 +73,19 @@ impl Game<'_> {
             return Ok(());
         };
         let gate = self.state.gates.remove(index);
-        self.inv_mut(seat).gate_trophies.push(gate.marker);
-        self.inv_mut(seat).explored = false;
+        if how == Closing::NoTrophy {
+            self.state.gate_stack.push(gate.marker);
+        } else {
+            self.inv_mut(seat).gate_trophies.push(gate.marker);
+            self.inv_mut(seat).explored = false;
+        }
         self.log(format!(
             "{} ferme le portail de {}.",
             self.name(seat),
             self.location(location)?.name
         ));
         self.return_monsters_of_gate(gate.marker)?;
-        if how != Closing::Closed {
+        if matches!(how, Closing::SealedWithClues | Closing::SealedWithElderSign) {
             self.seal(location, how == Closing::SealedWithElderSign)?;
         }
         self.check_gate_victory()
@@ -125,7 +131,8 @@ impl Game<'_> {
 
     /// Whether a gate can be sealed: only on an unstable location.
     pub fn can_be_sealed(&self, location: &LocationId) -> Flow<bool> {
-        Ok(self.location(location)?.stability == Stability::Unstable)
+        Ok(self.location(location)?.stability == Stability::Unstable
+            && !self.mythos_has(|effect| *effect == data::Ongoing::NoSealing))
     }
 
     /// Victory by closing: no gate left and at least as many gate trophies

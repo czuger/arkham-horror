@@ -26,9 +26,15 @@ pub struct GateEncounter {
 pub struct GateCard {
     /// Identifier (the card code, `"cp003"`).
     pub id: CardId,
-    /// Border colour, matched against the colours of the Other World.
-    pub color: EncounterColor,
+    /// Border colour, matched against the colours of the Other World. A card
+    /// without colour has the gate deck reshuffled and another card drawn.
+    #[serde(default)]
+    pub color: Option<EncounterColor>,
+    /// Printed text of a card without encounters, in French.
+    #[serde(default)]
+    pub text: Option<String>,
     /// Encounters, the « Autre » one last.
+    #[serde(default)]
     pub encounters: Vec<GateEncounter>,
     /// Card image, relative to the `assets/` folder.
     pub image: String,

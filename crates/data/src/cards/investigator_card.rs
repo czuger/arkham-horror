@@ -27,6 +27,18 @@ pub struct Weapon {
     /// « Défaussez après usage ».
     #[serde(default)]
     pub discard_after_use: bool,
+    /// Bonus against Undead monsters, instead of `bonus` (Croix).
+    #[serde(default)]
+    pub undead_bonus: Option<i8>,
+    /// Bonus when the other hand is empty, instead of `bonus` (Hache).
+    #[serde(default)]
+    pub alone_bonus: Option<i8>,
+    /// Each 6 rolled counts as 2 successes (Fusil à Pompe).
+    #[serde(default)]
+    pub sixes_double: bool,
+    /// Sanity lost each time it is used (Poudre d'Ibn-Ghazi).
+    #[serde(default)]
+    pub sanity_loss: u8,
 }
 
 /// The casting line of a spell.
@@ -37,6 +49,9 @@ pub struct Casting {
     pub modifier: i8,
     /// Coût en Santé Mentale.
     pub sanity_cost: u8,
+    /// The modifier is the monster's awareness instead (Brumes de Releh).
+    #[serde(default)]
+    pub awareness_modifier: bool,
 }
 
 /// One investigator card, with its number of copies in the box.

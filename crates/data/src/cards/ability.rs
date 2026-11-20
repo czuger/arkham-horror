@@ -10,7 +10,7 @@ use crate::cards::resource::Resource;
 /// When an ability may or must be used.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Timing {
-    /// Entretien: resolved at every Upkeep (mandatory).
+    /// Entretien: resolved at every Upkeep; optional when it has a cost.
     Upkeep,
     /// Mouvement: during the investigator's Movement phase.
     Movement,
@@ -24,8 +24,14 @@ pub enum Timing {
     OnTake,
     /// When the investigator is about to lose this resource.
     OnLoss(Resource),
-    /// Right after the investigator made a check of this kind.
+    /// Right after the investigator failed a check of this kind.
     AfterCheck(CheckKind),
+    /// Right after the investigator failed any skill check.
+    AfterAnyCheck,
+    /// Right before the investigator makes a check of this kind.
+    BeforeCheck(CheckKind),
+    /// Right after an encounter card was drawn for the investigator.
+    AfterEncounterDraw,
 }
 
 /// What using an ability costs, paid before its effects.
@@ -39,6 +45,8 @@ pub enum Cost {
     MovementPoints(u8),
     /// Payez N.
     Pay(Resource, u8),
+    /// Takes the place of the whole movement (Véhicule de Patrouille).
+    WholeMovement,
 }
 
 /// One ability of a card.

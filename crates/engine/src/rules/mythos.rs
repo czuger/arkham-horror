@@ -1,10 +1,10 @@
 //! Phase V: Mythos.
 
-use data::{CardId, EnvironmentKind, LocationId, MythosCard, MythosKind, Ongoing, RumorCondition};
+use data::{CardId, EnvironmentKind, LocationId, MythosCard, MythosKind, Ongoing};
 
 use crate::game::Game;
 use crate::halt::Flow;
-use crate::state::{ActiveRumor, MonsterPlace, Phase, Place};
+use crate::state::{MonsterPlace, Phase, Place};
 
 impl<'a> Game<'a> {
     /// The Mythos phase: one card (two after Le Grand Rituel failed, the
@@ -24,14 +24,30 @@ impl<'a> Game<'a> {
         self.end_of_mythos()
     }
 
-    /// Draws the top Mythos card.
+    /// Draws the top Mythos card. A « remélangez » card goes back, the deck
+    /// is shuffled and another card is drawn.
     pub fn draw_mythos(&mut self) -> Flow<Option<&'a MythosCard>> {
-        if self.state.mythos_deck.is_empty() {
-            self.log("Le paquet Mythe est vide.");
-            return Ok(None);
+        for _ in 0..=self.state.mythos_deck.len() {
+            if self.state.mythos_deck.is_empty() {
+                break;
+            }
+            let id = self.state.mythos_deck.remove(0);
+            let card = self.mythos_card(&id)?;
+            if card.kind != MythosKind::Reshuffle {
+                return Ok(Some(card));
+            }
+            self.covered.insert(crate::coverage::mythos_key(&id));
+            self.log(format!(
+                "Carte Mythe : {}. Le paquet est remélangé.",
+                card.name
+            ));
+            self.state.mythos_deck.push(id);
+            let mut deck = std::mem::take(&mut self.state.mythos_deck);
+            self.state.rng.shuffle(&mut deck);
+            self.state.mythos_deck = deck;
         }
-        let id = self.state.mythos_deck.remove(0);
-        self.mythos_card(&id).map(Some)
+        self.log("Le paquet Mythe est vide.");
+        Ok(None)
     }
 
     /// A Mythos card by id.
@@ -47,6 +63,7 @@ impl<'a> Game<'a> {
     /// Resolves a Mythos card in rule order: gate, clue, monster movement,
     /// then its ability.
     pub fn resolve_mythos(&mut self, card: &'a MythosCard) -> Flow<()> {
+        self.covered.insert(crate::coverage::mythos_key(&card.id));
         self.log(format!("Carte Mythe : {}.", card.name));
         self.mythos_gate(card)?;
         if let Some(location) = &card.clue {
@@ -64,6 +81,10 @@ impl<'a> Game<'a> {
         };
         if self.state.is_sealed(location) {
             self.log("Le lieu est scellé : rien ne se passe.");
+            return Ok(());
+        }
+        if self.stabilized_location(location) {
+            self.log("Le stabilisateur de flux de Kate empêche le portail de s'ouvrir.");
             return Ok(());
         }
         if self.state.gate_at(location).is_some() {
@@ -98,8 +119,13 @@ impl<'a> Game<'a> {
         match card.kind {
             MythosKind::Headline => {
                 self.apply_effects(self.state.first_player, &card.effects, None)?;
-                self.state.mythos_deck.push(card.id.clone());
+                if card.lingers {
+                    self.state.lingering.push((card.id.clone(), true));
+                } else {
+                    self.state.mythos_deck.push(card.id.clone());
+                }
             }
+            MythosKind::Reshuffle => {}
             MythosKind::Environment(kind) => {
                 if kind == EnvironmentKind::Weather && self.weather_cancelled() {
                     self.log("Ithaqua balaie la carte Temps.");
@@ -110,20 +136,23 @@ impl<'a> Game<'a> {
                     self.state.mythos_deck.push(previous);
                 }
                 self.banish_banned_monsters(card);
+                self.evacuate_closed(card)?;
                 self.apply_effects(self.state.first_player, &card.effects, None)?;
             }
-            MythosKind::Rumor => {
-                if self.state.rumor.is_some() {
-                    self.log("Une Rumeur est déjà en jeu : celle-ci est ignorée.");
-                    self.state.mythos_deck.push(card.id.clone());
-                    return Ok(());
-                }
-                self.state.rumor = Some(ActiveRumor {
-                    card: card.id.clone(),
-                    tokens: 0,
-                    fresh: true,
-                });
-                self.apply_effects(self.state.first_player, &card.effects, None)?;
+            MythosKind::Rumor => self.start_rumor(card)?,
+        }
+        if card.kind == MythosKind::Headline && card.lingers {
+            self.evacuate_closed(card)?;
+        }
+        Ok(())
+    }
+
+    /// Whoever stands in a location that the card closes goes to the street.
+    fn evacuate_closed(&mut self, card: &'a MythosCard) -> Flow<()> {
+        for effect in &card.ongoing {
+            if let Ongoing::LocationClosed(id) = effect {
+                let street = self.location(id)?.street.clone();
+                self.evacuate(id, &street)?;
             }
         }
         Ok(())
@@ -147,6 +176,10 @@ impl<'a> Game<'a> {
     /// Monster surge: as many monsters as open gates or players, spread as
     /// evenly as possible, the surging gate getting the most.
     pub fn monster_surge(&mut self, location: &LocationId) -> Flow<()> {
+        if self.stabilized_location(location) {
+            self.log("Le stabilisateur de flux de Kate annule la vague de monstres.");
+            return Ok(());
+        }
         self.log("Vague de monstres !");
         let mut gates: Vec<LocationId> = self
             .state
@@ -157,6 +190,11 @@ impl<'a> Game<'a> {
         gates.retain(|gate| gate != location);
         gates.insert(0, location.clone());
         let count = gates.len().max(self.state.players());
+        // Kate's gates get no monster; the others share the same count (FAQ).
+        gates.retain(|gate| !self.stabilized_location(gate));
+        if gates.is_empty() {
+            return Ok(());
+        }
         let mut shares = vec![count / gates.len(); gates.len()];
         let mut extra = count % gates.len();
         if extra > 0 {
@@ -179,43 +217,29 @@ impl<'a> Game<'a> {
         self.rumor_progress()?;
         self.end_of_mythos_triggers()?;
         self.power_end_of_mythos()?;
+        self.expire_lingering();
         for inv in &mut self.state.investigators {
+            inv.turn_bonus = 0;
             inv.skipping_turn = false;
             inv.encounters_over = false;
             inv.returned_this_turn = false;
+            inv.power_used = false;
         }
         Ok(())
     }
 
-    /// The Rumor in play gains its tokens, then its failure is checked.
-    fn rumor_progress(&mut self) -> Flow<()> {
-        let Some(rumor) = self.state.rumor.clone() else {
-            return Ok(());
-        };
-        let card = self.mythos_card(&rumor.card)?;
-        let Some(text) = &card.rumor else {
-            return Ok(());
-        };
-        if rumor.fresh {
-            if let Some(active) = &mut self.state.rumor {
-                active.fresh = false;
+    /// Headlines that last « jusqu'à la fin du prochain tour » go back to
+    /// the deck one Mythos phase after they came out.
+    fn expire_lingering(&mut self) {
+        let mut kept = Vec::new();
+        for (card, fresh) in std::mem::take(&mut self.state.lingering) {
+            if fresh {
+                kept.push((card, false));
+            } else {
+                self.state.mythos_deck.push(card);
             }
-            return Ok(());
         }
-        self.apply_effects(
-            self.state.first_player,
-            &text.each_mythos,
-            Some(&rumor.card),
-        )?;
-        let tokens = self.state.rumor.as_ref().map_or(0, |active| active.tokens);
-        if let RumorCondition::TokensAtLeast(needed) = text.fail.condition
-            && tokens >= needed
-        {
-            self.log(format!("La Rumeur « {} » échoue.", card.name));
-            self.state.rumor = None;
-            self.apply_effects(self.state.first_player, &text.fail.effects, None)?;
-        }
-        Ok(())
+        self.state.lingering = kept;
     }
 
     /// The first player spreads the monsters left over by an uneven surge,

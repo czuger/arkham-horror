@@ -1,12 +1,12 @@
 //! Card abilities: when they can be used, their costs, and casting spells.
 
-use data::{Ability, CardId, Condition, Cost, Ongoing, Timing};
+use data::{Ability, CardId, Cost, Ongoing, Timing};
 
 use crate::decision::{Choice, DecisionKind};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::stats::of_check;
-use crate::state::{HeldCard, Place};
+use crate::state::HeldCard;
 
 /// An ability that can be used now.
 pub(crate) struct Usable<'a> {
@@ -29,12 +29,12 @@ impl<'a> Game<'a> {
             for ability in card
                 .abilities
                 .iter()
-                .filter(|ability| timing(&ability.timing))
+                .filter(|ability| timing(&ability.timing) && !is_mandatory(ability))
             {
                 let only_ok = ability
                     .only
                     .as_ref()
-                    .is_none_or(|condition| self.holds(seat, condition));
+                    .is_none_or(|condition| self.holds_for(seat, condition, Some(&held.card)));
                 if only_ok && self.can_pay(seat, held, ability)? {
                     found.push(Usable {
                         card: held.card.clone(),
@@ -54,13 +54,17 @@ impl<'a> Game<'a> {
                 Cost::DiscardThis => true,
                 Cost::MovementPoints(points) => self.scratch.movement_points >= u32::from(*points),
                 Cost::Pay(resource, amount) => self.amount(seat, *resource) >= u32::from(*amount),
+                Cost::WholeMovement => {
+                    self.scratch.movement_points >= self.movement_points(seat)?
+                }
             };
             if !ok {
                 return Ok(false);
             }
         }
         if ability.cast {
-            return Ok(u32::from(self.inv(seat).sanity) >= self.spell_cost(seat, &held.card)?);
+            return Ok(!self.no_spells()
+                && u32::from(self.inv(seat).sanity) >= self.spell_cost(seat, &held.card)?);
         }
         Ok(true)
     }
@@ -102,18 +106,49 @@ impl<'a> Game<'a> {
     /// After a failed check: offers the cards that reroll it. Returns whether
     /// the check is to be rerolled.
     pub fn offer_reroll(&mut self, seat: usize, kind: data::CheckKind) -> Flow<bool> {
-        let usable = self.usable_abilities(seat, &|timing| *timing == Timing::AfterCheck(kind))?;
+        self.scratch.reroll = false;
+        let timing = |timing: &Timing| {
+            *timing == Timing::AfterCheck(kind) || *timing == Timing::AfterAnyCheck
+        };
+        let prompt = format!("Test {} raté.", of_check(kind));
+        self.offer_one(seat, &timing, &prompt)?;
+        Ok(std::mem::take(&mut self.scratch.reroll))
+    }
+
+    /// Before a check: offers the cards that pass it outright. Returns
+    /// whether it passes without a roll. Never against the Ancient One.
+    pub fn offer_pass(&mut self, seat: usize, kind: data::CheckKind) -> Flow<bool> {
+        if self.state.battle.is_some() {
+            return Ok(false);
+        }
+        self.scratch.pass_check = false;
+        let prompt = format!("Avant le test {}.", of_check(kind));
+        self.offer_one(
+            seat,
+            &|timing| *timing == Timing::BeforeCheck(kind),
+            &prompt,
+        )?;
+        Ok(std::mem::take(&mut self.scratch.pass_check))
+    }
+
+    /// Offers one ability at most. Returns whether one was used.
+    fn offer_one(
+        &mut self,
+        seat: usize,
+        timing: &dyn Fn(&Timing) -> bool,
+        prompt: &str,
+    ) -> Flow<bool> {
+        let usable = self.usable_abilities(seat, timing)?;
         if usable.is_empty() {
             return Ok(false);
         }
-        let mut options = vec![option(Choice::Done, "Garder le résultat")];
+        let mut options = vec![option(Choice::Done, "Ne rien utiliser")];
         for (index, entry) in usable.iter().enumerate() {
             options.push(option(
                 Choice::Option(index),
                 format!("Utiliser {}", self.card_name(&entry.card)),
             ));
         }
-        let prompt = format!("Test {} raté.", of_check(kind));
         let Choice::Option(index) = self.ask(seat, DecisionKind::UseAbility, prompt, options)?
         else {
             return Ok(false);
@@ -121,14 +156,13 @@ impl<'a> Game<'a> {
         let Some(entry) = usable.into_iter().nth(index) else {
             return Ok(false);
         };
-        self.scratch.reroll = false;
-        self.use_ability(seat, &entry.card, entry.ability)?;
-        Ok(self.scratch.reroll)
+        self.use_ability(seat, &entry.card, entry.ability)
     }
 
     /// Pays the costs of an ability, casts the spell if needed, then applies
     /// its effects. Returns whether the effects were applied.
     pub fn use_ability(&mut self, seat: usize, card: &CardId, ability: &'a Ability) -> Flow<bool> {
+        self.covered.insert(crate::coverage::used_key(card));
         self.log(format!(
             "{} utilise {}.",
             self.name(seat),
@@ -147,6 +181,7 @@ impl<'a> Game<'a> {
                 Cost::Pay(resource, amount) => {
                     self.pay(seat, *resource, u32::from(*amount))?;
                 }
+                Cost::WholeMovement => self.scratch.movement_points = 0,
             }
         }
         if ability.cast && !self.cast(seat, card)? {
@@ -170,6 +205,11 @@ impl<'a> Game<'a> {
         {
             held.exhausted = true;
         }
+    }
+
+    /// Whether a Mythos card in play forbids casting spells.
+    pub fn no_spells(&self) -> bool {
+        self.mythos_has(|effect| *effect == Ongoing::NoSpells)
     }
 
     /// Sanity cost to cast a spell now.
@@ -197,7 +237,7 @@ impl<'a> Game<'a> {
             .casting
             .map_or(0, |casting| casting.modifier);
         let sanity = u32::from(self.inv(seat).sanity);
-        if sanity < cost {
+        if sanity < cost || self.no_spells() {
             return Ok(false);
         }
         self.inv_mut(seat).sanity = u8::try_from(sanity - cost).unwrap_or(0);
@@ -211,23 +251,10 @@ impl<'a> Game<'a> {
             .check(seat, data::CheckKind::Spell, i32::from(modifier), 1)?
             .passed)
     }
+}
 
-    /// Whether a condition holds for an investigator.
-    pub fn holds(&self, seat: usize, condition: &Condition) -> bool {
-        let inv = self.inv(seat);
-        match condition {
-            Condition::HasCard(card) => inv.holds(card),
-            Condition::CardCountAtMost { deck, count } => {
-                let held = inv
-                    .cards
-                    .iter()
-                    .filter(|held| self.card(&held.card).is_ok_and(|card| card.deck == *deck))
-                    .count();
-                held <= usize::from(*count)
-            }
-            Condition::InStreets => matches!(inv.place, Place::Street(_)),
-            Condition::InOtherWorld => matches!(inv.place, Place::OtherWorld { .. }),
-            Condition::LostInTimeAndSpace => inv.place == Place::LostInTimeAndSpace,
-        }
-    }
+/// A free Upkeep ability (no cost, no casting) is mandatory: it is applied
+/// by the Upkeep itself, never offered.
+pub(crate) fn is_mandatory(ability: &Ability) -> bool {
+    ability.timing == Timing::Upkeep && ability.cost.is_empty() && !ability.cast
 }

@@ -31,8 +31,25 @@ impl Game<'_> {
         Err(Halt::Awakened)
     }
 
+    /// Raises the Terror level step by step up to `level`, unless a card in
+    /// play stops it.
+    pub fn raise_terror_to(&mut self, level: u8) -> Flow<()> {
+        while self.state.terror < level {
+            let before = self.state.terror;
+            self.raise_terror()?;
+            if self.state.terror == before {
+                return Ok(());
+            }
+        }
+        Ok(())
+    }
+
     /// Raises the Terror level by one, with all its consequences.
     pub fn raise_terror(&mut self) -> Flow<()> {
+        if self.mythos_has(|effect| *effect == data::Ongoing::TerrorCannotRise) {
+            self.log("Le niveau de Terreur ne peut pas augmenter.");
+            return Ok(());
+        }
         if self.state.terror >= 10 {
             return self.add_doom();
         }
@@ -49,7 +66,7 @@ impl Game<'_> {
             self.clear_outskirts();
             self.add_doom()?;
         }
-        Ok(())
+        self.rumor_check(false)
     }
 
     /// Closes the locations whose Terror threshold is reached; whoever is
@@ -73,6 +90,11 @@ impl Game<'_> {
     /// Closes a location and moves investigators and monsters to its street.
     pub fn close_location(&mut self, id: &LocationId, street: &data::StreetId) -> Flow<()> {
         self.state.closed.push(id.clone());
+        self.evacuate(id, street)
+    }
+
+    /// Moves investigators and monsters out of a location, to its street.
+    pub fn evacuate(&mut self, id: &LocationId, street: &data::StreetId) -> Flow<()> {
         let here = Place::Location(id.clone());
         for seat in 0..self.state.investigators.len() {
             if self.inv(seat).place == here {

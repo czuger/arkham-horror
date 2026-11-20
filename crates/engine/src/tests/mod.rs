@@ -4,6 +4,7 @@ mod battle;
 mod checks;
 mod combat;
 mod gates;
+mod investigator_powers;
 mod monsters;
 mod status;
 mod turn;

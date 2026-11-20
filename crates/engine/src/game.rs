@@ -23,6 +23,8 @@ pub(crate) struct Game<'a> {
     pub events: Vec<String>,
     /// Short-lived values passed between rule steps (not part of the state).
     pub scratch: Scratch,
+    /// Cards and paragraphs played so far (see [`crate::coverage`]).
+    pub covered: std::collections::BTreeSet<String>,
     /// Dice results forced by unit tests, used before the generator.
     #[cfg(test)]
     pub loaded_dice: std::collections::VecDeque<u8>,
@@ -39,6 +41,33 @@ pub(crate) struct Scratch {
     pub combat_bonus: i32,
     /// The last ability used asks for a reroll.
     pub reroll: bool,
+    /// Care that ignores « no Stamina/Sanity gain » (Asylum, Hospital,
+    /// Carolyn Fern, Vincent Lee) is being given.
+    pub care: bool,
+    /// Each 6 rolled counts as 2 successes (Shotgun in hand).
+    pub sixes_double: bool,
+    /// The Flute was played: every monster in the area is defeated.
+    pub flute: bool,
+    /// The last ability used rerolls one die.
+    pub reroll_one_die: bool,
+    /// The last ability used makes the coming check pass.
+    pub pass_check: bool,
+    /// The last ability used cancels the monster's combat damage this round.
+    pub no_combat_damage: bool,
+    /// The last spell cast enchants a physical weapon.
+    pub enchant_weapon: bool,
+    /// The last spell cast weakens the monster fought (the Red Sign).
+    pub red_sign: bool,
+    /// Monsters of a Rumor that just ended, for its last effects.
+    pub rumor_monsters: Vec<data::MonsterId>,
+    /// A gate closing check is being made.
+    pub closing_gate: bool,
+    /// The encounter being resolved is to be drawn again.
+    pub redraw: bool,
+    /// Value rolled or chosen, read by [`data::Amount::X`].
+    pub x: u32,
+    /// Successes of the last check or roll, read by [`data::Amount::Successes`].
+    pub successes: u32,
 }
 
 impl<'a> Game<'a> {
@@ -51,6 +80,7 @@ impl<'a> Game<'a> {
             answers: Vec::new(),
             events: Vec::new(),
             scratch: Scratch::default(),
+            covered: std::collections::BTreeSet::new(),
             #[cfg(test)]
             loaded_dice: std::collections::VecDeque::new(),
         }

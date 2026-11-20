@@ -31,6 +31,8 @@ pub struct Outcome {
     pub answers: Vec<usize>,
     /// The journal, in French.
     pub events: Vec<String>,
+    /// Cards and encounter paragraphs played (keys of [`crate::coverage_keys`]).
+    pub covered: std::collections::BTreeSet<String>,
 }
 
 /// Plays a game from its setup, asking `responder` for every decision,
@@ -83,6 +85,7 @@ pub fn play(
         status,
         answers: game.answers,
         events: game.events,
+        covered: game.covered,
     })
 }
 
@@ -132,6 +135,8 @@ pub(crate) fn initial_state(data: &GameData, setup: &Setup) -> Result<GameState,
         gate_deck: Vec::new(),
         environment: None,
         rumor: None,
+        lingering: Vec::new(),
+        reserved_location_card: None,
         two_mythos_cards: false,
         battle: None,
         ending: None,

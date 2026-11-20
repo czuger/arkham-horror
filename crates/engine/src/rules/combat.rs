@@ -1,6 +1,6 @@
 //! Evading and fighting monsters (§12, §13).
 
-use data::{CheckKind, MonsterAbility, MonsterId, Resource};
+use data::{CheckKind, Moment, MonsterAbility, MonsterId, MonsterTrait, Resource};
 
 use crate::decision::{Choice, DecisionKind};
 use crate::game::{Game, option};
@@ -37,6 +37,8 @@ pub(crate) struct Gear {
     pub defenses: Vec<MonsterAbility>,
     /// Cards in hand, with the bonus each one gives.
     pub equipped: Vec<Equipped>,
+    /// The Red Sign was cast: the monster is to be weakened.
+    pub weaken: bool,
 }
 
 /// A card in hand during a combat.
@@ -48,12 +50,38 @@ pub(crate) struct Equipped {
     pub hands: u8,
     /// Combat bonus it gives against this foe (0 for a failed spell).
     pub bonus: i32,
+    /// Bonus before the foe's defenses.
+    pub raw: i32,
+    /// Physical or magical (spells, enchanted weapons).
+    pub kind: data::WeaponKind,
+    /// Bonus instead of `raw` when nothing else is in hand (Axe).
+    pub alone: Option<i32>,
+    /// Each 6 rolled counts as 2 successes (Shotgun).
+    pub sixes_double: bool,
 }
 
 impl Gear {
     /// Total combat bonus of the cards in hand.
     pub fn bonus(&self) -> i32 {
         self.equipped.iter().map(|card| card.bonus).sum()
+    }
+
+    /// Bonuses after the foe's defenses, once these changed.
+    pub fn rate(&mut self) {
+        let hands = self.hands();
+        for equipped in &mut self.equipped {
+            let raw = match equipped.alone {
+                Some(alone) if hands == equipped.hands => alone,
+                _ => equipped.raw,
+            };
+            equipped.bonus =
+                crate::rules::combat_gear::reduced_bonus(&self.defenses, equipped.kind, raw);
+        }
+    }
+
+    /// Whether a card in hand doubles the sixes.
+    pub fn sixes_double(&self) -> bool {
+        self.equipped.iter().any(|equipped| equipped.sixes_double)
     }
 
     /// Hands in use.
@@ -85,7 +113,9 @@ impl Game<'_> {
             }
             self.monster_hits(seat, monster, &stats)?;
         }
-        self.combat(seat, monster.clone(), stats)
+        let faced = self.combat(seat, monster.clone(), stats)?;
+        self.fire_triggers(seat, Moment::EndOfCombat)?;
+        Ok(faced)
     }
 
     /// A full combat: Horror check once, then rounds of fight or flee.
@@ -95,10 +125,26 @@ impl Game<'_> {
             self.name(seat),
             self.monster_name(&monster)
         ));
+        let ignored = |ability: &MonsterAbility| match ability {
+            MonsterAbility::PhysicalResistance => {
+                self.ignores(seat, MonsterTrait::PhysicalResistance)
+            }
+            MonsterAbility::MagicalResistance => {
+                self.ignores(seat, MonsterTrait::MagicalResistance)
+            }
+            _ => false,
+        };
+        let defenses = stats
+            .abilities
+            .iter()
+            .filter(|a| !ignored(a))
+            .cloned()
+            .collect();
         let gear = Gear {
-            defenses: stats.abilities.clone(),
+            defenses,
             ..Gear::default()
         };
+        self.scratch.flute = false;
         let mut combat = Combat {
             monster,
             stats,
@@ -137,7 +183,11 @@ impl Game<'_> {
                 _ => None,
             });
         let loss = if passed {
-            nightmarish.unwrap_or(0)
+            if self.ignores(seat, MonsterTrait::Nightmarish) {
+                0
+            } else {
+                nightmarish.unwrap_or(0)
+            }
         } else {
             u32::from(horror.damage)
         };
@@ -147,6 +197,7 @@ impl Game<'_> {
     /// One round: arm, then fight or flee. Returns how the combat ended, if it did.
     fn combat_round(&mut self, seat: usize, combat: &mut Combat) -> Flow<Option<Faced>> {
         self.prepare_combat(seat, &mut combat.gear)?;
+        self.weaken_monster(seat, combat)?;
         let can_flee = !combat.stats.has(MonsterAbility::Ambush);
         self.hopeless_combat(seat, combat, can_flee)?;
         let mut options = vec![option(Choice::Attack, "Combattre")];
@@ -168,11 +219,25 @@ impl Game<'_> {
             self.monster_hits(seat, &combat.monster, &combat.stats)?;
             return Ok(None);
         }
-        let passed = self.combat_check(seat, combat)?;
+        self.scratch.no_combat_damage = false;
+        let passed = match self.special_attack(seat, combat)? {
+            Some(true) if self.scratch.flute => {
+                self.discard_used_weapons(seat, &mut combat.gear)?;
+                self.on_defeat_effects(seat, &combat.monster)?;
+                self.monster_defeated_special(seat, &combat.monster)?;
+                return Ok(Some(Faced::Defeated));
+            }
+            Some(passed) => passed,
+            None => self.combat_check(seat, combat)?,
+        };
         self.discard_used_weapons(seat, &mut combat.gear)?;
         if passed {
             self.monster_beaten(seat, combat)?;
             return Ok(Some(Faced::Defeated));
+        }
+        if std::mem::take(&mut self.scratch.no_combat_damage) {
+            self.log("Les dégâts de combat sont annulés.");
+            return Ok(None);
         }
         self.monster_hits(seat, &combat.monster, &combat.stats)?;
         Ok(None)
@@ -195,9 +260,22 @@ impl Game<'_> {
         } else {
             CheckKind::Combat
         };
-        Ok(self
-            .check(seat, kind, rating + combat.gear.bonus(), toughness)?
-            .passed)
+        self.gear_check(seat, kind, rating, &combat.gear, toughness)
+    }
+
+    /// A check made with the cards in hand: their bonus, and Shotgun sixes.
+    pub fn gear_check(
+        &mut self,
+        seat: usize,
+        kind: CheckKind,
+        rating: i32,
+        gear: &Gear,
+        needed: u8,
+    ) -> Flow<bool> {
+        self.scratch.sixes_double = gear.sixes_double();
+        let result = self.check(seat, kind, rating + gear.bonus(), needed);
+        self.scratch.sixes_double = false;
+        Ok(result?.passed)
     }
 
     /// A monster defeated: Overwhelming hurts anyway, then trophy or special fate.
@@ -210,32 +288,42 @@ impl Game<'_> {
                 MonsterAbility::Overwhelming(amount) => Some(u32::from(*amount)),
                 _ => None,
             });
-        if let Some(amount) = overwhelming {
+        if let Some(amount) = overwhelming
+            && !self.ignores(seat, MonsterTrait::Overwhelming)
+        {
             self.lose(seat, Resource::Stamina, amount)?;
         }
+        self.on_defeat_effects(seat, &combat.monster)?;
         self.monster_defeated_special(seat, &combat.monster)
     }
 
-    /// No hope left (cannot flee, cannot roll enough dice): the investigator
-    /// goes insane and the combat stops (FAQ).
+    /// No hope left (cannot roll enough dice to flee nor to win): the
+    /// investigator goes insane and the combat stops (FAQ).
     fn hopeless_combat(&mut self, seat: usize, combat: &Combat, can_flee: bool) -> Flow<()> {
-        if can_flee || combat.doomed {
+        if combat.doomed {
+            return Ok(());
+        }
+        if can_flee && self.most_dice(seat, CheckKind::Evade, combat.stats.awareness)? >= 1 {
             return Ok(());
         }
         let rating = combat
             .stats
             .combat
             .map_or(0, |check| i32::from(check.modifier));
-        let dice = self
-            .check_dice(seat, CheckKind::Combat, rating + combat.gear.bonus())?
-            .max(0);
-        let clue_dice = i32::from(self.inv(seat).clues)
-            * i32::try_from(self.dice_per_clue(seat, CheckKind::Combat)).unwrap_or(1);
-        if dice + clue_dice >= i32::try_from(combat.stats.toughness).unwrap_or(i32::MAX) {
+        let dice = self.most_dice(seat, CheckKind::Combat, rating + combat.gear.bonus())?;
+        if dice >= i32::try_from(combat.stats.toughness).unwrap_or(i32::MAX) {
             return Ok(());
         }
         self.log("Combat sans issue.");
         self.inv_mut(seat).sanity = 0;
         self.after_loss(seat)
+    }
+
+    /// Dice a check could roll at most: its own dice plus every clue token.
+    fn most_dice(&self, seat: usize, kind: CheckKind, modifier: i32) -> Flow<i32> {
+        let dice = self.check_dice(seat, kind, modifier)?.max(0);
+        let clue_dice = i32::from(self.inv(seat).clues)
+            * i32::try_from(self.dice_per_clue(seat, kind)).unwrap_or(1);
+        Ok(dice + clue_dice)
     }
 }

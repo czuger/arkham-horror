@@ -12,6 +12,10 @@ impl Game<'_> {
     /// « Un monstre apparaît ! »: evade or fight it; it never stays on the
     /// board and goes back to the cup unless defeated.
     pub fn encounter_monster(&mut self, seat: usize) -> Flow<()> {
+        if self.flux_stabilized(&self.inv(seat).place.clone()) {
+            self.log("Le stabilisateur de flux de Kate empêche le monstre d'apparaître.");
+            return Ok(());
+        }
         if let Some(location) = self.location_of(seat)
             && self.state.is_sealed(&location)
         {
@@ -62,6 +66,10 @@ impl Game<'_> {
                 Faced::Defeated => {
                     self.remove_monster_at(&place, &monster);
                     free = false;
+                    if std::mem::take(&mut self.scratch.flute) {
+                        self.flute_clears(seat, &place)?;
+                        return Ok(false);
+                    }
                 }
                 Faced::Fled => free = false,
             }
@@ -87,6 +95,16 @@ impl Game<'_> {
             Choice::Evade(index) => Ok((index, false)),
             _ => Ok((0, false)),
         }
+    }
+
+    /// The Flute: every other monster in the area is defeated too.
+    fn flute_clears(&mut self, seat: usize, place: &MonsterPlace) -> Flow<()> {
+        while let Some(&index) = self.monsters_at(place).first() {
+            let monster = self.state.monsters.remove(index).monster;
+            self.on_defeat_effects(seat, &monster)?;
+            self.monster_defeated_special(seat, &monster)?;
+        }
+        Ok(())
     }
 
     /// Removes one board monster of a kind from a place.

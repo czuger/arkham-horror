@@ -5,6 +5,7 @@ use data::{CardId, Timing};
 use crate::decision::{Choice, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
+use crate::rules::abilities::is_mandatory;
 use crate::state::{Phase, Place};
 
 /// French names of the slider tracks.
@@ -38,6 +39,7 @@ impl Game<'_> {
             held.exhausted = false;
         }
         self.upkeep_actions(seat)?;
+        self.sheet_upkeep(seat)?;
         self.adjust_skills(seat)
     }
 
@@ -54,7 +56,7 @@ impl Game<'_> {
         }
         pending.retain(|card| {
             self.card(card)
-                .is_ok_and(|printed| printed.abilities.iter().any(|a| a.timing == Timing::Upkeep))
+                .is_ok_and(|printed| printed.abilities.iter().any(is_mandatory))
         });
         pending.dedup();
         while !pending.is_empty() {
@@ -76,11 +78,8 @@ impl Game<'_> {
                 continue;
             }
             let printed = self.card(&card)?;
-            for ability in printed
-                .abilities
-                .iter()
-                .filter(|a| a.timing == Timing::Upkeep)
-            {
+            for ability in printed.abilities.iter().filter(|a| is_mandatory(a)) {
+                self.covered.insert(crate::coverage::used_key(&card));
                 self.log(format!(
                     "Entretien de {} : {}.",
                     self.name(seat),
@@ -89,6 +88,8 @@ impl Game<'_> {
                 self.apply_effects(seat, &ability.effects, Some(&card))?;
             }
         }
+        let prompt = "Utiliser une capacité d'Entretien ?";
+        self.offer_abilities(seat, &|timing| *timing == Timing::Upkeep, prompt)?;
         Ok(())
     }
 

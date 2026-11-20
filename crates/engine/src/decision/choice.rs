@@ -49,4 +49,6 @@ pub enum Choice {
     Investigator(usize),
     /// Pick an open gate.
     Gate(LocationId),
+    /// Pick a number.
+    Number(u32),
 }

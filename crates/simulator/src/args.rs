@@ -7,8 +7,9 @@ use engine::Setup;
 pub const USAGE: &str = "Usage :
   simulator jouer [--graine N] [--joueurs N] [--investigateur ID]... [--grand-ancien ID]
       Joue une partie en mode texte : vous répondez à chaque décision par son numéro.
-  simulator masse [--parties N] [--graine N] [--joueurs N] [--grand-ancien ID]
-      Joue N parties avec des réponses au hasard et affiche le bilan.
+  simulator masse [--parties N] [--graine N] [--joueurs N] [--grand-ancien ID] [--couverture FICHIER]
+      Joue N parties avec des réponses au hasard et affiche le bilan, avec la part
+      des cartes jouées ; FICHIER reçoit la liste de celles jamais jouées.
 Les données sont lues dans le dossier ARKHAM_DATA (par défaut : data).";
 
 /// What to do.
@@ -23,6 +24,8 @@ pub enum Command {
         games: u64,
         /// Setup of the first game; the seed goes up by one per game.
         setup: Setup,
+        /// File listing the cards never played.
+        missing_file: Option<std::path::PathBuf>,
     },
 }
 
@@ -33,6 +36,7 @@ pub fn parse(mut args: impl Iterator<Item = String>) -> Result<Command, String> 
     };
     let mut setup = Setup::random(seed_from_clock(), 1);
     let mut games = 100;
+    let mut missing_file = None;
     while let Some(flag) = args.next() {
         let value = args
             .next()
@@ -46,13 +50,18 @@ pub fn parse(mut args: impl Iterator<Item = String>) -> Result<Command, String> 
             "--investigateur" => setup.investigators.push(InvestigatorId::new(value)),
             "--grand-ancien" => setup.ancient_one = Some(AncientOneId::new(value)),
             "--parties" => games = number(&flag, &value)?,
+            "--couverture" => missing_file = Some(value.into()),
             other => return Err(format!("option inconnue : {other}")),
         }
     }
     setup.players = setup.players.max(setup.investigators.len());
     match verb.as_str() {
         "jouer" => Ok(Command::Play(setup)),
-        "masse" => Ok(Command::Bulk { games, setup }),
+        "masse" => Ok(Command::Bulk {
+            games,
+            setup,
+            missing_file,
+        }),
         "aide" | "--help" | "-h" => Ok(Command::Help),
         other => Err(format!("commande inconnue : {other}")),
     }

@@ -53,9 +53,10 @@ fn sealing_with_clues_costs_five_after_a_successful_close() {
     put_at(&mut state, "woods");
     state.investigators[0].explored = true;
     state.investigators[0].clues = 6;
-    // Close with Lore (option 2), one success, then seal (yes).
+    // Close with Lore (option 2), one success, then seal (yes); the other
+    // investigator declines the shop where they stand.
     let lore = 1;
-    let (result, _) = run(&mut state, &[lore, 0], &[6, 6, 6], |game| {
+    let (result, _) = run(&mut state, &[lore, 0, 1], &[6, 6, 6], |game| {
         game.arkham_encounter_phase()
     });
     assert_eq!(result, Ok(()));
@@ -72,7 +73,9 @@ fn elder_sign_seals_and_removes_a_doom_token() {
     put_at(&mut state, "woods");
     state.investigators[0].explored = true;
     hold(&mut state, "elder_sign");
-    let (result, _) = run(&mut state, &[3], &[], |game| game.arkham_encounter_phase());
+    let (result, _) = run(&mut state, &[3, 1], &[], |game| {
+        game.arkham_encounter_phase()
+    });
     assert_eq!(result, Ok(()));
     assert_eq!(state.doom, 2);
     assert_eq!(state.seals.len(), 1);

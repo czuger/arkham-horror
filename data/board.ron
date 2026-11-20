@@ -111,6 +111,9 @@ Board(
             ability: (
                 name: "Achat",
                 text: "Au lieu de faire une rencontre ici, vous pouvez piocher 3 Objets Uniques et acheter l'un d'eux à son prix indiqué. Défaussez les deux autres objets.",
+                effects: [
+                    Buy(draw: [UniqueItem, UniqueItem, UniqueItem]),
+                ],
             ),
             closes_at_terror: 6,
             position: (x: 75, y: 300),
@@ -124,6 +127,9 @@ Board(
             ability: (
                 name: "Prêt Bancaire",
                 text: "Au lieu de faire une rencontre ici, vous pouvez prendre un Prêt Bancaire si vous n'en avez pas déjà un.",
+                effects: [
+                    TakeCard(card: "bank_loan"),
+                ],
             ),
             position: (x: 315, y: 60),
         ),
@@ -135,6 +141,12 @@ Board(
             ability: (
                 name: "Soins Psychiatriques",
                 text: "Au lieu de faire une rencontre ici, vous pouvez récupérer de la Santé Mentale en recevant des soins psychiatriques. Vous pouvez récupérer 1 Santé Mentale gratuitement ou payer 2 $ pour restaurer votre Santé Mentale au maximum.",
+                effects: [
+                    Choice([
+                        (label: "Récupérer 1 point gratuitement", effects: [Gain(Sanity, 1)]),
+                        (label: "Payer 2 $ pour tout récupérer", effects: [Pay(Money, 2), RestoreToMax(Sanity)]),
+                    ]),
+                ],
             ),
             position: (x: 460, y: 60),
         ),
@@ -168,6 +180,13 @@ Board(
             ability: (
                 name: "Adjoint",
                 text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 10 en force, 2 trophées de portail, ou des trophées de monstres pour un total de 5 en force et 1 trophée de portail pour devenir l'Adjoint au Shérif d'Arkham. Prenez la carte correspondante.",
+                effects: [
+                    Choice([
+                        (label: "Trophées de monstres (force 10)", effects: [SpendMonsterTrophies(10), TakeCard(card: "deputy")]),
+                        (label: "2 trophées de portail", effects: [SpendGateTrophies(2), TakeCard(card: "deputy")]),
+                        (label: "Trophées de monstres (force 5) et 1 trophée de portail", effects: [SpendMonsterTrophies(5), SpendGateTrophies(1), TakeCard(card: "deputy")]),
+                    ]),
+                ],
             ),
             position: (x: 760, y: 350),
         ),
@@ -187,6 +206,12 @@ Board(
             ability: (
                 name: "Personnage Louche",
                 text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 5 en force ou 1 trophée de portail pour gagner 5 $.",
+                effects: [
+                    Choice([
+                        (label: "Trophées de monstres (force 5)", effects: [SpendMonsterTrophies(5), Gain(Money, 5)]),
+                        (label: "1 trophée de portail", effects: [SpendGateTrophies(1), Gain(Money, 5)]),
+                    ]),
+                ],
             ),
             position: (x: 70, y: 610),
         ),
@@ -220,6 +245,9 @@ Board(
             ability: (
                 name: "Achat",
                 text: "Au lieu de faire une rencontre ici, vous pouvez piocher 3 Objets Communs et en acheter un à son prix normal. Défaussez les deux autres objets.",
+                effects: [
+                    Buy(draw: [CommonItem, CommonItem, CommonItem]),
+                ],
             ),
             closes_at_terror: 3,
             position: (x: 590, y: 670),
@@ -233,6 +261,12 @@ Board(
             ability: (
                 name: "Dissection",
                 text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 5 en force ou 1 trophée de portail pour gagner 2 pions Indice.",
+                effects: [
+                    Choice([
+                        (label: "Trophées de monstres (force 5)", effects: [SpendMonsterTrophies(5), Gain(Clues, 2)]),
+                        (label: "1 trophée de portail", effects: [SpendGateTrophies(1), Gain(Clues, 2)]),
+                    ]),
+                ],
             ),
             position: (x: 65, y: 770),
         ),
@@ -244,6 +278,10 @@ Board(
             ability: (
                 name: "Cours",
                 text: "Au lieu de faire une rencontre ici, vous pouvez payer 8 $ pour piocher 2 Compétences. Gardez-en une et défaussez l'autre.",
+                effects: [
+                    Pay(Money, 8),
+                    Draw(deck: Skill, count: 2, keep: 1),
+                ],
             ),
             position: (x: 145, y: 960),
         ),
@@ -282,6 +320,12 @@ Board(
             ability: (
                 name: "Soins Médicaux",
                 text: "Au lieu de faire une rencontre ici, vous pouvez récupérer de la Résistance en recevant des soins médicaux. Vous pouvez récupérer 1 Résistance gratuitement ou payer 2 $ pour restaurer votre Résistance au maximum.",
+                effects: [
+                    Choice([
+                        (label: "Récupérer 1 point gratuitement", effects: [Gain(Stamina, 1)]),
+                        (label: "Payer 2 $ pour tout récupérer", effects: [Pay(Money, 2), RestoreToMax(Stamina)]),
+                    ]),
+                ],
             ),
             position: (x: 70, y: 1130),
         ),
@@ -293,6 +337,10 @@ Board(
             ability: (
                 name: "Cours de Magie",
                 text: "Au lieu de faire une rencontre ici, vous pouvez payer 5 $ pour piocher 2 Sorts. Gardez-en un et défaussez l'autre.",
+                effects: [
+                    Pay(Money, 5),
+                    Draw(deck: Spell, count: 2, keep: 1),
+                ],
             ),
             closes_at_terror: 9,
             position: (x: 178, y: 1305),
@@ -320,6 +368,13 @@ Board(
             ability: (
                 name: "Recruter",
                 text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 10 en force, 2 trophées de portail, ou des trophées de monstres pour un total de 5 en force et 1 trophée de portail pour prendre l'Allié de votre choix dans le paquet Allié.",
+                effects: [
+                    Choice([
+                        (label: "Trophées de monstres (force 10)", effects: [SpendMonsterTrophies(10), SearchDeck(Ally)]),
+                        (label: "2 trophées de portail", effects: [SpendGateTrophies(2), SearchDeck(Ally)]),
+                        (label: "Trophées de monstres (force 5) et 1 trophée de portail", effects: [SpendMonsterTrophies(5), SpendGateTrophies(1), SearchDeck(Ally)]),
+                    ]),
+                ],
             ),
             position: (x: 765, y: 1095),
         ),
@@ -331,6 +386,12 @@ Board(
             ability: (
                 name: "Bénédiction",
                 text: "Au lieu de faire une rencontre ici, vous pouvez dépenser des trophées de monstres pour un total de 5 en force ou 1 trophée de portail pour que l'investigateur de votre choix devienne Béni.",
+                effects: [
+                    Choice([
+                        (label: "Trophées de monstres (force 5)", effects: [SpendMonsterTrophies(5), AnyInvestigator([TakeCard(card: "blessing")])]),
+                        (label: "1 trophée de portail", effects: [SpendGateTrophies(1), AnyInvestigator([TakeCard(card: "blessing")])]),
+                    ]),
+                ],
             ),
             position: (x: 705, y: 1275),
         ),

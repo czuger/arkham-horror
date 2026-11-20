@@ -2,7 +2,8 @@
 
 use data::{CardId, Deck, InvestigatorId, MonsterAbility, Resource, Stability};
 
-use crate::game::Game;
+use crate::decision::{Choice, DecisionKind};
+use crate::game::{Game, option};
 use crate::halt::{Flow, Halt};
 use crate::setup::Setup;
 use crate::state::{InvestigatorState, Phase, Place};
@@ -23,6 +24,7 @@ impl<'a> Game<'a> {
         for id in chosen {
             self.state.investigators.push(self.blank_investigator(id)?);
         }
+        self.kate_setup();
         for seat in self.state.seat_order() {
             self.bring_in(seat)?;
         }
@@ -149,6 +151,9 @@ impl<'a> Game<'a> {
             gate_trophies: Vec::new(),
             no_more_bank_loans: false,
             eliminated: false,
+            turn_bonus: 0,
+            entered_gate: None,
+            power_used: false,
         })
     }
 
@@ -227,5 +232,49 @@ impl<'a> Game<'a> {
         self.log(format!("{} rejoint la partie.", self.name(seat)));
         self.bring_in(seat)?;
         self.place_sliders(seat)
+    }
+
+    /// Body swap: the investigator leaves with cards and trophies, and an
+    /// unused sheet of the player's choice comes in.
+    pub fn swap_body(&mut self, seat: usize) -> Flow<()> {
+        let mut options = vec![option(Choice::Done, "Garder son personnage")];
+        for (index, id) in self.state.unused_investigators.iter().enumerate() {
+            let label = self
+                .data
+                .investigators
+                .investigators
+                .iter()
+                .find(|sheet| &sheet.id == id)
+                .map_or_else(|| id.to_string(), |sheet| sheet.name.clone());
+            options.push(option(Choice::Option(index), label));
+        }
+        let prompt = "Quel investigateur prend votre place ?";
+        let Choice::Option(index) = self.ask(seat, DecisionKind::CardChoice, prompt, options)?
+        else {
+            return Ok(());
+        };
+        if index >= self.state.unused_investigators.len() {
+            return Ok(());
+        }
+        let cards: Vec<_> = self
+            .inv(seat)
+            .cards
+            .iter()
+            .map(|held| held.card.clone())
+            .collect();
+        for card in cards {
+            self.discard_card(seat, &card)?;
+        }
+        let old = self.inv(seat).clone();
+        self.state.monster_cup.extend(old.monster_trophies);
+        self.state.gate_stack.extend(old.gate_trophies);
+        self.log(format!("{} quitte la partie.", self.name(seat)));
+        let id = self.state.unused_investigators.remove(index);
+        self.state.unused_investigators.push(old.id);
+        self.state.investigators[seat] = self.blank_investigator(id)?;
+        self.log(format!("{} prend sa place.", self.name(seat)));
+        self.bring_in(seat)?;
+        self.place_sliders(seat)?;
+        Err(Halt::KnockedOut(seat))
     }
 }

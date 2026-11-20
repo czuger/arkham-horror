@@ -12,6 +12,9 @@ pub struct HeldCard {
     pub exhausted: bool,
     /// Acquired since the last upkeep: no upkeep roll at the next one.
     pub fresh: bool,
+    /// Tokens put on the card by its own effects.
+    #[serde(default)]
+    pub tokens: u8,
 }
 
 impl HeldCard {
@@ -21,6 +24,7 @@ impl HeldCard {
             card,
             exhausted: false,
             fresh: true,
+            tokens: 0,
         }
     }
 }

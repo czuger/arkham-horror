@@ -62,8 +62,18 @@ impl Game<'_> {
     }
 
     /// Clue tokens needed to seal a gate (Hastur: 8).
+    /// Mythos cards in play change it (« Mauvais Présages »…).
     pub fn seal_cost(&self) -> u16 {
-        if self.ancient() == "hastur" { 8 } else { 5 }
+        let base: i32 = if self.ancient() == "hastur" { 8 } else { 5 };
+        let change: i32 = self
+            .mythos_ongoing()
+            .into_iter()
+            .map(|effect| match effect {
+                data::Ongoing::SealCost(amount) => i32::from(*amount),
+                _ => 0,
+            })
+            .sum();
+        u16::try_from((base + change).max(0)).unwrap_or(0)
     }
 
     /// Successes needed to close a gate (Yog-Sothoth: 2).

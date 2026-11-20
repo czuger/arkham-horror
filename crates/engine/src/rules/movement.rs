@@ -1,6 +1,6 @@
 //! Phase II: Movement.
 
-use data::{Ability, Effect, LocationId, Moment, Timing};
+use data::{Ability, Effect, LocationId, Moment, Ongoing, Timing};
 
 use crate::decision::{Choice, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
@@ -112,7 +112,11 @@ impl Game<'_> {
     ) -> Vec<DecisionOption> {
         let mut options = vec![option(Choice::Done, "Terminer le mouvement ici")];
         if points > 0 {
+            let stuck = self.street_closed(place);
             for next in self.neighbours(place) {
+                if stuck || self.street_closed(&next) {
+                    continue;
+                }
                 let label = format!("Aller à {}", self.place_name(&next));
                 options.push(option(Choice::Place(next), label));
             }
@@ -178,13 +182,15 @@ impl Game<'_> {
             return Ok(());
         };
         let mut options = Vec::new();
+        let any_gate = self.has_ongoing(seat, |effect| *effect == Ongoing::AnyGateReturn);
         for gate in &self.state.gates {
-            let leads_there = self
-                .data
-                .gate_markers
-                .markers
-                .get(gate.marker)
-                .is_some_and(|m| m.world == world);
+            let leads_there = any_gate
+                || self
+                    .data
+                    .gate_markers
+                    .markers
+                    .get(gate.marker)
+                    .is_some_and(|m| m.world == world);
             if leads_there {
                 let label = self.location(&gate.location)?.name.clone();
                 options.push(option(Choice::Gate(gate.location.clone()), label));
@@ -212,6 +218,6 @@ impl Game<'_> {
         let inv = self.inv_mut(seat);
         inv.explored = true;
         inv.returned_this_turn = true;
-        Ok(())
+        self.fire_triggers(seat, Moment::BackFromOtherWorld)
     }
 }

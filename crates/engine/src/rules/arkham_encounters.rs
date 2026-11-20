@@ -1,6 +1,6 @@
 //! Phase III: Arkham encounters, and closing or sealing gates.
 
-use data::{CardId, CheckKind, LocationEncounter, LocationId, Resource, SpecialId};
+use data::{CardId, CheckKind, LocationId, Resource, SpecialId};
 
 use crate::decision::{Choice, DecisionKind};
 use crate::game::{Game, option};
@@ -27,7 +27,9 @@ impl<'a> Game<'a> {
     /// One investigator: Rumor action in the streets, gate (drawn in, or
     /// close and seal when explored), or a location card.
     fn arkham_encounter(&mut self, seat: usize) -> Flow<()> {
-        self.rumor_street_action(seat)?;
+        if self.rumor_action(seat)? {
+            return Ok(());
+        }
         let Place::Location(location) = self.inv(seat).place.clone() else {
             return Ok(());
         };
@@ -37,50 +39,31 @@ impl<'a> Game<'a> {
             }
             return self.draw_through_gate(seat, &location, false);
         }
-        let Some(encounter) = self.draw_location_encounter(seat, &location)? else {
+        if self.location_ability(seat, &location)? {
             return Ok(());
-        };
-        self.log(format!(
-            "Rencontre à {} : {}",
-            self.location(&location)?.name,
-            encounter.text
-        ));
-        self.apply_effects(seat, &encounter.effects, None)
+        }
+        self.location_encounter(seat, &location, 1)
     }
 
-    /// Shuffles the district deck and reads the paragraph of the location
-    /// (the one with a fulfilled condition replaces the normal one).
-    fn draw_location_encounter(
-        &mut self,
-        seat: usize,
-        location: &LocationId,
-    ) -> Flow<Option<&'a LocationEncounter>> {
-        let data: &'a data::GameData = self.data;
-        let street = self.location(location)?.street.clone();
-        let deck: Vec<_> = data
-            .location_cards
-            .cards
-            .iter()
-            .filter(|card| card.district == street)
-            .collect();
-        if deck.is_empty() {
-            self.log("Aucune carte Lieu pour ce quartier.");
-            return Ok(None);
+    /// The ability printed under the location, used instead of the
+    /// encounter. Returns whether it was used.
+    fn location_ability(&mut self, seat: usize, location: &LocationId) -> Flow<bool> {
+        let Some(ability) = &self.location(location)?.ability else {
+            return Ok(false);
+        };
+        if ability.effects.is_empty() || !self.can_start(seat, &ability.effects)? {
+            return Ok(false);
         }
-        let card = deck[self.state.rng.below(deck.len())];
-        let here = card
-            .encounters
-            .iter()
-            .filter(|encounter| &encounter.location == location);
-        let mut normal = None;
-        for encounter in here {
-            match &encounter.requires {
-                Some(condition) if self.holds(seat, condition) => return Ok(Some(encounter)),
-                Some(_) => {}
-                None => normal = Some(encounter),
-            }
+        let prompt = format!("Utiliser « {} » au lieu de la rencontre ?", ability.name);
+        if !self.ask_yes_no(seat, DecisionKind::Optional, prompt)? {
+            return Ok(false);
         }
-        Ok(normal)
+        self.log(format!("{} utilise « {} ».", self.name(seat), ability.name));
+        self.scratch.care = true;
+        let applied = self.apply_effects(seat, &ability.effects, None);
+        self.scratch.care = false;
+        applied?;
+        Ok(true)
     }
 
     /// With an explored marker: try to close the gate (Lore or Fight), seal it
@@ -89,12 +72,7 @@ impl<'a> Game<'a> {
         let Some(marker) = self.state.gate_at(location).map(|gate| gate.marker) else {
             return Ok(());
         };
-        let modifier = self
-            .data
-            .gate_markers
-            .markers
-            .get(marker)
-            .map_or(0, |m| m.close_modifier);
+        let modifier = self.close_modifier(marker);
         let sealable = self.can_be_sealed(location)?;
         let mut options = vec![
             option(Choice::Done, "Ne rien tenter"),
@@ -169,5 +147,23 @@ impl<'a> Game<'a> {
             }
         }
         Ok(None)
+    }
+
+    /// Printed modifier of a gate, plus the Mythos cards in play.
+    fn close_modifier(&self, marker: usize) -> i8 {
+        let Some(printed) = self.data.gate_markers.markers.get(marker) else {
+            return 0;
+        };
+        let change: i8 = self
+            .mythos_ongoing()
+            .into_iter()
+            .map(|effect| match effect {
+                data::Ongoing::GateCloseModifier { world, amount } if *world == printed.world => {
+                    *amount
+                }
+                _ => 0,
+            })
+            .sum();
+        printed.close_modifier.saturating_add(change)
     }
 }

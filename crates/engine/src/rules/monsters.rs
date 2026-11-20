@@ -45,6 +45,14 @@ impl Game<'_> {
     /// Puts a monster on the board, or in the Outskirts when the limit is
     /// reached. A full Outskirts empties into the cup and raises the Terror.
     pub fn place_monster(&mut self, id: MonsterId, place: MonsterPlace) -> Flow<()> {
+        if place
+            .as_place()
+            .is_some_and(|place| self.flux_stabilized(&place))
+        {
+            self.log("Le stabilisateur de flux de Kate empêche le monstre d'apparaître.");
+            self.state.monster_cup.push(id);
+            return Ok(());
+        }
         let over_limit = self
             .monster_limit()
             .is_some_and(|limit| self.monsters_in_arkham() >= limit);
@@ -103,7 +111,8 @@ impl Game<'_> {
             self.monster_name(&id)
         ));
         self.on_monster_defeated(&id)?;
-        if self.monster_stats(&id)?.has(MonsterAbility::Endless) {
+        let endless = self.monster_stats(&id)?.has(MonsterAbility::Endless);
+        if endless && !self.ignores(seat, data::MonsterTrait::Endless) {
             self.state.monster_cup.push(id);
         } else {
             self.inv_mut(seat).monster_trophies.push(id);

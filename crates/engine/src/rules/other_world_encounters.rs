@@ -1,10 +1,14 @@
 //! Phase IV: Other World encounters.
 
-use data::{GateCard, GateEncounter, OtherWorldId};
+use data::{GateCard, GateEncounter, OtherWorldId, Timing};
 
-use crate::game::Game;
+use crate::decision::{Choice, DecisionKind};
+use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::state::{Phase, Place};
+
+/// Most redraws in a row, so a loop of redraw effects always ends.
+const MAX_REDRAWS: usize = 5;
 
 impl<'a> Game<'a> {
     /// The Other World encounter phase, investigator by investigator.
@@ -21,33 +25,94 @@ impl<'a> Game<'a> {
         Ok(())
     }
 
-    /// Draws gate cards until one has a colour of the world, then applies the
-    /// world's paragraph or « Autre ». Cards go under the deck.
-    fn other_world_encounter(&mut self, seat: usize, world: &OtherWorldId) -> Flow<()> {
+    /// An encounter in an Other World; Œil du Dragon may redraw the card.
+    pub fn other_world_encounter(&mut self, seat: usize, world: &OtherWorldId) -> Flow<()> {
+        for _ in 0..MAX_REDRAWS {
+            self.scratch.redraw = false;
+            let Some((card, encounter)) = self.pick_gate_encounter(seat, world)? else {
+                return Ok(());
+            };
+            self.log(format!(
+                "Rencontre dans {} : {}",
+                self.world(world)?.name,
+                encounter.text
+            ));
+            self.covered.insert(crate::coverage::gate_key(
+                &card.id,
+                encounter.world.as_ref(),
+            ));
+            let prompt = "Utiliser une capacité avant de résoudre la rencontre ?";
+            self.offer_abilities(
+                seat,
+                &|timing| *timing == Timing::AfterEncounterDraw,
+                prompt,
+            )?;
+            if !self.scratch.redraw {
+                return self.apply_effects(seat, &encounter.effects, None);
+            }
+        }
+        self.scratch.redraw = false;
+        Ok(())
+    }
+
+    /// Draws the gate card (two for Gloria, who picks one) and finds the
+    /// paragraph for the world.
+    fn pick_gate_encounter(
+        &mut self,
+        seat: usize,
+        world: &OtherWorldId,
+    ) -> Flow<Option<(&'a GateCard, &'a GateEncounter)>> {
+        let mut found: Vec<(&'a GateCard, &'a GateEncounter)> = Vec::new();
+        for _ in 0..self.gate_draws(seat) {
+            let Some(card) = self.draw_gate_card(world)? else {
+                break;
+            };
+            if found.iter().any(|(other, _)| other.id == card.id) {
+                continue;
+            }
+            if let Some(encounter) = Self::world_paragraph(card, world) {
+                found.push((card, encounter));
+            }
+        }
+        if found.is_empty() {
+            self.log("Aucune carte Portail de la bonne couleur.");
+        }
+        if found.len() <= 1 {
+            return Ok(found.pop());
+        }
+        let options = found
+            .iter()
+            .enumerate()
+            .map(|(index, (_, encounter))| option(Choice::Option(index), encounter.text.clone()))
+            .collect();
+        let prompt = "Quelle rencontre suivez-vous ?";
+        let Choice::Option(index) = self.ask(seat, DecisionKind::CardChoice, prompt, options)?
+        else {
+            return Ok(None);
+        };
+        Ok(found.get(index).copied())
+    }
+
+    /// Draws gate cards until one has a colour of the world. Cards go under
+    /// the deck; the colourless card reshuffles it.
+    fn draw_gate_card(&mut self, world: &OtherWorldId) -> Flow<Option<&'a GateCard>> {
         let colors = self.world(world)?.colors.clone();
-        let mut card = None;
         for _ in 0..self.state.gate_deck.len() {
             let id = self.state.gate_deck.remove(0);
             self.state.gate_deck.push(id.clone());
             let candidate = self.gate_card(&id)?;
-            if colors.contains(&candidate.color) {
-                card = Some(candidate);
-                break;
+            let Some(color) = candidate.color else {
+                self.log("Carte Portail sans couleur : le paquet Portail est remélangé.");
+                let mut deck = std::mem::take(&mut self.state.gate_deck);
+                self.state.rng.shuffle(&mut deck);
+                self.state.gate_deck = deck;
+                continue;
+            };
+            if colors.contains(&color) {
+                return Ok(Some(candidate));
             }
         }
-        let Some(card) = card else {
-            self.log("Aucune carte Portail de la bonne couleur.");
-            return Ok(());
-        };
-        let Some(encounter) = Self::world_paragraph(card, world) else {
-            return Ok(());
-        };
-        self.log(format!(
-            "Rencontre dans {} : {}",
-            self.world(world)?.name,
-            encounter.text
-        ));
-        self.apply_effects(seat, &encounter.effects, None)
+        Ok(None)
     }
 
     /// A gate card by id.
