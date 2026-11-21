@@ -4,6 +4,7 @@ use data::{Deck, LocationId, Resource};
 use engine::{Area, MonsterPlace, Place, View};
 
 use crate::fighting::fight_chance;
+use crate::knob::knob;
 use crate::route::{Route, route};
 use crate::rumor::rumor_spot;
 use crate::value::amount_of;
@@ -101,6 +102,14 @@ pub fn goal(view: &View<'_, '_>, seat: usize) -> Option<Goal> {
         });
     }
     candidates.extend(shops(view, seat));
+    let stay = knob("STAY", -1000.0);
+    if stay > -999.0 {
+        candidates.push(Candidate {
+            place: here.clone(),
+            worth: stay,
+            reason: Reason::Stay,
+        });
+    }
     candidates
         .iter()
         .filter_map(|candidate| {
@@ -126,11 +135,12 @@ pub fn intention(view: &View<'_, '_>, seat: usize) -> Option<(Place, Reason)> {
 /// $2 for full care, a point a turn is not worth staying for unless at 1.
 fn healing(view: &View<'_, '_>, seat: usize) -> Option<Goal> {
     let can_pay = amount_of(view, seat, Resource::Money) >= HEALING_PRICE;
-    let low = if can_pay { 2 } else { 1 };
+    let low = if can_pay { knob("HEAL_LOW", 2.0) as u32 } else { knob("HEAL_LOW_POOR", 1.0) as u32 };
+    let frac = knob("HEAL_FRAC", 3.0) as u32;
     for (resource, place) in [(Resource::Stamina, HOSPITAL), (Resource::Sanity, ASYLUM)] {
         let held = amount_of(view, seat, resource);
         let most = u32::from(view.maximum(seat, resource));
-        if (held <= low || (can_pay && held * 3 <= most)) && held < most {
+        if (held <= low || (can_pay && held * frac <= most)) && held < most {
             let id = LocationId::new(place);
             if !view.is_closed(&id) {
                 return to(view, seat, &Place::Location(id), Reason::Heal);
@@ -162,12 +172,23 @@ pub fn seal_cost(view: &View<'_, '_>) -> u32 {
 /// Open gates, when healthy enough; worth more when they can be sealed,
 /// much less when another investigator already deals with them.
 fn gates(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
-    let ready = amount_of(view, seat, Resource::Stamina) >= READY_FOR_GATE
-        && amount_of(view, seat, Resource::Sanity) >= READY_FOR_GATE;
+    let ready_at = knob("READY", f64::from(READY_FOR_GATE)) as u32;
+    let ready = amount_of(view, seat, Resource::Stamina) >= ready_at
+        && amount_of(view, seat, Resource::Sanity) >= ready_at;
     if !ready {
         return Vec::new();
     }
-    let can_seal = amount_of(view, seat, Resource::Clues) >= seal_cost(view);
+    let clues_held = amount_of(view, seat, Resource::Clues);
+    let elder_sign = knob("ELDER", 0.0) > 0.0
+        && view.state().investigators.get(seat).is_some_and(|inv| inv.holds(&data::CardId::new("elder_sign")));
+    let can_seal = clues_held >= seal_cost(view) || elder_sign;
+    let trophies: usize = view.state().investigators.iter().map(|inv| inv.gate_trophies.len()).sum();
+    let finishing = trophies + 1 >= view.state().players() && view.state().gates.len() <= knob("FINISH_GATES", 0.0) as usize;
+    let finish = if finishing { knob("FINISH", 0.0) } else { 0.0 };
+    let short = f64::from(seal_cost(view).saturating_sub(clues_held));
+    let open = view.state().gates.len() as f64;
+    let limit = match view.state().players() { 0..=2 => 8.0, 3..=4 => 7.0, 5..=6 => 6.0, _ => 5.0 };
+    let pressure = knob("GATE_PRESSURE", 0.0) * open / limit;
     view.state()
         .gates
         .iter()
@@ -176,7 +197,10 @@ fn gates(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
             let taken = taken_by_others(view, seat, &gate.location);
             Candidate {
                 place: Place::Location(gate.location.clone()),
-                worth: 7.0 + if sealable { 4.0 } else { 0.0 } - GATE_TAKEN * taken,
+                worth: knob("GATE", 7.0) + if sealable { knob("SEALABLE", 4.0) } else { 0.0 }
+                    - knob("SHORT", 0.0) * short * f64::from(u8::from(view.can_be_sealed(&gate.location)))
+                    + pressure + finish
+                    - knob("TAKEN", GATE_TAKEN) * taken,
                 reason: Reason::Gate,
             }
         })
@@ -218,7 +242,8 @@ fn clues(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
         })
         .map(|(id, count)| Candidate {
             place: Place::Location(id.clone()),
-            worth: 1.5 * f64::from(*count),
+            worth: knob("CLUE", 1.5) * f64::from(*count)
+                + if amount_of(view, seat, Resource::Clues) + u32::from(*count) >= seal_cost(view) { knob("COMPLETE", 0.0) } else { 0.0 },
             reason: Reason::Clues,
         })
         .collect()
@@ -234,14 +259,14 @@ fn hunts(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
         .filter(|monster| monster.place.as_place().is_some())
         .count();
     let limit = state.players() + 3;
-    let pressure = if in_town + 1 >= limit { 4.0 } else { 1.0 };
+    let pressure = if in_town + 1 >= limit { knob("HUNT_HOT", 4.0) } else { knob("HUNT", 1.0) };
     state
         .monsters
         .iter()
         .filter_map(|monster| {
             let place = monster.place.as_place()?;
             let odds = fight_chance(view, seat, &monster.monster)?;
-            (odds >= HUNTING_ODDS).then_some(Candidate {
+            (odds >= knob("HUNT_ODDS", HUNTING_ODDS)).then_some(Candidate {
                 place,
                 worth: pressure,
                 reason: Reason::Hunt,

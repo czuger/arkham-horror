@@ -92,6 +92,7 @@ impl Game<'_> {
         if let Some(battle) = &mut self.state.battle {
             battle.round = round;
         }
+        self.turn_answers = 0;
         self.log(format!("Round {round}."));
         for seat in self.state.seat_order() {
             self.catch_knock_out(seat, |game| game.upkeep(seat))?;

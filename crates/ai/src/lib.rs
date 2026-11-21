@@ -5,6 +5,7 @@ mod choices;
 mod fighting;
 mod gear;
 mod goal;
+mod knob;
 mod movement;
 mod odds;
 mod policy;

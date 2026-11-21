@@ -7,6 +7,7 @@ use data::{
 
 use crate::decision::{Choice, Context, Decision, DecisionKind, DecisionOption, Responder};
 use crate::halt::{Flow, Halt};
+use crate::rules::turn::MAX_ANSWERS_PER_TURN;
 use crate::shown::{Exhibit, Shown};
 use crate::state::{GameState, InvestigatorState, Place};
 use crate::view::View;
@@ -21,6 +22,8 @@ pub(crate) struct Game<'a> {
     responder: Option<&'a mut dyn Responder>,
     /// Answers accepted so far, in order.
     pub answers: Vec<usize>,
+    /// Answers accepted since the turn (or final battle round) began.
+    pub turn_answers: usize,
     /// Journal lines, in French.
     pub events: Vec<String>,
     /// Cards drawn, dice rolled and combats, beside the journal lines.
@@ -84,6 +87,7 @@ impl<'a> Game<'a> {
             state,
             responder: Some(responder),
             answers: Vec::new(),
+            turn_answers: 0,
             events: Vec::new(),
             shown: Vec::new(),
             scratch: Scratch::default(),
@@ -142,6 +146,11 @@ impl<'a> Game<'a> {
             1 => return Ok(options[0].choice.clone()),
             _ => {}
         }
+        if self.turn_answers >= MAX_ANSWERS_PER_TURN {
+            return Err(Halt::Broken(format!(
+                "la partie dépasse {MAX_ANSWERS_PER_TURN} décisions dans un tour"
+            )));
+        }
         let decision = Decision {
             who,
             kind,
@@ -168,6 +177,7 @@ impl<'a> Game<'a> {
         };
         let choice = option.choice.clone();
         self.answers.push(answer);
+        self.turn_answers += 1;
         Ok(choice)
     }
 

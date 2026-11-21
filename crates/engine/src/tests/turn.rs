@@ -98,3 +98,18 @@ fn clues_are_picked_up_at_the_end_of_the_movement() {
     assert_eq!(result, Ok(()));
     assert_eq!(state.investigators[0].clues, 2);
 }
+
+#[test]
+fn a_turn_stuck_in_a_loop_of_decisions_is_stopped() {
+    let mut state = clean_state(1, "azathoth");
+    let answers = vec![0; crate::rules::turn::MAX_ANSWERS_PER_TURN + 1];
+    let (result, _) = run(&mut state, &answers, &[], |game| -> crate::halt::Flow<()> {
+        loop {
+            game.ask_yes_no(0, crate::decision::DecisionKind::Optional, "Encore ?")?;
+        }
+    });
+    assert!(
+        matches!(&result, Err(crate::halt::Halt::Broken(reason)) if reason.contains("1000 décisions")),
+        "{result:?}"
+    );
+}

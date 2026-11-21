@@ -201,8 +201,8 @@ pub fn spend_clue(
         || (closing_gate && clues != seal)
         || clues > seal
         || match kind {
-            CheckKind::Combat | CheckKind::Evade => stamina <= 2,
-            CheckKind::Horror => sanity <= 2,
+            CheckKind::Combat | CheckKind::Evade => f64::from(stamina) <= crate::knob::knob("SPEND_HP", 2.0),
+            CheckKind::Horror => f64::from(sanity) <= crate::knob::knob("SPEND_HP", 2.0),
             _ => false,
         };
     if worth_it { spend } else { done }

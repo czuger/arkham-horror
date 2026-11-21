@@ -76,7 +76,7 @@ pub fn danger(view: &View<'_, '_>, seat: usize, place: &Place) -> f64 {
         .filter_map(|monster| view.monster_stats(&monster.monster))
         .map(|stats| {
             let dice = view.check_dice(seat, CheckKind::Evade, stats.awareness);
-            (1.0 - chance(dice, 1, face)) * MONSTER_COST
+            (1.0 - chance(dice, 1, face)) * crate::knob::knob("MONSTER_COST", MONSTER_COST)
         })
         .sum()
 }

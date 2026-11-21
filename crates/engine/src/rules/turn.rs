@@ -7,6 +7,10 @@ use crate::setup::Setup;
 /// A game still running after this many turns is stopped as broken.
 pub(crate) const MAX_TURNS: u32 = 500;
 
+/// A turn (or final battle round) asking more decisions than this is stuck
+/// in a loop and stopped as broken.
+pub(crate) const MAX_ANSWERS_PER_TURN: usize = 1000;
+
 impl Game<'_> {
     /// Plays the game from the setup to its end, or to the first decision
     /// without an answer.
@@ -29,6 +33,7 @@ impl Game<'_> {
     /// One turn: the five phases, then the first player marker moves left.
     fn play_turn(&mut self) -> Flow<()> {
         self.state.turn += 1;
+        self.turn_answers = 0;
         self.log(format!("— Tour {} —", self.state.turn));
         self.upkeep_phase()?;
         self.movement_phase()?;

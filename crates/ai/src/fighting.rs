@@ -19,6 +19,8 @@ struct Odds {
     win: f64,
     /// The investigator would be knocked out by one more hit or Horror.
     fragile: bool,
+    /// Chance of not going insane on the Horror check.
+    horror_ok: f64,
 }
 
 /// Chances against a monster, with `bonus` from the cards in hand (the
@@ -40,10 +42,19 @@ fn odds(view: &View<'_, '_>, seat: usize, stats: &MonsterStats, bonus: Option<i3
     let damage = stats.combat.map_or(0, |check| check.damage);
     let horror = stats.horror.map_or(0, |check| check.damage);
     let fragile = inv.is_none_or(|inv| inv.stamina <= damage || inv.sanity <= horror);
+    let horror_ok = match (inv, stats.horror) {
+        (Some(inv), Some(check)) if inv.sanity <= check.damage => chance(
+            view.check_dice(seat, CheckKind::Horror, i32::from(check.modifier)),
+            1,
+            face,
+        ),
+        _ => 1.0,
+    };
     Odds {
         evade,
         win,
         fragile,
+        horror_ok,
     }
 }
 
@@ -68,9 +79,12 @@ pub fn fight_chance(view: &View<'_, '_>, seat: usize, monster: &MonsterId) -> Op
 /// Whether fighting beats evading.
 fn should_fight(odds: &Odds) -> bool {
     if odds.fragile {
+        if crate::knob::knob("FRAGILE", 0.0) > 0.0 {
+            return odds.win * odds.horror_ok > odds.evade;
+        }
         return odds.win > odds.evade + 0.2;
     }
-    odds.win >= SURE_WIN || (odds.evade < 0.4 && odds.win > odds.evade)
+    odds.win >= crate::knob::knob("SURE_WIN", SURE_WIN) || (odds.evade < 0.4 && odds.win > odds.evade)
 }
 
 /// Which monster to deal with, and how: the surest move first.
@@ -124,7 +138,7 @@ pub fn fight_or_flee(
     let attack_wins = if odds.fragile {
         odds.win >= odds.evade
     } else {
-        odds.win >= POOR_WIN || odds.win >= odds.evade
+        odds.win >= crate::knob::knob("POOR_WIN", POOR_WIN) || odds.win >= odds.evade
     };
     if attack_wins { attack } else { flee }
 }
