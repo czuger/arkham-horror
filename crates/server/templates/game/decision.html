@@ -10,6 +10,11 @@
   {% else %}
   <form id="decision" method="post" action="/partie/{{ id }}/reponse">
     <input type="hidden" name="coup" value="{{ decision.move_number }}">
+    {% if !decision.cards.is_empty() %}
+    <div class="offer">
+      {% for offered in decision.cards %}<button type="submit" name="choix" value="{{ offered.index }}" class="offered-card" title="{{ offered.label }}">{% if offered.token.image.is_empty() %}<span class="card-name">{{ offered.token.name }}</span>{% else %}<img src="/assets/{{ offered.token.image }}" alt="{{ offered.token.name }}">{% endif %}<span>{{ offered.label }}</span></button>{% endfor %}
+    </div>
+    {% endif %}
     {% for (index, label) in decision.options %}
     <button type="submit" name="choix" value="{{ index }}">{{ label }}</button>
     {% endfor %}

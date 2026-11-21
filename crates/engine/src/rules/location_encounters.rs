@@ -64,7 +64,7 @@ impl<'a> Game<'a> {
                 self.show(Exhibit::Card {
                     deck: Deck::Location,
                     card: card.id.clone(),
-                    seat: Some(seat),
+                    seat,
                 });
                 drawn.push(card);
             }

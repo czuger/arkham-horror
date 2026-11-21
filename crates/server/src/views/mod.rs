@@ -1,5 +1,6 @@
 mod board_geometry;
 mod board_view;
+mod closed_marker;
 mod combat_span;
 mod combat_view;
 mod decision_view;

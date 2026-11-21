@@ -37,7 +37,7 @@ impl<'a> Game<'a> {
             self.show(Exhibit::Card {
                 deck: Deck::Mythos,
                 card: id.clone(),
-                seat: None,
+                seat: self.state.first_player,
             });
             if card.kind != MythosKind::Reshuffle {
                 return Ok(Some(card));

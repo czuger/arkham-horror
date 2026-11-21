@@ -5,9 +5,10 @@ use engine::{Area, Choice, Decision, GameState, MonsterPlace, Place, View};
 
 use crate::session::HUMAN_SEAT;
 use crate::views::board_geometry::{BOARD_SIZE, edge, percent};
+use crate::views::closed_marker::closed_marker;
 use crate::views::image_token::ImageToken;
 use crate::views::location_panel::LocationPanel;
-use crate::views::names::{initials, investigator_name, monster};
+use crate::views::names::{initials, investigator_name, monster_on_board};
 use crate::views::spot::{InvestigatorToken, Spot};
 use crate::views::terror_pawn::TerrorPawn;
 use crate::views::tips;
@@ -34,6 +35,7 @@ impl BoardView {
         add_investigators(view, &mut spots);
         add_monsters(view, &mut spots);
         add_locations(data, state, &mut spots);
+        add_closed(view, &mut spots);
         if let Some(decision) = decision {
             add_choices(data, decision, &mut spots);
         }
@@ -148,7 +150,7 @@ fn add_monsters(view: &View<'_, '_>, spots: &mut BTreeMap<String, Spot>) {
                 .as_place()
                 .and_then(|place| spot_of(data, spots, &place)),
         };
-        if let (Some(spot), Some(token)) = (spot, monster(view, &board_monster.monster)) {
+        if let (Some(spot), Some(token)) = (spot, monster_on_board(view, &board_monster.monster)) {
             spot.monsters.push(token);
         }
     }
@@ -164,7 +166,7 @@ fn special_spot<'s>(
     Some(spots.entry(key).or_insert_with(|| blank(name, position)))
 }
 
-/// Gates, clue tokens, seals and closed locations.
+/// Gates, clue tokens and seals.
 fn add_locations(data: &GameData, state: &GameState, spots: &mut BTreeMap<String, Spot>) {
     for gate in &state.gates {
         let Some(spot) = spot_of(data, spots, &Place::Location(gate.location.clone())) else {
@@ -189,9 +191,16 @@ fn add_locations(data: &GameData, state: &GameState, spots: &mut BTreeMap<String
             spot.sealed = true;
         }
     }
-    for id in &state.closed {
-        if let Some(spot) = spot_of(data, spots, &Place::Location(id.clone())) {
-            spot.closed = true;
+}
+
+/// The « Lieu fermé » marker on each closed location.
+fn add_closed(view: &View<'_, '_>, spots: &mut BTreeMap<String, Spot>) {
+    let data = view.data();
+    for location in &data.board.locations {
+        if let Some(marker) = closed_marker(view, &location.id)
+            && let Some(spot) = spot_of(data, spots, &Place::Location(location.id.clone()))
+        {
+            spot.closed = Some(marker);
         }
     }
 }

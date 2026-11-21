@@ -11,7 +11,7 @@
     <div class="tokens">
       {% if let Some(gate) = spot.gate %}<span class="tip" tabindex="0"><img class="gate" src="/assets/{{ gate.image }}" alt="{{ gate.name }}">{{ gate.tip|safe }}</span>{% endif %}
       {% if spot.sealed %}<span class="seal tip" tabindex="0">✶<span class="bubble" role="tooltip"><strong>Scellé</strong><span>{{ spot.name }} : un Signe des Anciens empêche tout portail de s'ouvrir ici.</span></span></span>{% endif %}
-      {% if spot.closed %}<span class="closed tip" tabindex="0">✕<span class="bubble" role="tooltip"><strong>Lieu fermé</strong><span>{{ spot.name }}</span></span></span>{% endif %}
+      {% if let Some(closed) = spot.closed %}<span class="tip" tabindex="0"><img class="closed-marker" src="/assets/{{ closed.image }}" alt="{{ closed.name }}">{{ closed.tip|safe }}</span>{% endif %}
       {% if spot.clues > 0 %}<span class="clue tip" tabindex="0">{{ spot.clues }}<span class="bubble" role="tooltip"><strong>{{ spot.clues }} Indice(s)</strong><span>{{ spot.name }}</span></span></span>{% endif %}
       {% for monster in spot.monsters %}<span class="monster tip" tabindex="0" style="background-image: url('/assets/{{ monster.image }}')" aria-label="{{ monster.name }}">{{ monster.tip|safe }}</span>{% endfor %}
       {% for pawn in spot.investigators %}<span class="pawn tip{% if pawn.human %} human{% endif %}" tabindex="0">{{ pawn.initials }}{{ pawn.tip|safe }}</span>{% endfor %}

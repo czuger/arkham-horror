@@ -1,4 +1,4 @@
-use engine::{Deck, Exhibit, Shown, View};
+use engine::{Deck, DiceCount, Exhibit, Shown, View};
 
 use crate::views::image_token::ImageToken;
 use crate::views::names::card;
@@ -15,13 +15,15 @@ pub struct JournalLine {
     pub rolls: Vec<DiceRoll>,
 }
 
-/// A Mythos, location or gate card drawn.
+/// A Mythos, location or gate card drawn, or an investigator card received.
 #[derive(Debug, Clone)]
 pub struct DrawnCard {
     /// Name, image and bubble.
     pub token: ImageToken,
-    /// « Carte Mythe », « Carte Lieu tirée par Amanda Sharpe »…
-    pub caption: String,
+    /// « Carte Mythe tirée par », « Carte reçue par »…
+    pub action: &'static str,
+    /// Who drew it (the first player for a Mythos card).
+    pub who: String,
 }
 
 /// Dice rolled at once.
@@ -31,8 +33,8 @@ pub struct DiceRoll {
     pub who: String,
     /// Each die.
     pub dice: Vec<Die>,
-    /// Successes rolled.
-    pub successes: u32,
+    /// What the roll gives: « 1 succès », « total : 7 »…
+    pub summary: String,
 }
 
 /// One die rolled.
@@ -110,42 +112,55 @@ fn attach(view: &View<'_, '_>, line: &mut JournalLine, what: &Exhibit) {
             card: id,
             seat,
         } => {
-            let deck = match deck {
-                Deck::Mythos => "Carte Mythe",
-                Deck::Location => "Carte Lieu",
-                Deck::Gate => "Carte Portail",
-            };
-            let caption = match seat {
-                Some(seat) => format!("{deck} tirée par {}", view.name(*seat)),
-                None => deck.to_owned(),
+            let action = match deck {
+                Deck::Mythos => "Carte Mythe tirée par",
+                Deck::Location => "Carte Lieu tirée par",
+                Deck::Gate => "Carte Portail tirée par",
+                Deck::Investigator => "Carte reçue par",
             };
             line.cards.push(DrawnCard {
                 token: card(view.data(), id),
-                caption,
+                action,
+                who: view.name(*seat),
             });
         }
-        Exhibit::Dice { faces, .. } if faces.is_empty() => {}
-        Exhibit::Dice {
-            seat,
-            faces,
-            success_from,
-            sixes_double,
-        } => line.rolls.push(DiceRoll {
-            who: view.name(*seat),
-            dice: faces
-                .iter()
-                .map(|&face| Die {
-                    face,
-                    successes: u8::try_from(Exhibit::successes(
-                        &[face],
-                        *success_from,
-                        *sixes_double,
-                    ))
-                    .unwrap_or(0),
-                })
-                .collect(),
-            successes: Exhibit::successes(faces, *success_from, *sixes_double),
-        }),
+        Exhibit::Dice { seat, faces, count } => {
+            line.rolls.push(dice_roll(view, *seat, faces, *count));
+        }
         Exhibit::CombatStart { .. } | Exhibit::CombatEnd { .. } => {}
     }
+}
+
+/// A roll as shown: each die, and the successes or the total. A roll of no
+/// dice is shown too.
+fn dice_roll(view: &View<'_, '_>, seat: Option<usize>, faces: &[u8], count: DiceCount) -> DiceRoll {
+    let who = seat.map_or_else(|| "Monstre".to_owned(), |seat| view.name(seat));
+    let dice = faces
+        .iter()
+        .map(|&face| Die {
+            face,
+            successes: match count {
+                DiceCount::Successes {
+                    success_from,
+                    sixes_double,
+                } => u8::try_from(Exhibit::successes(&[face], success_from, sixes_double))
+                    .unwrap_or(0),
+                DiceCount::Total => 0,
+            },
+        })
+        .collect();
+    let total: u32 = faces.iter().map(|&face| u32::from(face)).sum();
+    let summary = match count {
+        _ if faces.is_empty() => "aucun dé : 0 succès".to_owned(),
+        DiceCount::Successes {
+            success_from,
+            sixes_double,
+        } => format!(
+            "{} succès",
+            Exhibit::successes(faces, success_from, sixes_double)
+        ),
+        DiceCount::Total if faces.len() == 1 => format!("résultat : {total}"),
+        DiceCount::Total => format!("total : {total}"),
+    };
+    DiceRoll { who, dice, summary }
 }

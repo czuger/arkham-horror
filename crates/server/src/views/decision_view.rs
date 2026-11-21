@@ -1,6 +1,7 @@
-use engine::{Context, Decision, View, of_check};
+use engine::{CardAim, Choice, Context, Decision, View, of_check};
 
-use crate::views::names::monster_name;
+use crate::views::image_token::ImageToken;
+use crate::views::names::{card, monster_name};
 use crate::views::sheet_decision::on_sheet;
 
 /// The decision the human must take, as a form.
@@ -12,8 +13,11 @@ pub struct DecisionView {
     pub prompt: String,
     /// What the decision is about, in a few words (successes so far…).
     pub hint: String,
-    /// The answers: index and label.
+    /// The answers given by plain buttons: index and label.
     pub options: Vec<(usize, String)>,
+    /// When picking a card (to keep, buy, sell or lose): the cards, shown at
+    /// their own size, each a button.
+    pub cards: Vec<CardOption>,
     /// Number of answers given so far, sent back with the form.
     pub move_number: usize,
     /// Answered on the investigator's page, not with these buttons.
@@ -22,9 +26,21 @@ pub struct DecisionView {
     pub in_combat: bool,
 }
 
+/// A card that can be picked: the answer index, the card and the button text.
+#[derive(Debug, Clone)]
+pub struct CardOption {
+    /// Answer index.
+    pub index: usize,
+    /// Name and image.
+    pub token: ImageToken,
+    /// Button text (« Acheter Revolver .38 (4 $) »).
+    pub label: String,
+}
+
 impl DecisionView {
     /// The form for a decision.
     pub fn new(view: &View<'_, '_>, decision: &Decision, move_number: usize) -> Self {
+        let cards = card_choices(view, decision);
         Self {
             who: view.name(decision.who),
             prompt: decision.prompt.clone(),
@@ -33,8 +49,10 @@ impl DecisionView {
                 .options
                 .iter()
                 .enumerate()
+                .filter(|(index, _)| !cards.iter().any(|card| card.index == *index))
                 .map(|(index, option)| (index, option.label.clone()))
                 .collect(),
+            cards,
             move_number,
             on_sheet: on_sheet(decision),
             in_combat: false,
@@ -46,6 +64,33 @@ impl DecisionView {
         self.in_combat = in_combat && !self.on_sheet;
         self
     }
+}
+
+/// The cards to pick from when keeping, buying, selling or losing one; empty
+/// for any other decision.
+fn card_choices(view: &View<'_, '_>, decision: &Decision) -> Vec<CardOption> {
+    let Context::Cards(aim) = decision.context else {
+        return Vec::new();
+    };
+    let verb = match aim {
+        CardAim::Keep => "Prendre",
+        CardAim::Buy => "Acheter",
+        CardAim::Sell => "Vendre",
+        CardAim::Lose => "Défausser",
+    };
+    decision
+        .options
+        .iter()
+        .enumerate()
+        .filter_map(|(index, option)| match &option.choice {
+            Choice::Card(id) => Some(CardOption {
+                index,
+                token: card(view.data(), id),
+                label: format!("{verb} {}", option.label),
+            }),
+            _ => None,
+        })
+        .collect()
 }
 
 /// A short French line about the decision's context.

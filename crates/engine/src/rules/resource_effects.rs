@@ -67,7 +67,7 @@ impl Game<'_> {
 
     /// Rolls one die, logs it and keeps it as X.
     fn rolled(&mut self, seat: usize) -> u32 {
-        let roll = u32::from(self.die());
+        let roll = u32::from(self.die_shown(Some(seat)));
         self.scratch.x = roll;
         self.log(format!("{} lance un dé : {roll}.", self.name(seat)));
         roll

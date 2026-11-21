@@ -1,7 +1,8 @@
 use askama::Template;
 
-/// A bubble shown when the pointer rests on a game element: a title and a few
-/// lines of text. Rendered by `tip.html`, already escaped.
+/// A bubble shown when the pointer rests on a game element: a title, a few
+/// lines of text and maybe an image at its own size. Rendered by `tip.html`,
+/// already escaped.
 #[derive(Debug, Clone, Default, Template)]
 #[template(path = "tip.html")]
 pub struct Tip {
@@ -9,6 +10,8 @@ pub struct Tip {
     pub title: String,
     /// The other lines.
     pub lines: Vec<String>,
+    /// Image path under `/assets/`, shown at its own size; empty for none.
+    pub image: String,
 }
 
 impl Tip {
@@ -17,7 +20,14 @@ impl Tip {
         Self {
             title,
             lines: Vec::new(),
+            image: String::new(),
         }
+    }
+
+    /// Shows an image, at its own size, under the text.
+    pub fn picture(mut self, image: String) -> Self {
+        self.image = image;
+        self
     }
 
     /// Adds a line.

@@ -32,11 +32,13 @@ pub struct Board {
     pub special_areas: Vec<SpecialArea>,
     /// The terror track.
     pub terror_track: TerrorTrack,
+    /// « Lieu fermé » marker, relative to the `assets/` folder.
+    pub closed_marker: String,
 }
 
 impl Board {
     /// Format version this code reads.
-    pub const VERSION: u32 = 3;
+    pub const VERSION: u32 = 4;
 
     /// Finds a location by id.
     pub fn location(&self, id: &LocationId) -> Option<&Location> {

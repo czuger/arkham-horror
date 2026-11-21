@@ -74,7 +74,7 @@ impl<'a> Game<'a> {
             self.show(Exhibit::Card {
                 deck: Deck::Gate,
                 card: card.id.clone(),
-                seat: Some(seat),
+                seat,
             });
             if let Some(encounter) = Self::world_paragraph(card, world) {
                 found.push((card, encounter));

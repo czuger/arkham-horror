@@ -8,6 +8,10 @@
 {% if let Some(decision) = decision %}
 <form id="sheet-form" method="post" action="/partie/{{ id }}/reponse">
 <input type="hidden" name="coup" value="{{ decision.form.move_number }}">
+{% endif %}
+<div class="investigator-page{% if hands.active %} active{% endif %}">
+<div class="investigator-main">
+{% if let Some(decision) = decision %}
 <section class="decision">
   <h2>{{ decision.form.who }} : à vous</h2>
   <p class="prompt">{{ decision.form.prompt }}</p>
@@ -57,8 +61,6 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="hand-zones{% if hands.active %} active{% endif %}">
     <div class="zone hands" data-zone="hand">
       <h3>En main : {{ hands.used }} / {{ hands.total }} mains</h3>
       {% if !hands.active && !hands.in_hand.is_empty() %}<p class="hint">Ces armes restent en main ; vous pourrez les changer avant chaque combat.</p>{% endif %}
@@ -67,15 +69,17 @@
         {% for held in hands.in_hand %}{% let target = "possessions" %}{% let action = "Lâcher" %}{% include "investigator/held_card.html" %}{% endfor %}
       </div>
     </div>
-    <div class="zone possessions" data-zone="possessions">
-      <h3>Possessions : {{ hands.possessions.len() }} carte(s)</h3>
-      {% if hands.possessions.is_empty() && hands.in_hand.is_empty() %}<p class="hint">Aucune carte.</p>{% endif %}
-      <div class="cards-row">
-        {% for held in hands.possessions %}{% let target = "hand" %}{% let action = "Prendre en main" %}{% include "investigator/held_card.html" %}{% endfor %}
-      </div>
-    </div>
   </div>
 </section>
+</div>
+<div class="zone possessions" data-zone="possessions">
+  <h3>Possessions : {{ hands.possessions.len() }} carte(s)</h3>
+  {% if hands.possessions.is_empty() && hands.in_hand.is_empty() %}<p class="hint">Aucune carte.</p>{% endif %}
+  <div class="cards-row">
+    {% for held in hands.possessions %}{% let target = "hand" %}{% let action = "Prendre en main" %}{% include "investigator/held_card.html" %}{% endfor %}
+  </div>
+</div>
+</div>
 {% if decision.is_some() %}
 </form>
 {% if can_undo %}

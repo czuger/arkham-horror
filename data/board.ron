@@ -17,7 +17,7 @@
 //   légende du livret (`marqueurs/legende_icones_rencontre.png`).
 #![enable(implicit_some)]
 Board(
-    version: 3,
+    version: 4,
     image: "plateau/arkham.jpg",
     icon_images: {
         Ally: "marqueurs/icones_rencontre/allie.png",
@@ -626,4 +626,7 @@ Board(
             (x: 322, y: 1538), // 10
         ],
     ),
+    // Marqueur « Lieu fermé », posé sur un lieu fermé pour de bon ou par une
+    // carte Mythe.
+    closed_marker: "marqueurs/lieu_ferme.jpg",
 )

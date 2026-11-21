@@ -1,7 +1,6 @@
-Elargit la fiche des investigateurs, place les possessions à droite dans une nouvelle colonne
+Dans la ficher des investigateurs fait partir la colonne possession du haut
 
-Inverse l'ordre du journal (les évènements les plus récents d'abord)
-Dans le journal, affiche qui a tiré la carte (quel investigateurs si il y en a un)
-Affiche toujours les cartes en plein écran dans le journal.
+Inverse l'ordre du journal également lorsque l'on affiche le journal complêt.
 
-Les monstres ont deux faces, on n'est censé voir la face de combat que lors d'un combat. Sur la carte on doit voir la face de mouvement.
+Lorsque l'on passe la souris sur un monstre montre également son image de mouvement et son image de combat en taille 1:1 
+

@@ -1,9 +1,9 @@
 <section class="recent" aria-label="Journal">
   <h2>Depuis votre dernier choix</h2>
-  <ol class="journal">
+  <ol class="journal" reversed>
+    {% for line in journal.new.iter().rev() %}{% let class = "new" %}{% include "journal/line.html" %}{% endfor %}
+    {% for line in journal.older.iter().rev() %}{% let class = "old" %}{% include "journal/line.html" %}{% endfor %}
     {% if journal.truncated %}<li class="old">…</li>{% endif %}
-    {% for line in journal.older %}{% let class = "old" %}{% include "journal/line.html" %}{% endfor %}
-    {% for line in journal.new %}{% let class = "new" %}{% include "journal/line.html" %}{% endfor %}
   </ol>
   <p class="tools"><a href="/partie/{{ id }}/journal">Journal complet</a></p>
 </section>

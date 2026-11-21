@@ -335,7 +335,7 @@ async fn drawn_cards_and_combat_dice_are_shown() {
                 .get(&game)
                 .await
                 .body
-                .contains("Carte Mythe</figcaption>");
+                .contains("<figcaption>Carte Mythe tirée par <strong>");
             if cards_seen && combat_seen {
                 return;
             }

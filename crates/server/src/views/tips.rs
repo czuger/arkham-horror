@@ -25,6 +25,22 @@ pub fn monster(view: &View<'_, '_>, monster: &Monster) -> Tip {
         .line(format!("Force {}", stats.toughness))
         .maybe(Some(abilities.join(", ")))
         .maybe(monster.special.clone())
+        .picture(monster.image.clone())
+}
+
+/// A monster on the board: name, movement and awareness, and the token
+/// image (combat side, then movement side) at its own size.
+pub fn monster_movement_side(view: &View<'_, '_>, monster: &Monster) -> Tip {
+    let stats = view
+        .monster_stats(&monster.id)
+        .unwrap_or_else(|| printed(monster));
+    Tip::new(monster.name.clone())
+        .line(format!(
+            "Mouvement {} · Conscience {:+}",
+            stats.movement.label(),
+            stats.awareness
+        ))
+        .picture(monster.image.clone())
 }
 
 /// The values printed on a token, when the engine cannot tell the current ones.

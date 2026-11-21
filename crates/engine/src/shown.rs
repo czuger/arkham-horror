@@ -16,25 +16,24 @@ pub struct Shown {
 /// A card drawn, a roll of dice, or the start or end of a combat.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Exhibit {
-    /// A Mythos, location or gate card drawn.
+    /// A Mythos, location or gate card drawn, or an investigator card
+    /// received.
     Card {
         /// Its deck.
         deck: Deck,
         /// The card.
         card: CardId,
-        /// Who drew it; `None` for a Mythos card.
-        seat: Option<usize>,
-    },
-    /// Dice rolled for a check.
-    Dice {
-        /// Who rolled.
+        /// Who drew it (the first player for a Mythos card).
         seat: usize,
+    },
+    /// Dice rolled, for a check or for their value.
+    Dice {
+        /// Who rolled; `None` for a monster (the Chthonian).
+        seat: Option<usize>,
         /// Each die, from 1 to 6.
         faces: Vec<u8>,
-        /// Lowest face that is a success (5, or 4 when blessed).
-        success_from: u8,
-        /// Each 6 counts as 2 successes (Shotgun).
-        sixes_double: bool,
+        /// What the roll is counted by.
+        count: DiceCount,
     },
     /// An investigator faces a monster: evading it or fighting it.
     CombatStart {
@@ -52,6 +51,20 @@ pub enum Exhibit {
     },
 }
 
+/// What a roll of dice is counted by.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiceCount {
+    /// Successes, as in a check.
+    Successes {
+        /// Lowest face that is a success (5, or 4 when blessed).
+        success_from: u8,
+        /// Each 6 counts as 2 successes (Shotgun).
+        sixes_double: bool,
+    },
+    /// The faces added up (« lancez un dé »).
+    Total,
+}
+
 /// The deck a card was drawn from.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Deck {
@@ -61,6 +74,9 @@ pub enum Deck {
     Location,
     /// Gate cards (Other World encounters).
     Gate,
+    /// An investigator card received during the game (item, spell, skill,
+    /// ally, special card).
+    Investigator,
 }
 
 /// How facing a monster ended.

@@ -24,8 +24,8 @@
     {% if !combat.lines.is_empty() %}
     <section class="combat-log">
       <h2>Jets de dés</h2>
-      <ol class="journal full">
-        {% for line in combat.lines %}{% let class = "new" %}{% include "journal/line.html" %}{% endfor %}
+      <ol class="journal full" reversed>
+        {% for line in combat.lines.iter().rev() %}{% let class = "new" %}{% include "journal/line.html" %}{% endfor %}
       </ol>
       {% if let Some(ending) = combat.ending %}<p class="combat-ending">{{ ending }}</p>{% endif %}
     </section>

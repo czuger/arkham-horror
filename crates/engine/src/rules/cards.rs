@@ -4,6 +4,7 @@ use data::{CardId, Deck, SpecialId, Timing};
 
 use crate::game::Game;
 use crate::halt::Flow;
+use crate::shown::{Deck as ShownDeck, Exhibit};
 use crate::state::HeldCard;
 
 /// Special effect: Blessing and Curse cancel each other.
@@ -86,6 +87,13 @@ impl Game<'_> {
             self.discard_card(seat, &opposite)?;
             self.state.decks.get_mut(deck).push(card);
             return Ok(());
+        }
+        if self.state.turn > 0 {
+            self.show(Exhibit::Card {
+                deck: ShownDeck::Investigator,
+                card: card.clone(),
+                seat,
+            });
         }
         self.log(format!("{} reçoit {}.", self.name(seat), printed.name));
         self.inv_mut(seat).cards.push(HeldCard::new(card.clone()));

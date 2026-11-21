@@ -10,7 +10,7 @@
   </form>
   {% endif %}
 </p>
-<ol class="journal full">
-  {% for line in lines %}{% let class = "old" %}{% include "journal/line.html" %}{% endfor %}
+<ol class="journal full" reversed>
+  {% for line in lines.iter().rev() %}{% let class = "old" %}{% include "journal/line.html" %}{% endfor %}
 </ol>
 {% endblock %}

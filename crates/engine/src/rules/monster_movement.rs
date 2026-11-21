@@ -198,7 +198,7 @@ impl Game<'_> {
     /// Chthonian: instead of moving, on 4–6 every investigator in Arkham
     /// loses 1 Stamina.
     fn chthonian_shakes(&mut self) -> Flow<()> {
-        let roll = self.die();
+        let roll = self.die_shown(None);
         self.log(format!("Le Chthonien fait trembler la terre : {roll}."));
         if roll < 4 {
             return Ok(());

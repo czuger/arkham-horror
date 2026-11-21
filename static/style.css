@@ -57,7 +57,7 @@ main:has(.game) { max-width: none; }
 .side { flex: 1 1 22rem; min-width: 20rem; display: flex; flex-direction: column; gap: 0.8rem; }
 .side section, .log section, .combat section { background: #fffaf0; border: 1px solid #d8cbb3; border-radius: 6px; padding: 0.5rem 0.8rem; }
 .log {
-  flex: 0 0 24rem; position: sticky; top: 0.5rem;
+  flex: 0 0 26rem; position: sticky; top: 0.5rem;
   max-height: calc(100vh - 4.5rem); overflow-y: auto;
 }
 .log .journal { max-height: none; }
@@ -95,9 +95,10 @@ main:has(.game) { max-width: none; }
   border: 2px solid #fff;
 }
 .pawn.human { background: #b22222; }
+/* Monsters on the board show their movement side (right half of the image). */
 .monster {
   width: 28px; height: 28px; border-radius: 4px;
-  background-size: 200% 100%; background-position: 0 0;
+  background-size: 200% 100%; background-position: 100% 0;
   border: 1px solid #000;
 }
 .gate { width: 30px; height: 30px; border-radius: 50%; }
@@ -116,8 +117,9 @@ main:has(.game) { max-width: none; }
   background: #2e8b57; color: #fff; font: bold 11px sans-serif;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.seal, .closed { font-size: 20px; color: #ffd700; text-shadow: 0 0 3px #000; }
-.closed { color: #c00; }
+.seal { font-size: 20px; color: #ffd700; text-shadow: 0 0 3px #000; }
+/* « Lieu fermé » marker (94 × 149 image). */
+.closed-marker { display: block; width: 24px; height: auto; border-radius: 2px; box-shadow: 0 0 3px #000; }
 
 .decision form#decision { display: flex; flex-direction: column; align-items: stretch; }
 .decision form#decision button { text-align: left; }
@@ -137,13 +139,11 @@ main:has(.game) { max-width: none; }
 .die.success { color: #1f7a3a; }
 .die.double { text-shadow: 0 0 4px #4caf50; }
 .roll-count { font-size: 0.8rem; margin-left: 0.4rem; color: #2b2118; }
-/* Cards drawn: at their size among the new lines, small among the old ones. */
+/* Cards drawn: always at their own size, who drew them above. */
 .drawn { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.3rem 0; }
 .drawn-card { position: relative; margin: 0; display: flex; flex-direction: column; align-items: center; }
-.drawn-card img { display: block; max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
-.drawn-card figcaption { font-size: 0.8rem; color: #7a6b58; }
-.journal .old .drawn-card img, .journal.full .old .drawn-card img { width: 90px; }
-.journal .new .drawn-card { max-width: 100%; }
+.drawn-card img { display: block; width: auto; max-width: none; height: auto; border-radius: 8px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
+.drawn-card figcaption { font-size: 0.9rem; color: #2b2118; margin-bottom: 0.2rem; }
 .log .tip > .bubble { left: auto; right: 0; transform: none; }
 
 .facts { margin: 0; padding-left: 1.2rem; }
@@ -172,6 +172,9 @@ main:has(.game) { max-width: none; }
 }
 .tip > .bubble strong { display: block; margin-bottom: 0.15rem; }
 .tip > .bubble span { display: block; }
+/* A monster bubble: both sides of its token at their own size. */
+.tip > .bubble.pictured { max-width: none; }
+.tip > .bubble > img.bubble-image { display: block; width: auto; height: auto; max-width: none; margin-top: 0.4rem; border-radius: 4px; }
 .tip:hover > .bubble, .tip:focus > .bubble, .tip:focus-within > .bubble { display: block; }
 .spot:hover, .spot:focus-within { z-index: 10; }
 .spot.west .tip > .bubble { left: 0; transform: none; }
@@ -199,8 +202,21 @@ main:has(.game) { max-width: none; }
 .mat { background: #fffaf0; border: 1px solid #d8cbb3; border-radius: 6px; padding: 0.5rem 0.8rem; margin-bottom: 1rem; }
 .mat.eliminated { opacity: 0.6; }
 .mat h2 small { font-weight: normal; color: #7a6b58; }
-.mat-body { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-.investigator-sheet { position: relative; flex: 0 0 auto; width: min(450px, 100%); }
+/* Wide page: decision and sheet on the left, possessions in a column on the
+   right from the top of the page; hands under the sheet. */
+main:has(.mat) { max-width: none; }
+.investigator-page { display: grid; grid-template-columns: auto minmax(20rem, 1fr); gap: 1rem; align-items: stretch; }
+.investigator-main { min-width: 0; }
+@media (max-width: 1200px) { .investigator-page { grid-template-columns: 1fr; } }
+.mat-body {
+  display: grid; gap: 1rem; align-items: start;
+  grid-template-columns: 450px minmax(16rem, 22rem);
+  grid-template-areas: "sheet tokens" "hands hands";
+}
+@media (max-width: 760px) {
+  .mat-body { grid-template-columns: 1fr; grid-template-areas: "sheet" "tokens" "hands"; }
+}
+.investigator-sheet { grid-area: sheet; position: relative; width: min(450px, 100%); }
 .investigator-sheet > img { width: 100%; height: auto; display: block; }
 .investigator-sheet > img.slider {
   position: absolute; width: 9%; height: auto; transform: translate(-50%, -50%);
@@ -216,7 +232,7 @@ main:has(.game) { max-width: none; }
   background: rgba(255, 215, 0, 0.6); animation: none;
 }
 @keyframes stop-pulse { from { box-shadow: 0 0 2px #e0a800; } to { box-shadow: 0 0 10px #ffcc00; } }
-.mat-tokens { flex: 1 1 18rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.mat-tokens { grid-area: tokens; display: flex; flex-direction: column; gap: 0.6rem; }
 .pile .tokens { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 2rem; }
 .pile img.san { width: 40px; height: auto; }
 .pile img.res { width: 34px; height: auto; }
@@ -249,13 +265,17 @@ form.undo { margin-top: 0.5rem; }
 .zone { border: 2px dashed #d8cbb3; border-radius: 6px; padding: 0.4rem 0.6rem; min-height: 9rem; }
 .zone h3 { margin: 0 0 0.4rem; font-size: 1rem; }
 .zone.hands { background: #f7ecd9; }
-.hand-zones.active .zone { border-color: #b08850; }
+.mat-body > .zone.hands { grid-area: hands; }
+.investigator-page > .zone.possessions { background: #fffaf0; margin-bottom: 1rem; }
+.investigator-page.active .zone, .hand-zones.active .zone { border-color: #b08850; }
 .zone.over { border-color: #e0a800; background: #fff3c4; }
 .cards-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-start; }
-/* Cards at their own size (1:1). */
-.held-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; text-align: center; font-size: 0.8rem; }
-.held-card > img { width: auto; height: auto; max-width: none; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
-.held-card .card-name { display: flex; align-items: center; justify-content: center; width: 110px; height: 170px; border: 1px solid #7a6b58; border-radius: 6px; background: #fff; padding: 0.3rem; }
+/* Possessions: every card in a 196 × 302 frame (the common card size), its
+   name below. Landscape cards (Bank Loan…) fit inside without stretching. */
+.held-card { position: relative; width: 196px; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; text-align: center; font-size: 0.8rem; }
+.held-card > img { width: 196px; height: 302px; max-width: none; object-fit: contain; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+.held-card .card-name { display: flex; align-items: center; justify-content: center; width: 196px; height: 302px; box-sizing: border-box; border: 1px solid #7a6b58; border-radius: 6px; background: #fff; padding: 0.3rem; }
+.held-card .card-title { font-weight: bold; font-size: 0.85rem; color: #2b2118; }
 .held-card.exhausted > img { filter: grayscale(0.8); opacity: 0.6; }
 .held-card.movable { cursor: grab; }
 .held-card.movable > img { outline: 2px solid #e0a800; }
@@ -286,3 +306,9 @@ main:has(.landscape) { max-width: none; overflow-x: auto; }
 .combat-ending { font-weight: bold; font-size: 1.1rem; }
 .combat .decision button { margin-right: 0.4rem; }
 .combat .decision button.primary { font-weight: bold; background: #f0d9b5; }
+
+/* Buying: each card on offer at its own size, a click buys it. */
+.offer { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.4rem 0; }
+.offered-card { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: 0.3rem; }
+.offered-card > img { display: block; width: auto; height: auto; max-width: none; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+.offered-card .card-name { display: flex; align-items: center; justify-content: center; width: 110px; height: 170px; border: 1px solid #7a6b58; border-radius: 6px; background: #fff; }

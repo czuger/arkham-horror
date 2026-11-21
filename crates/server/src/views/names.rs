@@ -43,6 +43,21 @@ pub fn monster(view: &View<'_, '_>, id: &MonsterId) -> Option<ImageToken> {
         })
 }
 
+/// A monster on the board: name, token image, and a bubble with its
+/// movement values and both sides of its token.
+pub fn monster_on_board(view: &View<'_, '_>, id: &MonsterId) -> Option<ImageToken> {
+    view.data()
+        .monsters
+        .monsters
+        .iter()
+        .find(|monster| &monster.id == id)
+        .map(|monster| ImageToken {
+            name: monster.name.clone(),
+            image: monster.image.clone(),
+            tip: tips::monster_movement_side(view, monster),
+        })
+}
+
 /// French name of a monster (the id when unknown).
 pub fn monster_name(data: &GameData, id: &MonsterId) -> String {
     data.monsters

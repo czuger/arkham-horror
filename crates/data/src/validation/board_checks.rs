@@ -249,6 +249,7 @@ mod tests {
                 marker: String::new(),
                 spaces: vec![ORIGIN; TerrorTrack::SPACES],
             },
+            closed_marker: String::new(),
         }
     }
 

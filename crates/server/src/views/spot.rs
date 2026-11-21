@@ -22,8 +22,8 @@ pub struct Spot {
     pub clues: u8,
     /// Whether an Elder Sign seals the location.
     pub sealed: bool,
-    /// Whether the location is closed.
-    pub closed: bool,
+    /// The « Lieu fermé » marker, when the location is closed.
+    pub closed: Option<ImageToken>,
     /// CSS classes telling which way the bubbles open, so they stay inside
     /// the window (« west north »…).
     pub edge: String,
@@ -39,7 +39,7 @@ impl Spot {
             && self.gate.is_none()
             && self.clues == 0
             && !self.sealed
-            && !self.closed
+            && self.closed.is_none()
             && self.choices.is_empty()
     }
 }

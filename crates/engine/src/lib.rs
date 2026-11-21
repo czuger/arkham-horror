@@ -33,7 +33,7 @@ pub use rules::combat_gear::HANDS;
 pub use rules::monster_stats::MonsterStats;
 pub use rules::stats::of_check;
 pub use setup::Setup;
-pub use shown::{CombatEnd, Deck, Exhibit, Shown};
+pub use shown::{CombatEnd, Deck, DiceCount, Exhibit, Shown};
 pub use state::{
     ActiveRumor, Area, BattleState, BoardMonster, Decks, Ending, GameState, HeldCard,
     InvestigatorState, MonsterPlace, OpenGate, Phase, Place,

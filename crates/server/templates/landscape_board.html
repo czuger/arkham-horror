@@ -10,7 +10,7 @@
     <div class="tokens">
       {% if let Some(gate) = spot.gate %}<img class="gate" src="/assets/{{ gate.image }}" alt="{{ gate.name }}" title="{{ gate.name }}">{% endif %}
       {% if spot.sealed %}<span class="seal" title="Scellé">✶</span>{% endif %}
-      {% if spot.closed %}<span class="closed" title="Lieu fermé">✕</span>{% endif %}
+      {% if let Some(closed) = spot.closed %}<img class="closed-marker" src="/assets/{{ closed.image }}" alt="{{ closed.name }}" title="{{ closed.name }}">{% endif %}
       {% if spot.clues > 0 %}<span class="clue" title="{{ spot.clues }} Indice(s)">{{ spot.clues }}</span>{% endif %}
       {% for monster in spot.monsters %}<span class="monster" style="background-image: url('/assets/{{ monster.image }}')" title="{{ monster.name }}"></span>{% endfor %}
       {% for pawn in spot.investigators %}<span class="pawn{% if pawn.human %} human{% endif %}" title="{{ pawn.tip.title }}">{{ pawn.initials }}</span>{% endfor %}

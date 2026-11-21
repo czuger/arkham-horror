@@ -5,6 +5,7 @@ use data::{CardId, CheckKind, Effect, Resource, TableRow};
 use crate::decision::{Choice, DecisionKind};
 use crate::game::{Game, option};
 use crate::halt::Flow;
+use crate::shown::{DiceCount, Exhibit};
 
 impl<'a> Game<'a> {
     /// Checks, rolls and picked numbers.
@@ -36,7 +37,7 @@ impl<'a> Game<'a> {
                 rows,
             } => self.check_table(seat, *skill, *modifier, rows, this),
             Effect::RollDie { at_most, effects } => {
-                let roll = self.die();
+                let roll = self.die_shown(Some(seat));
                 self.scratch.x = u32::from(roll);
                 self.log(format!("{} lance un dé : {roll}.", self.name(seat)));
                 if roll <= *at_most {
@@ -45,9 +46,7 @@ impl<'a> Game<'a> {
                 Ok(())
             }
             Effect::RollDice(count) => {
-                let total: u32 = (0..*count).map(|_| u32::from(self.die())).sum();
-                self.scratch.x = total;
-                self.log(format!("{} lance {count} dés : {total}.", self.name(seat)));
+                self.roll_total(seat, *count);
                 Ok(())
             }
             Effect::RollEach {
@@ -119,6 +118,17 @@ impl<'a> Game<'a> {
         }
     }
 
+    /// Rolls dice and keeps their total as X.
+    fn roll_total(&mut self, seat: usize, count: u8) {
+        let total: u32 = self
+            .dice_shown(Some(seat), count)
+            .into_iter()
+            .map(u32::from)
+            .sum();
+        self.scratch.x = total;
+        self.log(format!("{} lance {count} dés : {total}.", self.name(seat)));
+    }
+
     /// Rolls dice one at a time: effects for each success and each failure.
     fn roll_each(
         &mut self,
@@ -130,6 +140,14 @@ impl<'a> Game<'a> {
     ) -> Flow<()> {
         let face = self.success_face(seat);
         let rolls: Vec<u8> = (0..dice).map(|_| self.die()).collect();
+        self.show(Exhibit::Dice {
+            seat: Some(seat),
+            faces: rolls.clone(),
+            count: DiceCount::Successes {
+                success_from: face,
+                sixes_double: false,
+            },
+        });
         let successes = rolls.iter().filter(|&&value| value >= face).count();
         self.scratch.successes = u32::try_from(successes).unwrap_or(0);
         self.log(format!(

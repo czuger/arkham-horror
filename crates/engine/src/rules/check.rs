@@ -6,7 +6,7 @@ use crate::decision::{Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::stats::of_check;
-use crate::shown::Exhibit;
+use crate::shown::{DiceCount, Exhibit};
 
 /// Result of a check.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -108,12 +108,40 @@ impl Game<'_> {
         let faces: Vec<u8> = (0..dice).map(|_| self.die()).collect();
         let successes = Exhibit::successes(&faces, success_from, sixes_double);
         self.show(Exhibit::Dice {
-            seat,
+            seat: Some(seat),
             faces,
-            success_from,
-            sixes_double,
+            count: DiceCount::Successes {
+                success_from,
+                sixes_double,
+            },
         });
         successes
+    }
+
+    /// Rolls dice counted by their value, and shows them.
+    ///
+    /// # Arguments
+    ///
+    /// * `seat` - who rolls; `None` for a monster.
+    pub fn dice_shown(&mut self, seat: Option<usize>, dice: u8) -> Vec<u8> {
+        let faces: Vec<u8> = (0..dice).map(|_| self.die()).collect();
+        self.show(Exhibit::Dice {
+            seat,
+            faces: faces.clone(),
+            count: DiceCount::Total,
+        });
+        faces
+    }
+
+    /// Rolls one die counted by its value, and shows it.
+    pub fn die_shown(&mut self, seat: Option<usize>) -> u8 {
+        let face = self.die();
+        self.show(Exhibit::Dice {
+            seat,
+            faces: vec![face],
+            count: DiceCount::Total,
+        });
+        face
     }
 
     /// Offers clue tokens one at a time while the check fails.
