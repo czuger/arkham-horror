@@ -3,12 +3,16 @@
   <h2>{{ decision.who }} : à vous</h2>
   <p class="prompt">{{ decision.prompt }}</p>
   {% if !decision.hint.is_empty() %}<p class="hint">{{ decision.hint }}</p>{% endif %}
+  {% if decision.on_sheet %}
+  <p><a class="on-sheet" href="/partie/{{ id }}/investigateurs">Répondre sur votre fiche d'investigateur</a></p>
+  {% else %}
   <form id="decision" method="post" action="/partie/{{ id }}/reponse">
     <input type="hidden" name="coup" value="{{ decision.move_number }}">
     {% for (index, label) in decision.options %}
     <button type="submit" name="choix" value="{{ index }}">{{ label }}</button>
     {% endfor %}
   </form>
+  {% endif %}
 {% else %}
   {% if let Some((label, victory)) = status.ending %}
   <h2 class="{% if *victory %}victory{% else %}defeat{% endif %}">{{ label }}</h2>

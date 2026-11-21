@@ -39,6 +39,12 @@ pub(crate) struct Gear {
     pub equipped: Vec<Equipped>,
     /// The Red Sign was cast: the monster is to be weakened.
     pub weaken: bool,
+    /// The weapons kept from earlier combats are in hand, and the
+    /// investigator was offered to change them.
+    pub ready: bool,
+    /// A card left the hands since the last change (discarded after use):
+    /// the investigator is offered to change them again.
+    pub freed: bool,
 }
 
 /// A card in hand during a combat.

@@ -13,18 +13,33 @@ fn temp() -> tempfile::TempDir {
 async fn new_game(app: &TestApp, form: &str) -> String {
     let reply = app.post("/nouvelle", form).await;
     assert_eq!(reply.status, StatusCode::SEE_OTHER, "{}", reply.body);
-    reply.location.expect("redirect")
+    let location = reply.location.expect("redirect");
+    location.trim_end_matches(SHEET).to_owned()
+}
+
+/// Path of the human investigator's page, after the game's.
+const SHEET: &str = "/investigateurs";
+
+/// The page where the current decision is answered: the game page, or the
+/// human investigator's page when the game page sends there.
+async fn current_page(app: &TestApp, game: &str) -> String {
+    let page = app.get(game).await.body;
+    if page.contains("class=\"on-sheet\"") {
+        app.get(&format!("{game}{SHEET}")).await.body
+    } else {
+        page
+    }
 }
 
 /// Answers the first option of the current decision.
 async fn answer_first(app: &TestApp, game: &str) -> String {
-    let page = app.get(game).await.body;
+    let page = current_page(app, game).await;
     let coup = move_number(&page).expect("a decision");
     let reply = app
         .post(&format!("{game}/reponse"), &format!("choix=0&coup={coup}"))
         .await;
     assert_eq!(reply.status, StatusCode::SEE_OTHER, "{}", reply.body);
-    app.get(game).await.body
+    current_page(app, game).await
 }
 
 #[tokio::test(flavor = "current_thread")]
@@ -83,23 +98,77 @@ async fn the_ancient_one_page_shows_its_sheet() {
 }
 
 #[tokio::test(flavor = "current_thread")]
-async fn the_investigators_page_shows_every_sheet_with_its_tokens() {
+async fn each_investigator_has_a_page_with_tokens_and_possessions() {
     let dir = temp();
     let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     assert!(app.get(&game).await.body.contains("/investigateurs\""));
-    let page = app.get(&format!("{game}/investigateurs")).await;
-    assert_eq!(page.status, StatusCode::OK);
-    let body = page.body;
-    assert_eq!(body.matches("class=\"investigator-sheet\"").count(), 3);
-    assert_eq!(body.matches("class=\"slider\"").count(), 9);
-    assert!(body.contains("marqueurs/san.jpg"), "{body}");
-    assert!(body.contains("marqueurs/res.jpg"), "{body}");
+    let own = app.get(&format!("{game}/investigateurs")).await;
+    assert_eq!(own.status, StatusCode::OK);
+    let body = own.body;
+    assert_eq!(body.matches("class=\"investigator-sheet\"").count(), 1);
+    assert_eq!(body.matches("class=\"slider\"").count(), 3);
+    assert!(body.contains("<h1>Amanda Sharpe"), "{body}");
+    assert!(body.contains("marqueurs/san.png"), "{body}");
+    assert!(body.contains("marqueurs/res.png"), "{body}");
+    assert!(body.contains("marqueurs/dollar_1.png"), "{body}");
     assert!(body.contains("Trophées"), "{body}");
-    assert_eq!(
-        app.get("/partie/99/investigateurs").await.status,
-        StatusCode::NOT_FOUND
-    );
+    assert!(body.contains("class=\"held-card"), "{body}");
+    assert!(body.contains("En main : 0 / 2 mains"), "{body}");
+    for seat in 0..3 {
+        assert!(
+            body.contains(&format!("/investigateurs/{seat}\"")),
+            "{body}"
+        );
+    }
+    let other = app.get(&format!("{game}/investigateurs/1")).await;
+    assert_eq!(other.status, StatusCode::OK);
+    assert!(other.body.contains("(IA ·"), "{}", other.body);
+    assert!(!other.body.contains("name=\"choix\""), "{}", other.body);
+    for missing in [
+        "/partie/99/investigateurs",
+        &format!("{game}/investigateurs/3"),
+    ] {
+        assert_eq!(app.get(missing).await.status, StatusCode::NOT_FOUND);
+    }
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn sliders_are_placed_on_the_sheet() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db")).await;
+    let mut next = app.post("/nouvelle", NEW_GAME).await.location;
+    // Starting cards may be picked first, on the game page.
+    for _ in 0..10 {
+        if next.as_deref() != Some("/partie/1") {
+            break;
+        }
+        let coup = move_number(&app.get("/partie/1").await.body).expect("a decision");
+        next = app
+            .post("/partie/1/reponse", &format!("choix=0&coup={coup}"))
+            .await
+            .location;
+    }
+    assert_eq!(next.as_deref(), Some("/partie/1/investigateurs"));
+    let game_page = app.get("/partie/1").await.body;
+    assert!(game_page.contains("class=\"on-sheet\""), "{game_page}");
+    assert!(!game_page.contains("name=\"choix\""), "{game_page}");
+    let mut sheet = app.get("/partie/1/investigateurs").await.body;
+    for _ in 0..3 {
+        assert_eq!(sheet.matches("class=\"stop-target\"").count(), 4, "{sheet}");
+        let coup = move_number(&sheet).expect("a decision");
+        let reply = app
+            .post("/partie/1/reponse", &format!("choix=3&coup={coup}"))
+            .await;
+        assert_eq!(reply.status, StatusCode::SEE_OTHER);
+        let next = reply.location.expect("redirect");
+        if next == "/partie/1" {
+            break;
+        }
+        sheet = app.get(&next).await.body;
+    }
+    let sheet = app.get("/partie/1/investigateurs").await.body;
+    assert!(!sheet.contains("stop-target"), "{sheet}");
 }
 
 #[tokio::test(flavor = "current_thread")]

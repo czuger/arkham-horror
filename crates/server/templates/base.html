@@ -7,6 +7,7 @@
   <title>{% block title %}Horreur à Arkham{% endblock %}</title>
   <link rel="stylesheet" href="/static/style.css">
   {% if htmx %}<script src="/static/htmx.min.js" defer></script>{% endif %}
+  <script src="/static/drag_drop.js" defer></script>
 </head>
 <body{% if htmx %} hx-boost="true"{% endif %}>
   <header class="top">

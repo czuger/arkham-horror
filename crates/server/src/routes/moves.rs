@@ -17,7 +17,7 @@ pub struct AnswerForm {
 }
 
 /// Applies the human's answer, lets the AI play up to the human's next
-/// decision, saves, and goes back to the game page.
+/// decision, saves, and goes to the page where it is answered.
 ///
 /// # Errors
 ///
@@ -32,10 +32,11 @@ pub async fn answer(
     if session.answer(&state.data, form.choix, form.coup)? {
         session.save(&state.db, &state.data).await?;
     }
-    Ok(Redirect::to(&format!("/partie/{id}")))
+    Ok(Redirect::to(&session.page()))
 }
 
-/// Takes back the human's last answer and what the AI played after it.
+/// Takes back the human's last answer and what the AI played after it, and
+/// goes to the page where the decision is answered again.
 ///
 /// # Errors
 ///
@@ -48,7 +49,7 @@ pub async fn undo(
     if session.undo(&state.data)? {
         session.save(&state.db, &state.data).await?;
     }
-    Ok(Redirect::to(&format!("/partie/{id}")))
+    Ok(Redirect::to(&session.page()))
 }
 
 /// Deletes a game and goes back home.

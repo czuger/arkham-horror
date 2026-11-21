@@ -1,7 +1,7 @@
 //! Facing monsters: evade, fight or flee, and what to hold in hand.
 
-use data::{CheckKind, MonsterId};
-use engine::{Choice, Decision, MonsterStats, View};
+use data::{CheckKind, InvestigatorCard, MonsterAbility, MonsterId};
+use engine::{Choice, Decision, HANDS, MonsterStats, View};
 
 use crate::gear::{best_bonus, combat_bonus};
 use crate::odds::chance;
@@ -129,7 +129,8 @@ pub fn fight_or_flee(
     if attack_wins { attack } else { flee }
 }
 
-/// Before the Combat check: take the card that adds the most, else attack.
+/// Before the Combat check: let go of a kept weapon that is useless or in
+/// the way of a better one, take the card that adds the most, else attack.
 pub fn prepare(
     view: &View<'_, '_>,
     seat: usize,
@@ -140,6 +141,9 @@ pub fn prepare(
         .and_then(|id| view.monster_stats(id))
         .map(|stats| stats.abilities)
         .unwrap_or_default();
+    if let Some(index) = weapon_to_drop(view, seat, decision, &defenses) {
+        return index;
+    }
     let mut best: Option<(usize, f64)> = None;
     for (index, option) in decision.options.iter().enumerate() {
         let Choice::Card(card) = &option.choice else {
@@ -157,4 +161,48 @@ pub fn prepare(
         return index;
     }
     decision.find(&Choice::Attack).unwrap_or(0)
+}
+
+/// A weapon in hand worth nothing against this foe, or whose hands a
+/// better weapon held would use.
+fn weapon_to_drop(
+    view: &View<'_, '_>,
+    seat: usize,
+    decision: &Decision,
+    defenses: &[MonsterAbility],
+) -> Option<usize> {
+    let cards = &view.data().investigator_cards;
+    let in_hand: Vec<(usize, &InvestigatorCard)> = decision
+        .options
+        .iter()
+        .enumerate()
+        .filter_map(|(index, option)| match &option.choice {
+            Choice::Drop(id) => cards.card(id).map(|card| (index, card)),
+            _ => None,
+        })
+        .collect();
+    let used: u8 = in_hand.iter().map(|(_, card)| card.hands).sum();
+    let worth = |card: &InvestigatorCard| combat_bonus(view, seat, card, defenses).unwrap_or(0.0);
+    let left_out = view
+        .state()
+        .investigators
+        .get(seat)?
+        .cards
+        .iter()
+        .filter_map(|held| cards.card(&held.card))
+        .filter(|card| card.weapon.is_some() && used + card.hands > HANDS)
+        .filter(|card| !in_hand.iter().any(|(_, kept)| kept.id == card.id))
+        .map(|card| (worth(card), card.hands))
+        .max_by(|a, b| a.0.total_cmp(&b.0));
+    in_hand
+        .iter()
+        .filter(|(_, card)| card.weapon.is_some())
+        .find_map(|(index, card)| {
+            let value = worth(card);
+            if value <= 0.0 {
+                return Some(*index);
+            }
+            let (better, hands) = left_out?;
+            (better > value && used - card.hands + hands <= HANDS).then_some(*index)
+        })
 }

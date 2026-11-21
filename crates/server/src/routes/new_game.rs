@@ -64,7 +64,7 @@ pub async fn new_game_form(State(state): State<AppState>) -> Result<Html<String>
 }
 
 /// Creates a game from the form, lets the AI play up to the human's first
-/// decision, and goes to the game page.
+/// decision, and goes to the page where it is answered.
 ///
 /// # Errors
 ///
@@ -81,8 +81,8 @@ pub async fn create_game(
             return Ok((StatusCode::BAD_REQUEST, Html(page)).into_response());
         }
     };
-    let id = Session::start(&state.db, &state.data, setup).await?;
-    Ok(Redirect::to(&format!("/partie/{id}")).into_response())
+    let session = Session::start(&state.db, &state.data, setup).await?;
+    Ok(Redirect::to(&session.page()).into_response())
 }
 
 /// Renders the form, with an error line when not empty.

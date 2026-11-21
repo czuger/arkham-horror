@@ -1,11 +1,12 @@
 use ai::Seated;
 use data::GameData;
-use engine::{Decision, Outcome, Replay, Setup, Status, play};
+use engine::{Decision, EngineError, Outcome, Replay, Setup, Status, play};
 
 use crate::app_error::AppError;
-use crate::database::Database;
+use crate::database::{Database, DatabaseError};
 use crate::game_row::GameContent;
 use crate::progress::Progress;
+use crate::views::on_sheet;
 
 /// Seat of the human player; the AI plays every other seat.
 pub const HUMAN_SEAT: usize = 0;
@@ -25,14 +26,10 @@ impl Session {
     /// Creates a game, lets the AI play up to the human's first decision
     /// and saves it.
     ///
-    /// # Returns
-    ///
-    /// The new game's number.
-    ///
     /// # Errors
     ///
     /// An [`AppError`] if the setup is refused or the database fails.
-    pub async fn start(db: &Database, data: &GameData, setup: Setup) -> Result<i64, AppError> {
+    pub async fn start(db: &Database, data: &GameData, setup: Setup) -> Result<Self, AppError> {
         let mut progress = Progress {
             setup,
             answers: Vec::new(),
@@ -41,19 +38,33 @@ impl Session {
         };
         let outcome = advance(data, &progress)?;
         progress.answers.clone_from(&outcome.answers);
-        Ok(db.insert_game(&content(data, &progress, &outcome)?).await?)
+        let id = db.insert_game(&content(data, &progress, &outcome)?).await?;
+        Ok(Self {
+            id,
+            progress,
+            outcome,
+        })
     }
 
-    /// Loads and replays a saved game.
+    /// Loads and replays a saved game. A game whose answers no longer fit
+    /// the rules (saved before a rules change) is deleted.
     ///
     /// # Errors
     ///
-    /// [`AppError::NotFound`] if there is no such game, or another
-    /// [`AppError`] if it cannot be read or replayed.
+    /// [`AppError::NotFound`] if there is no such game,
+    /// [`AppError::Outdated`] if it was deleted, or another [`AppError`] if
+    /// it cannot be read or replayed.
     pub async fn load(db: &Database, data: &GameData, id: i64) -> Result<Self, AppError> {
         let row = db.game(id).await?.ok_or(AppError::NotFound)?;
         let progress: Progress = serde_json::from_str(&row.record)?;
-        let outcome = advance(data, &progress)?;
+        let outcome = match advance(data, &progress) {
+            Err(error) if outdated(&error) => {
+                tracing::warn!(game = id, %error, "game no longer fits the rules: deleted");
+                db.delete_game(id).await?;
+                return Err(AppError::Outdated);
+            }
+            other => other?,
+        };
         Ok(Self {
             id,
             progress,
@@ -66,6 +77,15 @@ impl Session {
         match &self.outcome.status {
             Status::Waiting(decision) => Some(decision),
             Status::Over(_) => None,
+        }
+    }
+
+    /// Where the human answers next: the investigator's page for the
+    /// sliders and the hands, the game page otherwise.
+    pub fn page(&self) -> String {
+        match self.decision() {
+            Some(decision) if on_sheet(decision) => format!("/partie/{}/investigateurs", self.id),
+            _ => format!("/partie/{}", self.id),
         }
     }
 
@@ -170,6 +190,38 @@ fn content(
         over: matches!(outcome.status, Status::Over(_)),
         record: serde_json::to_string(progress)?,
     })
+}
+
+/// Deletes the saved games whose answers no longer fit the rules.
+///
+/// # Returns
+///
+/// How many were deleted.
+///
+/// # Errors
+///
+/// A [`DatabaseError`] if the database fails. A game that cannot be read
+/// or replayed for another reason is left alone.
+pub async fn delete_outdated_games(db: &Database, data: &GameData) -> Result<usize, DatabaseError> {
+    let mut deleted = 0;
+    for row in db.all_games().await? {
+        let Ok(progress) = serde_json::from_str::<Progress>(&row.record) else {
+            continue;
+        };
+        if let Err(error) = advance(data, &progress)
+            && outdated(&error)
+        {
+            tracing::warn!(game = row.id, %error, "game no longer fits the rules: deleted");
+            db.delete_game(row.id).await?;
+            deleted += 1;
+        }
+    }
+    Ok(deleted)
+}
+
+/// Whether a replay failed because a saved answer no longer fits the rules.
+fn outdated(error: &AppError) -> bool {
+    matches!(error, AppError::Engine(EngineError::IllegalAnswer { .. }))
 }
 
 /// Replays the saved answers, then lets the AI answer every seat but the

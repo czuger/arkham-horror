@@ -187,23 +187,64 @@ table.sliders td.here { background: #f0d9b5; font-weight: bold; }
 .investigator-sheet > img { width: 100%; height: auto; display: block; }
 .investigator-sheet > img.slider {
   position: absolute; width: 9%; height: auto; transform: translate(-50%, -50%);
-  mix-blend-mode: multiply;
+  pointer-events: none; filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.5));
 }
+/* A stop the slider can go to: a ring to click. */
+.investigator-sheet > .stop-target {
+  position: absolute; width: 8%; aspect-ratio: 1; padding: 0; margin: 0; transform: translate(-50%, -50%);
+  border: 3px solid #e0a800; border-radius: 50%; background: rgba(255, 215, 0, 0.25); cursor: pointer;
+  box-shadow: 0 0 6px #e0a800; animation: stop-pulse 1.2s ease-in-out infinite alternate;
+}
+.investigator-sheet > .stop-target:hover, .investigator-sheet > .stop-target:focus-visible {
+  background: rgba(255, 215, 0, 0.6); animation: none;
+}
+@keyframes stop-pulse { from { box-shadow: 0 0 2px #e0a800; } to { box-shadow: 0 0 10px #ffcc00; } }
 .mat-tokens { flex: 1 1 18rem; display: flex; flex-direction: column; gap: 0.6rem; }
 .pile .tokens { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 2rem; }
 .pile img.san { width: 40px; height: auto; }
 .pile img.res { width: 34px; height: auto; }
 .pile img.clue-token { width: 30px; height: auto; border-radius: 50%; }
-/* The money image stacks the $1, $5 and $10 bills top to bottom. */
-.bill { width: 74px; height: 37px; background-size: 100% 300%; border-radius: 2px; box-shadow: 0 0 2px #000; }
-.bill-1 { background-position: 0 0; }
-.bill-5 { background-position: 0 50%; }
-.bill-10 { background-position: 0 100%; }
+/* Bills: one row per value, the bills of a row fanned out. */
+.bills { display: grid; gap: 4px; }
+.bill-row { display: grid; grid-template-columns: 9rem auto; align-items: center; gap: 0.5rem; }
+.bill-stack { display: flex; }
+.bill { width: 74px; height: 36px; border-radius: 2px; box-shadow: 0 0 2px #000; }
+.bill + .bill { margin-left: -60px; }
+.bill-count { font-size: 0.85rem; color: #7a6b58; }
 .monster-trophy {
   width: 56px; height: 56px; border-radius: 4px; border: 1px solid #000;
   background-size: 200% 100%; background-position: 0 0; display: inline-block;
 }
 .gate-trophy { width: 56px; height: 56px; border-radius: 50%; display: block; }
+
+/* One page per investigator: links to the others. */
+.seat-tabs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0 1rem; }
+.seat-tabs a { padding: 0.3rem 0.7rem; border: 1px solid #d8cbb3; border-radius: 4px; background: #fffaf0; text-decoration: none; }
+.seat-tabs a[aria-current="page"] { background: #f0d9b5; font-weight: bold; }
+.seat-tabs a.back { margin-left: auto; }
+.mat h1 { font-size: 1.3rem; margin: 0.2rem 0 0.6rem; }
+.mat h1 small { font-weight: normal; color: #7a6b58; font-size: 0.9rem; }
+form.undo { margin-top: 0.5rem; }
+
+/* Hands and possessions: cards are dragged from one zone to the other. */
+.hand-zones { display: grid; grid-template-columns: minmax(16rem, 1fr) 2fr; gap: 0.8rem; margin-top: 1rem; }
+@media (max-width: 700px) { .hand-zones { grid-template-columns: 1fr; } }
+.zone { border: 2px dashed #d8cbb3; border-radius: 6px; padding: 0.4rem 0.6rem; min-height: 9rem; }
+.zone h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.zone.hands { background: #f7ecd9; }
+.hand-zones.active .zone { border-color: #b08850; }
+.zone.over { border-color: #e0a800; background: #fff3c4; }
+.cards-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-start; }
+.held-card { position: relative; width: 110px; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; text-align: center; font-size: 0.8rem; }
+.held-card > img { width: 110px; height: auto; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+.held-card .card-name { display: flex; align-items: center; justify-content: center; width: 110px; height: 170px; border: 1px solid #7a6b58; border-radius: 6px; background: #fff; padding: 0.3rem; }
+.held-card.exhausted > img { filter: grayscale(0.8); opacity: 0.6; }
+.held-card.movable { cursor: grab; }
+.held-card.movable > img { outline: 2px solid #e0a800; }
+.held-card.dragging { opacity: 0.4; }
+.held-card .card-facts { color: #7a6b58; }
+.held-card .card-note { color: #a03020; }
+.held-card button { font-size: 0.75rem; }
 
 /* Landscape board at its pixel size: the portrait image is turned a quarter right. */
 main:has(.landscape) { max-width: none; overflow-x: auto; }

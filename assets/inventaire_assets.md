@@ -517,6 +517,12 @@ Autres manques constatés (rien dans les sources locales) :
 | `marqueurs/premier_joueur.jpg` | 261x190 | `images__6__68__Premier_Joueur.jpg` (page `Marqueurs,_Jetons_&_Pions.html`) | Premier Joueur |
 | `marqueurs/res.jpg` | 107x97 | `images__2__2e__RES.jpg` (page `Marqueurs,_Jetons_&_Pions.html`) | Résistance |
 | `marqueurs/san.jpg` | 116x80 | `images__4__4e__SAN.jpg` (page `Marqueurs,_Jetons_&_Pions.html`) | Santé Mentale |
+| `marqueurs/pion_coulissant.png` | 94x131 | tiré de `pion_coulissant.jpg`, fond rendu transparent (21/11/2026) | Pions Coulissants |
+| `marqueurs/san.png` | 116x80 | tiré de `san.jpg`, fond rendu transparent (21/11/2026) | Santé Mentale |
+| `marqueurs/res.png` | 107x97 | tiré de `res.jpg`, fond rendu transparent (21/11/2026) | Résistance |
+| `marqueurs/dollar_1.png` | 144x70 | découpé dans `dollars.jpg` (21/11/2026) | Billet de 1 $ |
+| `marqueurs/dollar_5.png` | 144x70 | découpé dans `dollars.jpg` (21/11/2026) | Billet de 5 $ |
+| `marqueurs/dollar_10.png` | 144x70 | découpé dans `dollars.jpg` (21/11/2026) | Billet de 10 $ |
 | `marqueurs/legende_icones_rencontre.png` | 289x158 | capture d'écran fournie par l'utilisateur le 21/11/2026 (légende des icônes de rencontre) | Icônes de rencontre |
 | `marqueurs/icones_rencontre/allie.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Alliés |
 | `marqueurs/icones_rencontre/argent.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Argent |

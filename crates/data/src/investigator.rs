@@ -148,5 +148,5 @@ pub struct Investigators {
 
 impl Investigators {
     /// Format version this code reads.
-    pub const VERSION: u32 = 2;
+    pub const VERSION: u32 = 3;
 }

@@ -11,7 +11,7 @@ mod robots;
 pub use ancient_one::ancient_one;
 pub use game::game;
 pub use home::home;
-pub use investigators::investigators;
+pub use investigators::{investigator, investigators};
 pub use journal::journal;
 pub use landscape_board::landscape_board;
 pub use moves::{answer, delete, undo};

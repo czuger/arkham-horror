@@ -11,14 +11,18 @@
 //   Savoir/Chance), hauteur du milieu de la paire de lignes et centre de chaque
 //   cran, en pixels sur l'image de la fiche (relevé le 21/11/2026 d'après la
 //   position des chiffres bleus et rouges).
+// - markers : pions en PNG à fond transparent (21/11/2026), tirés des JPEG du
+//   wiki ; les trois billets sont découpés dans dollars.jpg.
 #![enable(implicit_some)]
 Investigators(
-    version: 2,
+    version: 3,
     markers: (
-        slider: "marqueurs/pion_coulissant.jpg",
-        sanity: "marqueurs/san.jpg",
-        stamina: "marqueurs/res.jpg",
-        money: "marqueurs/dollars.jpg",
+        slider: "marqueurs/pion_coulissant.png",
+        sanity: "marqueurs/san.png",
+        stamina: "marqueurs/res.png",
+        bill_1: "marqueurs/dollar_1.png",
+        bill_5: "marqueurs/dollar_5.png",
+        bill_10: "marqueurs/dollar_10.png",
         clue: "marqueurs/pion_indice.jpg",
     ),
     investigators: [

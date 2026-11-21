@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ mat.name }} — Horreur à Arkham{% endblock %}
+{% block content %}
+<nav class="seat-tabs">
+  {% for tab in tabs %}<a href="/partie/{{ id }}/investigateurs/{{ tab.seat }}"{% if tab.current %} aria-current="page"{% endif %}>{{ tab.name }} <small>({{ tab.player }})</small></a>{% endfor %}
+  <a href="/partie/{{ id }}" class="back">Retour à la partie</a>
+</nav>
+{% if let Some(decision) = decision %}
+<form id="sheet-form" method="post" action="/partie/{{ id }}/reponse">
+<input type="hidden" name="coup" value="{{ decision.form.move_number }}">
+<section class="decision">
+  <h2>{{ decision.form.who }} : à vous</h2>
+  <p class="prompt">{{ decision.form.prompt }}</p>
+  {% if !decision.form.hint.is_empty() %}<p class="hint">{{ decision.form.hint }}</p>{% endif %}
+  {% if !decision.stops.is_empty() %}<p class="hint">Cliquez sur un cran marqué de la fiche pour y mettre le curseur.</p>{% endif %}
+  {% if hands.active %}<p class="hint">Glissez une arme ou un sort de vos possessions vers vos mains, ou l'inverse (ou utilisez ses boutons).</p>{% endif %}
+  {% for (index, label) in decision.buttons %}<button type="submit" name="choix" value="{{ index }}">{{ label }}</button>{% endfor %}
+</section>
+{% endif %}
+<section class="mat{% if mat.eliminated %} eliminated{% endif %}">
+  <h1>{{ mat.name }}, {{ mat.title }} <small>({{ mat.player }} · à : {{ mat.place }}{% if mat.eliminated %} · éliminé{% endif %})</small></h1>
+  <div class="mat-body">
+    <div class="investigator-sheet">
+      <img src="/assets/{{ mat.image }}" alt="Fiche de {{ mat.name }}">
+      {% for (left, top) in mat.sliders %}<img class="slider" src="/assets/{{ markers.slider }}" alt="Curseur" style="left: {{ left }}; top: {{ top }}">{% endfor %}
+      {% if let Some(decision) = decision %}{% for stop in decision.stops %}<button type="submit" class="stop-target" name="choix" value="{{ stop.index }}" style="left: {{ stop.left }}; top: {{ stop.top }}" title="{{ stop.label }}" aria-label="{{ stop.label }}"></button>{% endfor %}{% endif %}
+    </div>
+    <div class="mat-tokens">
+      <div class="pile">
+        <h3>Santé Mentale : {{ mat.sanity.0 }} / {{ mat.sanity.1 }}</h3>
+        <div class="tokens">{% for _ in 0..mat.sanity.0 %}<img class="san" src="/assets/{{ markers.sanity }}" alt="Santé Mentale">{% endfor %}</div>
+      </div>
+      <div class="pile">
+        <h3>Résistance : {{ mat.stamina.0 }} / {{ mat.stamina.1 }}</h3>
+        <div class="tokens">{% for _ in 0..mat.stamina.0 %}<img class="res" src="/assets/{{ markers.stamina }}" alt="Résistance">{% endfor %}</div>
+      </div>
+      <div class="pile">
+        <h3>Argent : {{ mat.money }} $</h3>
+        <div class="bills">
+          {% for row in mat.bills %}
+          <div class="bill-row"><span class="bill-stack">{% for _ in 0..row.count %}<img class="bill" src="/assets/{{ row.image }}" alt="{{ row.value }} $">{% endfor %}</span><span class="bill-count">{{ row.count }} × {{ row.value }} $</span></div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="pile">
+        <h3>Indices : {{ mat.clues }}</h3>
+        <div class="tokens">{% for _ in 0..mat.clues %}<img class="clue-token" src="/assets/{{ markers.clue }}" alt="Indice">{% endfor %}</div>
+      </div>
+      <div class="pile trophies">
+        <h3>Trophées</h3>
+        {% if mat.monster_trophies.is_empty() && mat.gate_trophies.is_empty() %}<p class="hint">Aucun trophée.</p>{% endif %}
+        <div class="tokens">
+          {% for trophy in mat.monster_trophies %}<span class="monster-trophy tip" tabindex="0" style="background-image: url('/assets/{{ trophy.image }}')" aria-label="{{ trophy.name }}">{{ trophy.tip|safe }}</span>{% endfor %}
+          {% for trophy in mat.gate_trophies %}<span class="tip" tabindex="0"><img class="gate-trophy" src="/assets/{{ trophy.image }}" alt="{{ trophy.name }}">{{ trophy.tip|safe }}</span>{% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hand-zones{% if hands.active %} active{% endif %}">
+    <div class="zone hands" data-zone="hand">
+      <h3>En main : {{ hands.used }} / {{ hands.total }} mains</h3>
+      {% if !hands.active && !hands.in_hand.is_empty() %}<p class="hint">Ces armes restent en main ; vous pourrez les changer avant chaque combat.</p>{% endif %}
+      {% if hands.in_hand.is_empty() %}<p class="hint">{% if hands.active %}Mains libres.{% else %}Mains vides. Vous pourrez prendre des armes ou des sorts en main avant le prochain combat.{% endif %}</p>{% endif %}
+      <div class="cards-row">
+        {% for held in hands.in_hand %}{% let target = "possessions" %}{% let action = "Lâcher" %}{% include "investigator/held_card.html" %}{% endfor %}
+      </div>
+    </div>
+    <div class="zone possessions" data-zone="possessions">
+      <h3>Possessions : {{ hands.possessions.len() }} carte(s)</h3>
+      {% if hands.possessions.is_empty() && hands.in_hand.is_empty() %}<p class="hint">Aucune carte.</p>{% endif %}
+      <div class="cards-row">
+        {% for held in hands.possessions %}{% let target = "hand" %}{% let action = "Prendre en main" %}{% include "investigator/held_card.html" %}{% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% if decision.is_some() %}
+</form>
+{% if can_undo %}
+<form method="post" action="/partie/{{ id }}/annuler" class="inline undo">
+  <button type="submit" class="small">Annuler le dernier coup</button>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

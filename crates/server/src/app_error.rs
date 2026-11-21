@@ -21,6 +21,9 @@ pub enum AppError {
     /// No game with this number.
     #[error("Partie introuvable.")]
     NotFound,
+    /// The game no longer fits the rules and was deleted.
+    #[error("Cette partie ne suit plus les règles du jeu : elle a été supprimée.")]
+    Outdated,
     /// The request does not make sense (illegal answer, bad form).
     #[error("{0}")]
     BadRequest(String),
@@ -33,6 +36,7 @@ impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let status = match self {
             Self::NotFound => StatusCode::NOT_FOUND,
+            Self::Outdated => StatusCode::GONE,
             Self::BadRequest(_) => StatusCode::BAD_REQUEST,
             Self::Forbidden => StatusCode::FORBIDDEN,
             Self::Database(_) | Self::Template(_) | Self::Engine(_) | Self::Json(_) => {

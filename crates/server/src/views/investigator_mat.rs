@@ -1,4 +1,4 @@
-use data::{Investigator, Resource};
+use data::{Investigator, Resource, SheetMarkers};
 use engine::{InvestigatorState, View};
 
 use crate::session::HUMAN_SEAT;
@@ -31,8 +31,8 @@ pub struct InvestigatorMat {
     pub stamina: (u8, u8),
     /// Money.
     pub money: u16,
-    /// The bills making up the money, largest first (10, 5 or 1).
-    pub bills: Vec<u16>,
+    /// The bills making up the money, one row per value, largest first.
+    pub bills: Vec<BillRow>,
     /// Clue tokens.
     pub clues: u16,
     /// Monster trophies.
@@ -41,6 +41,17 @@ pub struct InvestigatorMat {
     pub gate_trophies: Vec<ImageToken>,
     /// Whether the investigator has been eliminated.
     pub eliminated: bool,
+}
+
+/// The bills of one value: $10, $5 or $1.
+#[derive(Debug, Clone)]
+pub struct BillRow {
+    /// Value of one bill, in dollars.
+    pub value: u16,
+    /// Bill image path under `/assets/`.
+    pub image: String,
+    /// How many bills of that value.
+    pub count: u16,
 }
 
 impl InvestigatorMat {
@@ -60,7 +71,7 @@ impl InvestigatorMat {
             sanity: (inv.sanity, view.maximum(seat, Resource::Sanity)),
             stamina: (inv.stamina, view.maximum(seat, Resource::Stamina)),
             money: inv.money,
-            bills: bills(inv.money),
+            bills: bills(&data.investigators.markers, inv.money),
             clues: inv.clues,
             monster_trophies: inv
                 .monster_trophies
@@ -75,29 +86,38 @@ impl InvestigatorMat {
 
 /// Where each slider stands on the sheet, in percent of the image.
 fn sliders(sheet: &Investigator, inv: &InvestigatorState) -> Vec<(String, String)> {
-    let size = sheet.image_size;
-    sheet
-        .sliders
+    inv.sliders
         .iter()
-        .zip(inv.sliders)
-        .filter_map(|(spots, stop)| {
-            let x = spots.x.get(usize::from(stop))?;
-            Some((percent(*x, size.width), percent(spots.y, size.height)))
-        })
+        .enumerate()
+        .filter_map(|(track, stop)| slider_spot(sheet, track, *stop))
         .collect()
 }
 
-/// The fewest bills making up an amount.
-fn bills(money: u16) -> Vec<u16> {
+/// Where a stop of a slider track is on the sheet: left and top, in percent
+/// of the image; `None` for an unknown track or stop.
+pub fn slider_spot(sheet: &Investigator, track: usize, stop: u8) -> Option<(String, String)> {
+    let size = sheet.image_size;
+    let spots = sheet.sliders.get(track)?;
+    let x = spots.x.get(usize::from(stop))?;
+    Some((percent(*x, size.width), percent(spots.y, size.height)))
+}
+
+/// The fewest bills making up an amount, grouped by value.
+fn bills(markers: &SheetMarkers, money: u16) -> Vec<BillRow> {
     let mut rest = money;
-    let mut out = Vec::new();
-    for bill in BILLS {
-        while rest >= bill {
-            out.push(bill);
-            rest -= bill;
-        }
-    }
-    out
+    BILLS
+        .iter()
+        .filter_map(|value| {
+            let count = rest / value;
+            rest %= value;
+            let image = markers.bill(*value)?.to_owned();
+            (count > 0).then_some(BillRow {
+                value: *value,
+                image,
+                count,
+            })
+        })
+        .collect()
 }
 
 /// The gate markers won, with their Other World.

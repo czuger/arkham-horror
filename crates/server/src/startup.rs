@@ -7,6 +7,7 @@ use crate::app_state::AppState;
 use crate::config::Config;
 use crate::database::{Database, DatabaseError};
 use crate::router::build_router;
+use crate::session::delete_outdated_games;
 
 /// The htmx library, served from the static folder when present.
 pub const HTMX_FILE: &str = "htmx.min.js";
@@ -25,7 +26,8 @@ pub enum StartupError {
     Io(#[from] std::io::Error),
 }
 
-/// Loads the game data, opens the database, binds the socket and serves until Ctrl-C.
+/// Loads the game data, opens the database, deletes the games that no
+/// longer fit the rules, binds the socket and serves until Ctrl-C.
 ///
 /// The database is closed once the server has stopped.
 ///
@@ -36,6 +38,10 @@ pub enum StartupError {
 pub async fn run(config: Config) -> Result<(), StartupError> {
     let data = Arc::new(GameData::load(&config.data_dir)?);
     let db = Database::open(&config.db_path).await?;
+    let deleted = delete_outdated_games(&db, &data).await?;
+    if deleted > 0 {
+        tracing::warn!("{deleted} game(s) no longer fitting the rules deleted");
+    }
     let htmx = config.static_dir.join(HTMX_FILE).is_file();
     if !htmx {
         tracing::warn!("{HTMX_FILE} absent from the static folder: pages reload in full");

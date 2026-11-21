@@ -154,6 +154,7 @@ impl<'a> Game<'a> {
             turn_bonus: 0,
             entered_gate: None,
             power_used: false,
+            in_hand: Vec::new(),
         })
     }
 

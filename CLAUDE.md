@@ -13,7 +13,7 @@ Milestones (plan in `plan_creation_jeu.md`, J0–J6):
 - **J2 engine** (2026-11-16): plays whole games.
 - **J3 all cards** (2026-11-20): all 267 cards in `data/*_cards.ron` (raw text in `J3_releve_cartes.md`, notes in `J3.md`); location abilities in `board.ron`; 16 investigator abilities in `rules/investigator_powers.rs`; 16 cards with a coded special effect.
 - **J4 AI, first version** (2026-11-20, `J4.md`): `ai::Policy`, priority-based. AI strength tuning and trades between investigators (Q12) postponed.
-- **J5 server, first version** (2026-11-21, `J5.md`): home, new game, game page, journal, unlimited undo, resume. Still to do: the user plays a whole game in the browser. `static/htmx.min.js` may be absent: **never download it**, the user drops it in.
+- **J5 server, first version** (2026-11-21, `J5.md`): home, new game, game page, journal, unlimited undo, resume, one page per investigator where the human sets sliders and combat hands (drag and drop). Still to do: the user plays a whole game in the browser. `static/htmx.min.js` may be absent: **never download it**, the user drops it in.
 
 ## Commands
 
@@ -21,6 +21,7 @@ Milestones (plan in `plan_creation_jeu.md`, J0–J6):
 - Text play (human = seat 0): `cargo run -p simulator -- jouer --graine 5 --joueurs 3`; watch an AI game: `… regarder --graine 5 --joueurs 3`; bulk: `cargo run --release -p simulator -- masse --parties 1000 --joueurs 3` (`--hasard` random answers, `--graine N` seed range, `--couverture FILE` writes what was never played). A bulk run that never ends = a hanging game: bisect with `--parties 1 --graine N`.
 - Server: `cargo run -p server` from the repo root → http://127.0.0.1:3000. Env: `ARKHAM_ADDR`, `ARKHAM_DB` (default `arkham.db`), `ARKHAM_ASSETS`, `ARKHAM_STATIC`, `ARKHAM_DATA` (default `data`), `RUST_LOG`.
 - Tests: `cargo test`; one test: `cargo test -p server a_game_resumes_after_a_restart`.
+- **For now (user's request, 2026-11-21): do not run the AI tests.** No `simulator masse` bulk runs, no `crates/ai/tests/ai_games.rs`; test with `cargo test --workspace --exclude ai` until the user says otherwise.
 - Local CI: `scripts/ci.sh` (rustfmt, clippy `-D warnings`, tests, cargo-audit, cargo-deny); same in `.github/workflows/ci.yml`. No git remote.
 
 ## Architecture and constraints
@@ -43,7 +44,7 @@ Technical facts (details in `manques_et_questions.md` §2):
 - **RON files**: ids English snake_case, player-facing values French; start with `#![enable(implicit_some)]` and a `version` checked against the type's `VERSION`; `deny_unknown_fields`. Locations have no arrow: a monster goes to its own street. Board values need user proofreading; monster token images beat the wiki table.
 - **Engine**: `engine::play(data, setup, responder)` replays from `Setup` (seed) and asks the `Responder` for each `Decision` (labelled options, answer = index); `Replay` feeds recorded answers, `Waiting` stops at the first open decision. Rules are `impl Game` blocks in `crates/engine/src/rules/`, one topic per file, unwinding with `Halt` via `?`. Ancient One and monster texts are coded by id in `rules/ancient_one_*.rs`, `rules/monster_*.rs`. All randomness via `Game::die` / in-repo `Rng` (xoshiro256**, output pinned by a test: never change it). `BTreeMap`, never `HashMap`, in the state. Unit tests in `crates/engine/src/tests/` force dice with `run(state, answers, dice, |game| …)`.
 - **AI**: `Responder::answer(&mut self, view: &View, decision: &Decision) -> Option<usize>`. `View` = read-only game window. Each `Decision` carries a `Context` and each option its card `effects`: keep them filled when adding decisions. `Outcome.tally` counts game events; `ai::intention` is the AI's turn plan. `crates/ai/tests/ai_games.rs` plays 160 games (≈35 s debug).
-- **Server**: no game state in memory. Table `game`, one `GameRow` per game, `record` = JSON of `Progress` (setup, all answers, human answer positions for undo, journal lines seen). Each request replays with `Replay` + `ai::Seated`; `engine::inspect` gives a `View` for page models in `crates/server/src/views/`. Forms carry the move number (`coup`) to ignore stale posts; `same_origin.rs` refuses cross-site posts. HTTP tests in `crates/server/src/tests/`.
+- **Server**: no game state in memory. Table `game`, one `GameRow` per game, `record` = JSON of `Progress` (setup, all answers, human answer positions for undo, journal lines seen). Each request replays with `Replay` + `ai::Seated`; `engine::inspect` gives a `View` for page models in `crates/server/src/views/`. A saved game whose answers no longer fit the rules (illegal answer on replay, after a rules change) is **deleted**, at startup and when opened (user's rule, 2026-11-21); never try to repair it. Forms carry the move number (`coup`) to ignore stale posts; `same_origin.rs` refuses cross-site posts. HTTP tests in `crates/server/src/tests/`.
 
 ## Reference files
 

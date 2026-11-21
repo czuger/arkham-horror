@@ -169,3 +169,9 @@ Si la FAQ officielle (`FAQ_Officiel_032017_V2.pdf`, voir R7) contredit une déci
 **Décision (20/11/2026)** : la règle FAQ « Combat sans issue » (Santé Mentale à 0, l'investigateur devient fou, le combat s'arrête) s'applique aussi quand la fuite est **permise mais impossible** : 0 dé pour fuir et pas assez de dés pour gagner, Indices compris.
 
 **Raison** : sinon le combat peut ne jamais finir (Michael McGlen et sa perte de Résistance réduite de 1 contre un monstre qui fait 1 dégât).
+
+## R28 — Armes gardées en main d'un combat à l'autre
+
+**Décision (21/11/2026)** : les **armes** restent en main d'un combat au suivant. Avant le combat, l'investigateur choisit « Garder en main » ou « Changer ce que vous avez en main » ; s'il change, il prend ou lâche armes et sorts, deux mains au plus. La question revient à un nouveau round seulement si une carte a quitté ses mains (arme défaussée après usage). Les **sorts** durent le combat, puis quittent les mains. Une arme perdue, vendue ou défaussée quitte aussi les mains. Contre le Grand Ancien, la question est posée à chaque attaque.
+
+**Raison** : choix de l'utilisateur, pour gérer les mains sur la fiche de l'investigateur. Le livret laisse choisir armes et sorts à chaque round de combat.

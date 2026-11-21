@@ -37,6 +37,8 @@ impl Policy {
             (DecisionKind::FightOrFlee, Context::Combat { foe, bonus }) => {
                 fighting::fight_or_flee(view, seat, decision, foe.as_ref(), *bonus)
             }
+            // Always look again at the cards in hand: `prepare` keeps what is good.
+            (DecisionKind::ChangeHands, _) => decision.find(&engine::Choice::Yes).unwrap_or(0),
             (DecisionKind::PrepareCombat, Context::Combat { foe, .. }) => {
                 fighting::prepare(view, seat, decision, foe.as_ref())
             }

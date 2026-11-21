@@ -1,12 +1,10 @@
-Chaque investigateur a sa page à lui, par défaut on arrive sur la page du joueur et de la on peut aller sur la page des autres.
-Essaye de supprimer l'arrier plan des pions san, res et coulissant, le mieux serait que tu les convertisse une bonne fois pour toutes en png avec un fond transparant.
+Sur la page de l'investigateur affiche toutes les cartes en taille 1:1
 
-Sépare les pions dollars et éssaie de les aligner.
+A chaque étape montre moi les cartes qui sont tirées. (mythe, cartes lieu, carte portail). Et ce pour tous les investigateur.
 
-Le placement placement initial des curseurs doivent se faire directement sur la fiche de l'investigateur, idem pour les modifications.
-A cette phase, redirige sur la page d'investigateur et puis retourne a la page de la partie quand c'est terminé.
+Ajoute également une page dédié au combat pour le rendre plus interactif. Montre chaque jet de dé. Cette partie ne concerne que l'investigateur qui est un joueur humain.
+Dans cette page, l'investigateur aura l'option de changer les armes de sa main. Ajoute juste un bouton laisse le joueur y cliquer si il le veut.
 
-Sur la page de l'investigateur affiche également ses possessions.
+La zone class="sheet" n'a plus lieu d'être. 
 
-C'est l'endroit également ou on va gérer ce que l'investigateur a en main. Affiche deux zones, on y déplace les objets via drag and drop.
-Gère correctement le nombre de mains.
+Retravaille l'écran avec la carte, déplace le log dans une colonne dédiée à droite.

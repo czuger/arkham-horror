@@ -8,8 +8,8 @@ use crate::halt::Flow;
 use crate::rules::combat::{Combat, Equipped, Gear};
 use crate::rules::monster_stats::MonsterStats;
 
-/// Hands an investigator has.
-const HANDS: u8 = 2;
+/// Hands an investigator has to hold weapons and spells in a combat.
+pub const HANDS: u8 = 2;
 
 /// Combat bonus left once the monster's resistance or immunity applies.
 pub(crate) fn reduced_bonus(stats: &[MonsterAbility], kind: WeaponKind, bonus: i32) -> i32 {
@@ -47,15 +47,26 @@ fn is_combat_spell(ability: &Ability) -> bool {
 const COMBAT_SPECIALS: [&str; 2] = ["enchant_weapon", "red_sign"];
 
 impl Game<'_> {
-    /// Before the Combat check: take weapons and cast combat spells, one at a
-    /// time, as long as hands are free; cards already in hand can be let go.
-    /// `foe` is the monster fought, `None` against the Ancient One.
+    /// Before the Combat check. The weapons kept from the last combat are
+    /// in hand (R28); before the first round, and whenever a card left the
+    /// hands, the investigator may keep them or change them: take weapons
+    /// and cast combat spells one at a time as long as hands are free, or
+    /// let cards go. `foe` is the monster fought, `None` against the
+    /// Ancient One.
     pub fn prepare_combat(
         &mut self,
         seat: usize,
         foe: Option<&MonsterId>,
         gear: &mut Gear,
     ) -> Flow<()> {
+        let offer = !gear.ready || std::mem::take(&mut gear.freed);
+        if !gear.ready {
+            self.take_kept_weapons(seat, gear)?;
+            gear.ready = true;
+        }
+        if !offer || !self.wants_to_change_hands(seat, foe, gear)? {
+            return Ok(());
+        }
         loop {
             let options = self.gear_options(seat, gear)?;
             let prompt = format!(
@@ -71,15 +82,75 @@ impl Game<'_> {
                 Choice::Card(card) => self.equip(seat, gear, card)?,
                 Choice::Drop(card) => {
                     gear.equipped.retain(|equipped| equipped.card != card);
+                    gear.rate();
                     self.log(format!(
                         "{} lâche {}.",
                         self.name(seat),
                         self.card_name(&card)
                     ));
                 }
-                _ => return Ok(()),
+                _ => break,
             }
         }
+        self.keep_weapons(seat, gear)
+    }
+
+    /// Puts back in hand the weapons kept from the last combat.
+    fn take_kept_weapons(&mut self, seat: usize, gear: &mut Gear) -> Flow<()> {
+        for card in self.inv(seat).weapons_in_hand() {
+            let printed = self.card(&card)?;
+            if printed.weapon.is_some() && gear.hands() + printed.hands <= HANDS {
+                self.equip(seat, gear, card)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Whether the investigator wants to change the cards in hand; not
+    /// asked when there is nothing to take or let go.
+    fn wants_to_change_hands(
+        &mut self,
+        seat: usize,
+        foe: Option<&MonsterId>,
+        gear: &Gear,
+    ) -> Flow<bool> {
+        if self.gear_options(seat, gear)?.len() < 2 {
+            return Ok(false);
+        }
+        let names: Vec<String> = gear
+            .equipped
+            .iter()
+            .map(|equipped| self.card_name(&equipped.card))
+            .collect();
+        let keep = if names.is_empty() {
+            "Combattre les mains vides".to_owned()
+        } else {
+            format!("Garder en main : {}", names.join(", "))
+        };
+        let options = vec![
+            option(Choice::Done, keep),
+            option(Choice::Yes, "Changer ce que vous avez en main"),
+        ];
+        let context = Context::Combat {
+            foe: foe.cloned(),
+            bonus: gear.bonus(),
+        };
+        let prompt = format!("Avant le combat (bonus en main : {:+})", gear.bonus());
+        let choice = self.ask_about(seat, DecisionKind::ChangeHands, context, prompt, options)?;
+        Ok(choice == Choice::Yes)
+    }
+
+    /// Remembers the weapons in hand for the next combat; spells end with
+    /// the combat.
+    fn keep_weapons(&mut self, seat: usize, gear: &Gear) -> Flow<()> {
+        let mut weapons = Vec::new();
+        for equipped in &gear.equipped {
+            if self.card(&equipped.card)?.weapon.is_some() {
+                weapons.push(equipped.card.clone());
+            }
+        }
+        self.inv_mut(seat).in_hand = weapons;
+        Ok(())
     }
 
     /// Cards that can be taken in hand or let go now.
@@ -228,12 +299,14 @@ impl Game<'_> {
             {
                 self.log(format!("{} est défaussé après usage.", printed.name));
                 self.discard_card(seat, &equipped.card)?;
+                gear.freed = true;
             } else {
                 kept.push(equipped);
             }
         }
         gear.equipped = kept;
-        Ok(())
+        gear.rate();
+        self.keep_weapons(seat, gear)
     }
 
     /// Combat damage, or the monster's special damage.

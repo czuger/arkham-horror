@@ -28,6 +28,7 @@ pub use decision::{
 pub use engine_error::EngineError;
 pub use play::{Outcome, Status, play};
 pub use rng::Rng;
+pub use rules::combat_gear::HANDS;
 pub use rules::monster_stats::MonsterStats;
 pub use rules::stats::of_check;
 pub use setup::Setup;

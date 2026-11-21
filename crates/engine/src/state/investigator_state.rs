@@ -58,6 +58,9 @@ pub struct InvestigatorState {
     /// Once-per-turn sheet ability already used this turn (Mandy).
     #[serde(default)]
     pub power_used: bool,
+    /// Weapons kept in hand from one combat to the next (R28).
+    #[serde(default)]
+    pub in_hand: Vec<CardId>,
 }
 
 impl InvestigatorState {
@@ -72,6 +75,29 @@ impl InvestigatorState {
             return false;
         };
         self.cards.remove(index);
+        let left = self.copies(card);
+        if self.in_hand.iter().filter(|kept| *kept == card).count() > left
+            && let Some(at) = self.in_hand.iter().position(|kept| kept == card)
+        {
+            self.in_hand.remove(at);
+        }
         true
+    }
+
+    /// Copies of a card held.
+    fn copies(&self, card: &CardId) -> usize {
+        self.cards.iter().filter(|held| &held.card == card).count()
+    }
+
+    /// The weapons kept in hand that are still held.
+    pub fn weapons_in_hand(&self) -> Vec<CardId> {
+        let mut kept: Vec<CardId> = Vec::new();
+        for card in &self.in_hand {
+            let used = kept.iter().filter(|other| *other == card).count();
+            if used < self.copies(card) {
+                kept.push(card.clone());
+            }
+        }
+        kept
     }
 }

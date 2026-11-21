@@ -26,6 +26,8 @@ pub enum DecisionKind {
     FaceMonster,
     /// Fight or flee during a combat.
     FightOrFlee,
+    /// Before a combat: keep the weapons in hand or change them.
+    ChangeHands,
     /// Which weapon or spell to use before a Combat check.
     PrepareCombat,
     /// Spend clue tokens on a failed check.

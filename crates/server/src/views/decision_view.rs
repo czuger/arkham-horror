@@ -1,6 +1,7 @@
 use engine::{Context, Decision, View, of_check};
 
 use crate::views::names::monster_name;
+use crate::views::sheet_decision::on_sheet;
 
 /// The decision the human must take, as a form.
 #[derive(Debug, Clone)]
@@ -15,6 +16,8 @@ pub struct DecisionView {
     pub options: Vec<(usize, String)>,
     /// Number of answers given so far, sent back with the form.
     pub move_number: usize,
+    /// Answered on the investigator's page, not with these buttons.
+    pub on_sheet: bool,
 }
 
 impl DecisionView {
@@ -31,6 +34,7 @@ impl DecisionView {
                 .map(|(index, option)| (index, option.label.clone()))
                 .collect(),
             move_number,
+            on_sheet: on_sheet(decision),
         }
     }
 }

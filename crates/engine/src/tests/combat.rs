@@ -60,7 +60,7 @@ fn nightmarish_and_overwhelming_hurt_on_success() {
     // fails automatically (-4). Fight 4 + 8/2 - 3 = 5 dice, three successes.
     state.investigators[0].sanity = 5;
     let dice = [6, 6, 6, 1, 1];
-    let (result, _) = run(&mut state, &[1, 0, 0], &dice, |game| {
+    let (result, _) = run(&mut state, &[1, 1, 0, 0], &dice, |game| {
         game.evade_or_fight(0, &MonsterId::new("dhole"), true)
     });
     assert_eq!(result, Ok(Faced::Defeated));
@@ -97,11 +97,60 @@ fn a_card_in_hand_can_be_let_go_for_another() {
     let mut state = clean_state(1, "azathoth");
     hold(&mut state, "revolver_38");
     hold(&mut state, "dynamite");
-    // Take the Dynamite (2 hands), let it go, take the Revolver, attack.
+    // Change the hands, take the Dynamite (2 hands), let it go, take the
+    // Revolver, attack.
     let mut gear = crate::rules::combat::Gear::default();
-    let (result, _) = run(&mut state, &[2, 1, 1, 0], &[], |game| {
+    let (result, _) = run(&mut state, &[1, 2, 1, 1, 0], &[], |game| {
         game.prepare_combat(0, None, &mut gear)
     });
     assert_eq!(result, Ok(()));
     assert_eq!((gear.bonus(), gear.hands()), (3, 1));
+}
+
+/// R28: weapons stay in hand from one combat to the next, and may be kept
+/// or changed before the combat.
+#[test]
+fn weapons_stay_in_hand_between_combats() {
+    let mut state = clean_state(1, "azathoth");
+    hold(&mut state, "revolver_38");
+    let revolver = data::CardId::new("revolver_38");
+    let mut first = crate::rules::combat::Gear::default();
+    // Change the hands, take the Revolver, attack.
+    let (result, _) = run(&mut state, &[1, 1, 0], &[], |game| {
+        game.prepare_combat(0, None, &mut first)
+    });
+    assert_eq!(result, Ok(()));
+    assert_eq!(state.investigators[0].in_hand, vec![revolver.clone()]);
+    let mut next = crate::rules::combat::Gear::default();
+    // Keep the Revolver.
+    let (result, _) = run(&mut state, &[0], &[], |game| {
+        game.prepare_combat(0, None, &mut next)
+    });
+    assert_eq!(result, Ok(()));
+    assert_eq!((next.bonus(), next.hands()), (3, 1));
+    assert!(state.investigators[0].remove_card(&revolver));
+    assert!(state.investigators[0].in_hand.is_empty());
+}
+
+/// A weapon discarded after use frees its hands: the next round offers to
+/// change them; otherwise the hands stay as they are without a question.
+#[test]
+fn freed_hands_are_offered_again() {
+    let mut state = clean_state(1, "azathoth");
+    hold(&mut state, "revolver_38");
+    hold(&mut state, "dynamite");
+    let mut gear = crate::rules::combat::Gear::default();
+    // Change, take the Dynamite, attack; it is discarded; change, take the
+    // Revolver, attack; next round: no question.
+    let (result, _) = run(&mut state, &[1, 2, 0, 1, 1, 0], &[], |game| {
+        game.prepare_combat(0, None, &mut gear)?;
+        game.discard_used_weapons(0, &mut gear)?;
+        game.prepare_combat(0, None, &mut gear)?;
+        game.prepare_combat(0, None, &mut gear)
+    });
+    assert_eq!(result, Ok(()));
+    assert_eq!((gear.bonus(), gear.hands()), (3, 1));
+    let inv = &state.investigators[0];
+    assert_eq!(inv.in_hand, vec![data::CardId::new("revolver_38")]);
+    assert!(!inv.holds(&data::CardId::new("dynamite")));
 }
