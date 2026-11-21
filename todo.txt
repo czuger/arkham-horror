@@ -1,5 +1,12 @@
-Fait une page pour afficher les fiches d'investigateurs, utilise les pions coulissants pour marquer les caracteristiques. Utilise également les pions res et san pour marquer la résistance et la santé mentale.
-Un investigateurs qui a 7 en san a 7 pions. Enlève des pions quand il en perd. Utilise également les pions dollars pour affocher le montant d'argent.
-Utilise les pions indoces pour montrer le nombre d'indices. Affiche les monstres dans une zone trophée dédiée. 
+Chaque investigateur a sa page à lui, par défaut on arrive sur la page du joueur et de la on peut aller sur la page des autres.
+Essaye de supprimer l'arrier plan des pions san, res et coulissant, le mieux serait que tu les convertisse une bonne fois pour toutes en png avec un fond transparant.
 
-Fait également une page ou l'on voit la carte en taille 1:1 orienté paysage avec tous les éléments dessus. Pour l'instant, cette carte n'est pas interactive, c'est juste pour un test.
+Sépare les pions dollars et éssaie de les aligner.
+
+Le placement placement initial des curseurs doivent se faire directement sur la fiche de l'investigateur, idem pour les modifications.
+A cette phase, redirige sur la page d'investigateur et puis retourne a la page de la partie quand c'est terminé.
+
+Sur la page de l'investigateur affiche également ses possessions.
+
+C'est l'endroit également ou on va gérer ce que l'investigateur a en main. Affiche deux zones, on y déplace les objets via drag and drop.
+Gère correctement le nombre de mains.

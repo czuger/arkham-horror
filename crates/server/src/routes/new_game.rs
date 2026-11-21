@@ -81,7 +81,7 @@ pub async fn create_game(
             return Ok((StatusCode::BAD_REQUEST, Html(page)).into_response());
         }
     };
-    let id = Session::start(&state.db, &state.data, setup)?;
+    let id = Session::start(&state.db, &state.data, setup).await?;
     Ok(Redirect::to(&format!("/partie/{id}")).into_response())
 }
 

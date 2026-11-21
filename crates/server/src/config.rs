@@ -21,7 +21,7 @@ const DEFAULT_DATA: &str = "data";
 pub struct Config {
     /// Address and port the server listens on.
     pub addr: SocketAddr,
-    /// Folder of the PoloDB database, created on first run.
+    /// SQLite database file, created on first run.
     pub db_path: PathBuf,
     /// Folder of the game images (`assets/` in the repository).
     pub assets_dir: PathBuf,

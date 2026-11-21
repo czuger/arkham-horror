@@ -23,14 +23,14 @@ pub struct Reply {
     pub body: String,
 }
 
-/// The application on a database folder.
+/// The application on a database file.
 pub struct TestApp {
     pub router: Router,
 }
 
 impl TestApp {
-    /// Opens (or reopens) the application on a database folder.
-    pub fn open(db_path: &Path) -> Self {
+    /// Opens (or reopens) the application on a database file.
+    pub async fn open(db_path: &Path) -> Self {
         let root = PathBuf::from("../..");
         let config = Config {
             addr: "127.0.0.1:0".parse().expect("addr"),
@@ -40,7 +40,7 @@ impl TestApp {
             data_dir: root.join("data"),
         };
         let data = Arc::new(GameData::load(&config.data_dir).expect("data"));
-        let db = Database::open(&config.db_path).expect("open");
+        let db = Database::open(&config.db_path).await.expect("open");
         let state = AppState {
             db,
             data,

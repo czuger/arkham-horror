@@ -33,7 +33,7 @@ pub async fn game(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
-    let session = Session::load(&state.db, &state.data, id)?;
+    let session = Session::load(&state.db, &state.data, id).await?;
     let decision = session.decision();
     let outcome = &session.outcome;
     let page = inspect(&state.data, &outcome.state, |view| GamePage {

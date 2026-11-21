@@ -5,7 +5,7 @@
 ## Ce qu'il faut
 
 - **Rust** installé avec `rustup` (https://rustup.rs). La bonne version (1.100.0) s'installe toute seule au premier lancement, grâce au fichier `rust-toolchain.toml`.
-- Un compilateur C++ (sur Mac : `xcode-select --install`), pour la base de données.
+- Un compilateur C (sur Mac : `xcode-select --install`), pour la base de données SQLite.
 
 ## Lancer le serveur
 
@@ -19,7 +19,7 @@ Puis ouvrir http://127.0.0.1:3000 dans le navigateur.
 
 - La **première fois**, la compilation prend quelques minutes. Les fois suivantes, quelques secondes.
 - Pour **arrêter** le serveur : `Ctrl+C` dans le terminal.
-- Les parties sont enregistrées dans le dossier `arkham.db`, créé au premier lancement. Elles reprennent là où vous les avez laissées après un redémarrage.
+- Les parties sont enregistrées dans le fichier `arkham.db` (base SQLite), créé au premier lancement. Elles reprennent là où vous les avez laissées après un redémarrage. Sauvegarde : copier ce fichier, serveur arrêté.
 
 ## Réglages (facultatifs)
 
@@ -28,7 +28,7 @@ Par variables d'environnement, à mettre devant la commande, par exemple `ARKHAM
 | Variable | Rôle | Par défaut |
 |---|---|---|
 | `ARKHAM_ADDR` | adresse et port d'écoute | `127.0.0.1:3000` |
-| `ARKHAM_DB` | dossier de la base des parties | `arkham.db` |
+| `ARKHAM_DB` | fichier de la base des parties | `arkham.db` |
 | `ARKHAM_DATA` | dossier des données du jeu (cartes, plateau…) | `data` |
 | `ARKHAM_ASSETS` | dossier des images | `assets` |
 | `ARKHAM_STATIC` | dossier de la feuille de style (et de `htmx.min.js` s'il y est) | `static` |

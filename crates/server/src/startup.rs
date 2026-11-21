@@ -27,8 +27,7 @@ pub enum StartupError {
 
 /// Loads the game data, opens the database, binds the socket and serves until Ctrl-C.
 ///
-/// The database is flushed and closed when the router, which holds the
-/// last handle on it, is dropped at the end.
+/// The database is closed once the server has stopped.
 ///
 /// # Errors
 ///
@@ -36,17 +35,25 @@ pub enum StartupError {
 /// address cannot be bound.
 pub async fn run(config: Config) -> Result<(), StartupError> {
     let data = Arc::new(GameData::load(&config.data_dir)?);
-    let db = Database::open(&config.db_path)?;
+    let db = Database::open(&config.db_path).await?;
     let htmx = config.static_dir.join(HTMX_FILE).is_file();
     if !htmx {
         tracing::warn!("{HTMX_FILE} absent from the static folder: pages reload in full");
     }
-    let app = build_router(&config, AppState { db, data, htmx });
+    let app = build_router(
+        &config,
+        AppState {
+            db: db.clone(),
+            data,
+            htmx,
+        },
+    );
     let listener = TcpListener::bind(config.addr).await?;
     tracing::info!("listening on http://{}", config.addr);
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;
+    db.close().await;
     tracing::info!("server stopped");
     Ok(())
 }

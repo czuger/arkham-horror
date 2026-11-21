@@ -25,7 +25,7 @@ pub async fn journal(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
-    let session = Session::load(&state.db, &state.data, id)?;
+    let session = Session::load(&state.db, &state.data, id).await?;
     Ok(Html(
         JournalPage {
             htmx: state.htmx,

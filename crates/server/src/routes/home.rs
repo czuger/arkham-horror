@@ -19,7 +19,7 @@ struct HomePage {
 ///
 /// Fails if the database or the template fails.
 pub async fn home(State(state): State<AppState>) -> Result<Html<String>, AppError> {
-    let games = state.db.all_games()?;
+    let games = state.db.all_games().await?;
     Ok(Html(
         HomePage {
             htmx: state.htmx,

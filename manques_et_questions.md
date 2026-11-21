@@ -97,6 +97,7 @@ Première version faite avec SurrealDB 4.0.1, puis **remplacée par PoloDB 5.3.0
 - **T3 — fait.** PoloDB 5 range ses données avec RocksDB, un moteur de stockage très éprouvé. Licence Apache-2.0. Sauvegarde : copier le dossier de base, serveur arrêté. Point d'attention : PoloDB est maintenu par une petite équipe ; comme la base ne contient que les parties sauvegardées, en changer plus tard resterait facile.
 - **T4 — fait.** État stocké comme un texte JSON : 200 écritures de 50 ko prennent **6 ms** au total. Aucun problème.
 - **T5 — fait : askama** (ta réponse du 16/11/2026 à Q3).
+- **21/11/2026 : PoloDB remplacée par SQLite** (sqlx 0.9, SQLite compilé avec le programme). Un seul fichier `arkham.db` au lieu d'un dossier ; plus de RocksDB à compiler. T4 refait : 200 écritures de 50 ko en **26 ms** (debug). Les anciennes parties PoloDB ne sont pas reprises.
 - **T6 — reporté au jalon J5** : il faut d'abord les coordonnées des lieux sur l'image du plateau (M1).
 
 ---

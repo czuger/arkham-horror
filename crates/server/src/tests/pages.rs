@@ -30,7 +30,7 @@ async fn answer_first(app: &TestApp, game: &str) -> String {
 #[tokio::test(flavor = "current_thread")]
 async fn home_page_lists_no_game_at_first() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let reply = app.get("/").await;
     assert_eq!(reply.status, StatusCode::OK);
     assert!(reply.body.contains("Aucune partie"));
@@ -40,7 +40,7 @@ async fn home_page_lists_no_game_at_first() {
 #[tokio::test(flavor = "current_thread")]
 async fn robots_txt_and_static_files_are_served() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let robots = app.get("/robots.txt").await;
     assert!(robots.body.contains("Disallow: /"));
     assert_eq!(app.get("/static/style.css").await.status, StatusCode::OK);
@@ -50,7 +50,7 @@ async fn robots_txt_and_static_files_are_served() {
 #[tokio::test(flavor = "current_thread")]
 async fn a_new_game_waits_for_the_human() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     assert_eq!(game, "/partie/1");
     let page = app.get(&game).await;
@@ -66,7 +66,7 @@ async fn a_new_game_waits_for_the_human() {
 #[tokio::test(flavor = "current_thread")]
 async fn the_ancient_one_page_shows_its_sheet() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     assert!(app.get(&game).await.body.contains("/grand-ancien\""));
     let page = app.get(&format!("{game}/grand-ancien")).await;
@@ -85,7 +85,7 @@ async fn the_ancient_one_page_shows_its_sheet() {
 #[tokio::test(flavor = "current_thread")]
 async fn the_investigators_page_shows_every_sheet_with_its_tokens() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     assert!(app.get(&game).await.body.contains("/investigateurs\""));
     let page = app.get(&format!("{game}/investigateurs")).await;
@@ -105,7 +105,7 @@ async fn the_investigators_page_shows_every_sheet_with_its_tokens() {
 #[tokio::test(flavor = "current_thread")]
 async fn the_landscape_board_page_shows_the_turned_board() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     assert!(app.get(&game).await.body.contains("/plateau\""));
     let page = app.get(&format!("{game}/plateau")).await;
@@ -126,7 +126,7 @@ async fn the_landscape_board_page_shows_the_turned_board() {
 #[tokio::test(flavor = "current_thread")]
 async fn locations_show_their_text_and_icons_on_hover() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     let page = app.get(&game).await.body;
     assert_eq!(page.matches("class=\"panel tip").count(), 26);
@@ -141,7 +141,7 @@ async fn locations_show_their_text_and_icons_on_hover() {
 #[tokio::test(flavor = "current_thread")]
 async fn answers_move_the_game_on_and_can_be_undone() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     let first = app.get(&game).await.body;
     let after_one = answer_first(&app, &game).await;
@@ -154,7 +154,7 @@ async fn answers_move_the_game_on_and_can_be_undone() {
 #[tokio::test(flavor = "current_thread")]
 async fn bad_and_stale_answers_are_refused() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     let page = app.get(&game).await.body;
     let coup = move_number(&page).expect("decision");
@@ -179,7 +179,7 @@ async fn bad_and_stale_answers_are_refused() {
 #[tokio::test(flavor = "current_thread")]
 async fn bad_setups_are_shown_again() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let twice = "investigateur=amanda_sharpe&ia=1&ia1=amanda_sharpe&graine=";
     let reply = app.post("/nouvelle", twice).await;
     assert_eq!(reply.status, StatusCode::BAD_REQUEST);
@@ -190,21 +190,21 @@ async fn bad_setups_are_shown_again() {
 async fn a_game_resumes_after_a_restart() {
     let dir = temp();
     let path = dir.path().join("db");
-    let app = TestApp::open(&path);
+    let app = TestApp::open(&path).await;
     let game = new_game(&app, NEW_GAME).await;
     for _ in 0..5 {
         answer_first(&app, &game).await;
     }
     let before = app.get(&game).await.body;
     drop(app);
-    let app = TestApp::open(&path);
+    let app = TestApp::open(&path).await;
     assert_eq!(app.get(&game).await.body, before);
 }
 
 #[tokio::test(flavor = "current_thread")]
 async fn cross_site_forms_are_refused() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let request = Request::post("/nouvelle")
         .header(header::CONTENT_TYPE, "application/x-www-form-urlencoded")
         .header("sec-fetch-site", "cross-site")
@@ -219,7 +219,7 @@ async fn cross_site_forms_are_refused() {
 #[tokio::test(flavor = "current_thread")]
 async fn a_whole_game_is_played_through_the_forms() {
     let dir = temp();
-    let app = TestApp::open(&dir.path().join("db"));
+    let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, "investigateur=amanda_sharpe&ia=2&graine=3").await;
     let mut page = app.get(&game).await.body;
     let mut answers = 0;

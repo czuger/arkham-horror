@@ -28,9 +28,9 @@ pub async fn answer(
     Path(id): Path<i64>,
     Form(form): Form<AnswerForm>,
 ) -> Result<Redirect, AppError> {
-    let mut session = Session::load(&state.db, &state.data, id)?;
+    let mut session = Session::load(&state.db, &state.data, id).await?;
     if session.answer(&state.data, form.choix, form.coup)? {
-        session.save(&state.db, &state.data)?;
+        session.save(&state.db, &state.data).await?;
     }
     Ok(Redirect::to(&format!("/partie/{id}")))
 }
@@ -44,9 +44,9 @@ pub async fn undo(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> Result<Redirect, AppError> {
-    let mut session = Session::load(&state.db, &state.data, id)?;
+    let mut session = Session::load(&state.db, &state.data, id).await?;
     if session.undo(&state.data)? {
-        session.save(&state.db, &state.data)?;
+        session.save(&state.db, &state.data).await?;
     }
     Ok(Redirect::to(&format!("/partie/{id}")))
 }
@@ -60,6 +60,6 @@ pub async fn delete(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> Result<Redirect, AppError> {
-    state.db.delete_game(id)?;
+    state.db.delete_game(id).await?;
     Ok(Redirect::to("/"))
 }

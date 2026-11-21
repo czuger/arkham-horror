@@ -1,12 +1,10 @@
-use std::time::{SystemTime, UNIX_EPOCH};
-
 use ai::Seated;
 use data::GameData;
 use engine::{Decision, Outcome, Replay, Setup, Status, play};
 
 use crate::app_error::AppError;
 use crate::database::Database;
-use crate::game_row::GameRow;
+use crate::game_row::GameContent;
 use crate::progress::Progress;
 
 /// Seat of the human player; the AI plays every other seat.
@@ -17,8 +15,6 @@ pub const HUMAN_SEAT: usize = 0;
 pub struct Session {
     /// Game number.
     pub id: i64,
-    /// Creation time, in seconds since 1970.
-    pub created_unix: i64,
     /// What is saved.
     pub progress: Progress,
     /// The game as replayed.
@@ -36,26 +32,16 @@ impl Session {
     /// # Errors
     ///
     /// An [`AppError`] if the setup is refused or the database fails.
-    pub fn start(db: &Database, data: &GameData, setup: Setup) -> Result<i64, AppError> {
-        let progress = Progress {
+    pub async fn start(db: &Database, data: &GameData, setup: Setup) -> Result<i64, AppError> {
+        let mut progress = Progress {
             setup,
             answers: Vec::new(),
             human_moves: Vec::new(),
             seen_events: 0,
         };
         let outcome = advance(data, &progress)?;
-        let mut session = Self {
-            id: db.next_game_id()?,
-            created_unix: now(),
-            progress,
-            outcome,
-        };
-        session
-            .progress
-            .answers
-            .clone_from(&session.outcome.answers);
-        db.insert_game(&session.row(data)?)?;
-        Ok(session.id)
+        progress.answers.clone_from(&outcome.answers);
+        Ok(db.insert_game(&content(data, &progress, &outcome)?).await?)
     }
 
     /// Loads and replays a saved game.
@@ -64,13 +50,12 @@ impl Session {
     ///
     /// [`AppError::NotFound`] if there is no such game, or another
     /// [`AppError`] if it cannot be read or replayed.
-    pub fn load(db: &Database, data: &GameData, id: i64) -> Result<Self, AppError> {
-        let row = db.game(id)?.ok_or(AppError::NotFound)?;
+    pub async fn load(db: &Database, data: &GameData, id: i64) -> Result<Self, AppError> {
+        let row = db.game(id).await?.ok_or(AppError::NotFound)?;
         let progress: Progress = serde_json::from_str(&row.record)?;
         let outcome = advance(data, &progress)?;
         Ok(Self {
             id,
-            created_unix: row.created_unix,
             progress,
             outcome,
         })
@@ -159,8 +144,9 @@ impl Session {
     /// # Errors
     ///
     /// An [`AppError`] if the database fails.
-    pub fn save(&self, db: &Database, data: &GameData) -> Result<(), AppError> {
-        db.update_game(&self.row(data)?)?;
+    pub async fn save(&self, db: &Database, data: &GameData) -> Result<(), AppError> {
+        let content = content(data, &self.progress, &self.outcome)?;
+        db.update_game(self.id, &content).await?;
         Ok(())
     }
 
@@ -170,18 +156,20 @@ impl Session {
         self.progress.answers.clone_from(&self.outcome.answers);
         Ok(())
     }
+}
 
-    /// The database row for this game.
-    fn row(&self, data: &GameData) -> Result<GameRow, AppError> {
-        Ok(GameRow {
-            id: self.id,
-            created_unix: self.created_unix,
-            title: title(data, &self.outcome),
-            summary: summary(&self.outcome),
-            over: self.decision().is_none(),
-            record: serde_json::to_string(&self.progress)?,
-        })
-    }
+/// What the database keeps for a game.
+fn content(
+    data: &GameData,
+    progress: &Progress,
+    outcome: &Outcome,
+) -> Result<GameContent, AppError> {
+    Ok(GameContent {
+        title: title(data, outcome),
+        summary: summary(outcome),
+        over: matches!(outcome.status, Status::Over(_)),
+        record: serde_json::to_string(progress)?,
+    })
 }
 
 /// Replays the saved answers, then lets the AI answer every seat but the
@@ -227,13 +215,4 @@ fn summary(outcome: &Outcome) -> String {
             outcome.state.phase.label()
         ),
     }
-}
-
-/// Seconds since 1970 (0 if the clock is before that).
-fn now() -> i64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |elapsed| {
-            i64::try_from(elapsed.as_secs()).unwrap_or(i64::MAX)
-        })
 }
