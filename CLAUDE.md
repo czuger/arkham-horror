@@ -13,7 +13,7 @@ Milestones (plan in `plan_creation_jeu.md`, J0–J6):
 - **J2 engine** (2026-11-16): plays whole games.
 - **J3 all cards** (2026-11-20): all 267 cards in `data/*_cards.ron` (raw text in `J3_releve_cartes.md`, notes in `J3.md`); location abilities in `board.ron`; 16 investigator abilities in `rules/investigator_powers.rs`; 16 cards with a coded special effect.
 - **J4 AI, first version** (2026-11-20, `J4.md`): `ai::Policy`, priority-based. AI strength tuning and trades between investigators (Q12) postponed.
-- **J5 server, first version** (2026-11-21, `J5.md`): home, new game, game page, journal, unlimited undo, resume, one page per investigator where the human sets sliders and combat hands (drag and drop). Still to do: the user plays a whole game in the browser. `static/htmx.min.js` may be absent: **never download it**, the user drops it in.
+- **J5 server, first version** (2026-11-21, `J5.md`): home, new game, game page, journal, unlimited undo, resume, one page per investigator where the human sets sliders; a combat page (monster, every die, hands by drag and drop); cards drawn and dice shown in a journal column (`Outcome.shown`). Still to do: the user plays a whole game in the browser. `static/htmx.min.js` may be absent: **never download it**, the user drops it in.
 
 ## Commands
 

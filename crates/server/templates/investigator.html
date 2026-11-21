@@ -19,6 +19,8 @@
 {% endif %}
 <section class="mat{% if mat.eliminated %} eliminated{% endif %}">
   <h1>{{ mat.name }}, {{ mat.title }} <small>({{ mat.player }} · à : {{ mat.place }}{% if mat.eliminated %} · éliminé{% endif %})</small></h1>
+  {% if !mat.flags.is_empty() %}<p class="flags">{{ mat.flags.join(" · ") }}</p>{% endif %}
+  <p class="ability"><strong>{{ mat.ability.0 }}</strong> : {{ mat.ability.1 }}</p>
   <div class="mat-body">
     <div class="investigator-sheet">
       <img src="/assets/{{ mat.image }}" alt="Fiche de {{ mat.name }}">

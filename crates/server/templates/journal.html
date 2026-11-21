@@ -11,6 +11,6 @@
   {% endif %}
 </p>
 <ol class="journal full">
-  {% for line in events %}<li>{{ line }}</li>{% endfor %}
+  {% for line in lines %}{% let class = "old" %}{% include "journal/line.html" %}{% endfor %}
 </ol>
 {% endblock %}

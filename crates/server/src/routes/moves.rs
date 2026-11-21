@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
-use crate::session::Session;
+use crate::session::{FollowUp, Session};
 
 /// An answer to the current decision, as posted.
 #[derive(Debug, Deserialize)]
@@ -14,6 +14,9 @@ pub struct AnswerForm {
     choix: usize,
     /// Number of answers given when the page was shown.
     coup: usize,
+    /// Fight or flee right after keeping the cards in hand.
+    #[serde(default)]
+    ensuite: Option<FollowUp>,
 }
 
 /// Applies the human's answer, lets the AI play up to the human's next
@@ -30,6 +33,9 @@ pub async fn answer(
 ) -> Result<Redirect, AppError> {
     let mut session = Session::load(&state.db, &state.data, id).await?;
     if session.answer(&state.data, form.choix, form.coup)? {
+        if let Some(follow_up) = form.ensuite {
+            session.follow_up(&state.data, follow_up)?;
+        }
         session.save(&state.db, &state.data).await?;
     }
     Ok(Redirect::to(&session.page()))

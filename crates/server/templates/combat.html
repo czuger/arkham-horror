@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Combat — Horreur à Arkham{% endblock %}
+{% block content %}
+<nav class="seat-tabs">
+  <a href="/partie/{{ id }}">Retour à la partie</a>
+  <a href="/partie/{{ id }}/investigateurs">Votre fiche</a>
+  <a href="/partie/{{ id }}/journal">Journal complet</a>
+</nav>
+<h1 class="combat-title">Combat — {{ combat.who }}{% if let Some(foe) = combat.foe %} contre {{ foe.token.name }}{% endif %}</h1>
+{% if let Some(decision) = decision %}<form id="combat-form" method="post" action="/partie/{{ id }}/reponse">
+<input type="hidden" name="coup" value="{{ decision.form.move_number }}">{% endif %}
+<div class="combat">
+  <div class="combat-foes">
+    {% if let Some(foe) = combat.foe %}{% include "combat/foe.html" %}{% endif %}
+    {% for foe in combat.to_face %}{% include "combat/foe.html" %}{% endfor %}
+    {% if combat.foe.is_none() && combat.to_face.is_empty() %}<p class="hint">Aucun combat en cours.</p>{% endif %}
+  </div>
+  <div class="combat-main">
+    <section class="fighter">
+      <h2>{{ combat.who }}</h2>
+      <p>Santé Mentale {{ combat.sanity.0 }} / {{ combat.sanity.1 }} · Résistance {{ combat.stamina.0 }} / {{ combat.stamina.1 }} · Indices {{ combat.clues }}</p>
+      <p class="hint">Un dé réussit sur {{ combat.success_from }}{% if combat.success_from < 6 %} ou plus{% endif %}.</p>
+    </section>
+    {% if !combat.lines.is_empty() %}
+    <section class="combat-log">
+      <h2>Jets de dés</h2>
+      <ol class="journal full">
+        {% for line in combat.lines %}{% let class = "new" %}{% include "journal/line.html" %}{% endfor %}
+      </ol>
+      {% if let Some(ending) = combat.ending %}<p class="combat-ending">{{ ending }}</p>{% endif %}
+    </section>
+    {% endif %}
+    <section class="decision">
+    {% if let Some(decision) = decision %}
+      <h2>{{ decision.form.who }} : à vous</h2>
+      <p class="prompt">{{ decision.form.prompt }}</p>
+      {% if !decision.form.hint.is_empty() %}<p class="hint">{{ decision.form.hint }}</p>{% endif %}
+      {% if hands.active %}<p class="hint">Glissez une arme ou un sort de vos possessions vers vos mains, ou l'inverse (ou utilisez ses boutons).</p>{% endif %}
+      {% if let Some(choice) = decision.hands %}
+      <p>{{ choice.held }}</p>
+      <input type="hidden" name="choix" value="{{ choice.keep }}">
+      <button type="submit" name="ensuite" value="combattre" class="primary">Combattre</button>
+      {% if choice.can_flee %}<button type="submit" name="ensuite" value="fuir">Fuir</button>{% endif %}
+      <button type="submit" form="change-hands" class="small">Changer les armes de ma main</button>
+      {% else %}
+      {% for (index, label) in decision.buttons %}<button type="submit" name="choix" value="{{ index }}">{{ label }}</button>{% endfor %}
+      {% endif %}
+    {% else %}
+      <p><a class="button" href="{{ next }}">Continuer la partie</a></p>
+    {% endif %}
+    </section>
+  </div>
+</div>
+<div class="hand-zones{% if hands.active %} active{% endif %}">
+  <div class="zone hands" data-zone="hand">
+    <h3>En main : {{ hands.used }} / {{ hands.total }} mains</h3>
+    {% if hands.in_hand.is_empty() %}<p class="hint">Mains libres.</p>{% endif %}
+    <div class="cards-row">
+      {% for held in hands.in_hand %}{% let target = "possessions" %}{% let action = "Lâcher" %}{% include "investigator/held_card.html" %}{% endfor %}
+    </div>
+  </div>
+  <div class="zone possessions" data-zone="possessions">
+    <h3>Possessions : {{ hands.possessions.len() }} carte(s)</h3>
+    <div class="cards-row">
+      {% for held in hands.possessions %}{% let target = "hand" %}{% let action = "Prendre en main" %}{% include "investigator/held_card.html" %}{% endfor %}
+    </div>
+  </div>
+</div>
+{% if let Some(decision) = decision %}</form>
+{% if let Some(choice) = decision.hands %}
+<form id="change-hands" method="post" action="/partie/{{ id }}/reponse" class="inline">
+  <input type="hidden" name="coup" value="{{ decision.form.move_number }}">
+  <input type="hidden" name="choix" value="{{ choice.change }}">
+</form>
+{% endif %}{% endif %}
+{% if can_undo %}
+<form method="post" action="/partie/{{ id }}/annuler" class="inline undo">
+  <button type="submit" class="small">Annuler le dernier coup</button>
+</form>
+{% endif %}
+{% endblock %}

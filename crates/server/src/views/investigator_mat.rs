@@ -41,6 +41,10 @@ pub struct InvestigatorMat {
     pub gate_trophies: Vec<ImageToken>,
     /// Whether the investigator has been eliminated.
     pub eliminated: bool,
+    /// Statuses worth a line (delayed, arrested…).
+    pub flags: Vec<&'static str>,
+    /// Special ability: name and text.
+    pub ability: (String, String),
 }
 
 /// The bills of one value: $10, $5 or $1.
@@ -80,6 +84,8 @@ impl InvestigatorMat {
                 .collect(),
             gate_trophies: gate_trophies(view, inv),
             eliminated: inv.eliminated,
+            flags: flags(inv),
+            ability: (sheet.ability.name.clone(), sheet.ability.text.clone()),
         })
     }
 }
@@ -135,6 +141,20 @@ fn gate_trophies(view: &View<'_, '_>, inv: &InvestigatorState) -> Vec<ImageToken
             }
         })
         .collect()
+}
+
+/// Statuses shown on the investigator's page.
+fn flags(inv: &InvestigatorState) -> Vec<&'static str> {
+    [
+        (inv.delayed, "Retardé"),
+        (inv.lose_next_turn, "Perdra son prochain tour"),
+        (inv.skipping_turn, "Passe ce tour"),
+        (inv.explored, "A exploré l'Autre Monde"),
+        (inv.no_more_bank_loans, "Plus de prêt bancaire"),
+    ]
+    .into_iter()
+    .filter_map(|(on, label)| on.then_some(label))
+    .collect()
 }
 
 /// A pixel coordinate as a CSS percentage of the image size.

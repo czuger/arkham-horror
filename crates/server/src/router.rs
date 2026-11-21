@@ -28,6 +28,7 @@ pub fn build_router(config: &Config, state: AppState) -> Router {
         .route("/partie/{id}/annuler", post(routes::undo))
         .route("/partie/{id}/supprimer", post(routes::delete))
         .route("/partie/{id}/journal", get(routes::journal))
+        .route("/partie/{id}/combat", get(routes::combat))
         .route("/partie/{id}/grand-ancien", get(routes::ancient_one))
         .route("/partie/{id}/investigateurs", get(routes::investigators))
         .route(

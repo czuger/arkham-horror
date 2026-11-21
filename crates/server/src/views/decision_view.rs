@@ -18,6 +18,8 @@ pub struct DecisionView {
     pub move_number: usize,
     /// Answered on the investigator's page, not with these buttons.
     pub on_sheet: bool,
+    /// Answered on the combat page, not with these buttons.
+    pub in_combat: bool,
 }
 
 impl DecisionView {
@@ -35,7 +37,14 @@ impl DecisionView {
                 .collect(),
             move_number,
             on_sheet: on_sheet(decision),
+            in_combat: false,
         }
+    }
+
+    /// The same form, answered on the combat page when `in_combat`.
+    pub fn in_combat(mut self, in_combat: bool) -> Self {
+        self.in_combat = in_combat && !self.on_sheet;
+        self
     }
 }
 

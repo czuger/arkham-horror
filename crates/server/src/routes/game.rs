@@ -5,8 +5,8 @@ use engine::inspect;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
-use crate::session::{HUMAN_SEAT, Session};
-use crate::views::{BoardView, DecisionView, JournalView, PartyRow, SheetView, StatusView};
+use crate::session::Session;
+use crate::views::{BoardView, DecisionView, JournalView, PartyRow, StatusView};
 
 #[derive(Template)]
 #[template(path = "game.html")]
@@ -15,7 +15,6 @@ struct GamePage {
     id: i64,
     seed: u64,
     board: BoardView,
-    sheet: Option<SheetView>,
     party: Vec<PartyRow>,
     status: StatusView,
     decision: Option<DecisionView>,
@@ -23,7 +22,8 @@ struct GamePage {
     can_undo: bool,
 }
 
-/// The game page: board, sheet, status, decision form and recent journal.
+/// The game page: board, decision form, status, investigators and recent
+/// journal with the cards drawn and the dice rolled.
 ///
 /// # Errors
 ///
@@ -41,11 +41,17 @@ pub async fn game(
         id,
         seed: session.progress.setup.seed,
         board: BoardView::new(view, decision),
-        sheet: SheetView::new(view, HUMAN_SEAT),
         party: PartyRow::all(view),
         status: StatusView::new(view, &outcome.status),
-        decision: decision.map(|d| DecisionView::new(view, d, session.move_number())),
-        journal: JournalView::recent(&outcome.events, session.progress.seen_events),
+        decision: decision.map(|d| {
+            DecisionView::new(view, d, session.move_number()).in_combat(session.in_combat())
+        }),
+        journal: JournalView::recent(
+            view,
+            &outcome.events,
+            &outcome.shown,
+            session.progress.seen_events,
+        ),
         can_undo: !session.progress.human_moves.is_empty(),
     });
     Ok(Html(page.render()?))

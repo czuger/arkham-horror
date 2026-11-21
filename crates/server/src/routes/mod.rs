@@ -1,4 +1,5 @@
 mod ancient_one;
+mod combat;
 mod game;
 mod home;
 mod investigators;
@@ -9,6 +10,7 @@ mod new_game;
 mod robots;
 
 pub use ancient_one::ancient_one;
+pub use combat::combat;
 pub use game::game;
 pub use home::home;
 pub use investigators::{investigator, investigators};

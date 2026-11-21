@@ -5,10 +5,11 @@
   {% include "game/board.html" %}
   <div class="side">
     {% include "game/decision.html" %}
-    {% include "game/journal.html" %}
     {% include "game/status.html" %}
-    {% include "game/sheet.html" %}
     {% include "game/party.html" %}
   </div>
+  <aside class="log">
+    {% include "game/journal.html" %}
+  </aside>
 </div>
 {% endblock %}

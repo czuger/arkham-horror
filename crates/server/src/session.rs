@@ -1,15 +1,28 @@
 use ai::Seated;
 use data::GameData;
-use engine::{Decision, EngineError, Outcome, Replay, Setup, Status, play};
+use engine::{Choice, Decision, DecisionKind, EngineError, Outcome, Replay, Setup, Status, play};
+use serde::Deserialize;
 
 use crate::app_error::AppError;
 use crate::database::{Database, DatabaseError};
 use crate::game_row::GameContent;
 use crate::progress::Progress;
-use crate::views::on_sheet;
+use crate::views::{CombatSpan, on_sheet};
 
 /// Seat of the human player; the AI plays every other seat.
 pub const HUMAN_SEAT: usize = 0;
+
+/// What to do once the cards in hand are kept, sent with the answer that
+/// keeps them (so fighting is one click on the combat page).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+pub enum FollowUp {
+    /// Fight this round.
+    #[serde(rename = "combattre")]
+    Fight,
+    /// Flee.
+    #[serde(rename = "fuir")]
+    Flee,
+}
 
 /// A game loaded from the database and replayed up to the human's next
 /// decision (or its end).
@@ -80,12 +93,41 @@ impl Session {
         }
     }
 
-    /// Where the human answers next: the investigator's page for the
-    /// sliders and the hands, the game page otherwise.
+    /// Where the human goes after a move: the combat page when a combat of
+    /// theirs ended since their last answer, else [`Session::decision_page`].
     pub fn page(&self) -> String {
+        let ended = self
+            .combat()
+            .is_some_and(|span| span.ended_since(self.progress.seen_events));
+        if ended && !self.in_combat() {
+            return format!("/partie/{}/combat", self.id);
+        }
+        self.decision_page()
+    }
+
+    /// Where the human answers the decision: the investigator's page for
+    /// the sliders, the combat page while facing a monster, the game page
+    /// otherwise.
+    pub fn decision_page(&self) -> String {
         match self.decision() {
             Some(decision) if on_sheet(decision) => format!("/partie/{}/investigateurs", self.id),
+            Some(_) if self.in_combat() => format!("/partie/{}/combat", self.id),
             _ => format!("/partie/{}", self.id),
+        }
+    }
+
+    /// The last time the human faced a monster.
+    pub fn combat(&self) -> Option<CombatSpan> {
+        CombatSpan::last(&self.outcome.shown, HUMAN_SEAT)
+    }
+
+    /// Whether the human's decision is about a monster faced: whether to
+    /// evade or fight it, or a step of the combat under way.
+    pub fn in_combat(&self) -> bool {
+        match self.decision() {
+            Some(decision) if decision.kind == DecisionKind::FaceMonster => true,
+            Some(_) => self.combat().is_some_and(|span| span.ongoing()),
+            None => false,
         }
     }
 
@@ -138,6 +180,33 @@ impl Session {
         self.progress.answers.push(choice);
         self.replay(data)?;
         Ok(true)
+    }
+
+    /// After the cards in hand were kept: fights or flees at once, when the
+    /// combat asks it next. Undoing takes both answers back.
+    ///
+    /// # Errors
+    ///
+    /// An [`AppError`] if the replay fails.
+    pub fn follow_up(&mut self, data: &GameData, follow_up: FollowUp) -> Result<(), AppError> {
+        let wanted = match follow_up {
+            FollowUp::Fight => Choice::Attack,
+            FollowUp::Flee => Choice::Flee,
+        };
+        let Some(index) = self
+            .decision()
+            .filter(|decision| decision.kind == DecisionKind::FightOrFlee)
+            .and_then(|decision| {
+                decision
+                    .options
+                    .iter()
+                    .position(|option| option.choice == wanted)
+            })
+        else {
+            return Ok(());
+        };
+        self.progress.answers.push(index);
+        self.replay(data)
     }
 
     /// Takes back the human's last answer and everything played after it.

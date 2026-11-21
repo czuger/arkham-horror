@@ -7,6 +7,7 @@ use data::{
 
 use crate::decision::{Choice, Context, Decision, DecisionKind, DecisionOption, Responder};
 use crate::halt::{Flow, Halt};
+use crate::shown::{Exhibit, Shown};
 use crate::state::{GameState, InvestigatorState, Place};
 use crate::view::View;
 
@@ -22,6 +23,8 @@ pub(crate) struct Game<'a> {
     pub answers: Vec<usize>,
     /// Journal lines, in French.
     pub events: Vec<String>,
+    /// Cards drawn, dice rolled and combats, beside the journal lines.
+    pub shown: Vec<Shown>,
     /// Short-lived values passed between rule steps (not part of the state).
     pub scratch: Scratch,
     /// Cards and paragraphs played so far (see [`crate::coverage`]).
@@ -82,6 +85,7 @@ impl<'a> Game<'a> {
             responder: Some(responder),
             answers: Vec::new(),
             events: Vec::new(),
+            shown: Vec::new(),
             scratch: Scratch::default(),
             covered: std::collections::BTreeSet::new(),
             tally: crate::tally::Tally::default(),
@@ -102,6 +106,14 @@ impl<'a> Game<'a> {
     /// Adds a line to the journal.
     pub fn log(&mut self, line: impl Into<String>) {
         self.events.push(line.into());
+    }
+
+    /// Notes something to show beside the next journal line.
+    pub fn show(&mut self, what: Exhibit) {
+        self.shown.push(Shown {
+            line: self.events.len(),
+            what,
+        });
     }
 
     /// Asks a decision and returns the chosen option. A single option is

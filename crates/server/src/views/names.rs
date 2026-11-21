@@ -76,9 +76,38 @@ pub fn card(data: &GameData, id: &CardId) -> ImageToken {
             tip: tips::mythos_card(card),
         };
     }
+    if let Some(card) = data.location_cards.cards.iter().find(|card| &card.id == id) {
+        return encounter_card(
+            "Carte Lieu",
+            &card.image,
+            card.encounters.iter().map(|e| &e.text),
+        );
+    }
+    if let Some(card) = data.gate_cards.cards.iter().find(|card| &card.id == id) {
+        let texts = card
+            .text
+            .iter()
+            .chain(card.encounters.iter().map(|e| &e.text));
+        return encounter_card("Carte Portail", &card.image, texts);
+    }
     ImageToken {
         name: id.to_string(),
         image: String::new(),
         tip: Tip::new(id.to_string()),
+    }
+}
+
+/// A location or gate card: its kind as name, its encounters in the bubble.
+fn encounter_card<'t>(
+    name: &str,
+    image: &str,
+    texts: impl Iterator<Item = &'t String>,
+) -> ImageToken {
+    ImageToken {
+        name: name.to_owned(),
+        image: image.to_owned(),
+        tip: texts.fold(Tip::new(name.to_owned()), |tip, text| {
+            tip.line(text.clone())
+        }),
     }
 }

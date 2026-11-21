@@ -31,6 +31,8 @@ pub struct Outcome {
     pub answers: Vec<usize>,
     /// The journal, in French.
     pub events: Vec<String>,
+    /// Cards drawn, dice rolled and combats, beside the journal lines.
+    pub shown: Vec<crate::shown::Shown>,
     /// Cards and encounter paragraphs played (keys of [`crate::coverage_keys`]).
     pub covered: std::collections::BTreeSet<String>,
     /// Counts of notable events.
@@ -87,6 +89,7 @@ pub fn play(
         status,
         answers: game.answers,
         events: game.events,
+        shown: game.shown,
         covered: game.covered,
         tally: game.tally,
     })

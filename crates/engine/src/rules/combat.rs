@@ -4,8 +4,9 @@ use data::{CheckKind, Moment, MonsterAbility, MonsterId, MonsterTrait, Resource}
 
 use crate::decision::{Choice, Context, DecisionKind};
 use crate::game::{Game, option};
-use crate::halt::Flow;
+use crate::halt::{Flow, Halt};
 use crate::rules::monster_stats::MonsterStats;
+use crate::shown::{CombatEnd, Exhibit};
 
 /// How facing a monster ended.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -103,7 +104,27 @@ impl Gear {
 
 impl Game<'_> {
     /// Tries to evade a monster; a failure hurts and starts the combat.
+    /// The start and the end are noted for the journal.
     pub fn evade_or_fight(&mut self, seat: usize, monster: &MonsterId, fight: bool) -> Flow<Faced> {
+        self.show(Exhibit::CombatStart {
+            seat,
+            foe: monster.clone(),
+        });
+        let result = self.face_monster(seat, monster, fight);
+        let end = match &result {
+            Ok(Faced::Evaded) => CombatEnd::Evaded,
+            Ok(Faced::Defeated) => CombatEnd::Defeated,
+            Ok(Faced::Fled) => CombatEnd::Fled,
+            Err(Halt::KnockedOut(knocked)) if *knocked == seat => CombatEnd::KnockedOut,
+            Err(Halt::Waiting(_) | Halt::Illegal { .. }) => return result,
+            Err(_) => CombatEnd::Stopped,
+        };
+        self.show(Exhibit::CombatEnd { seat, end });
+        result
+    }
+
+    /// Evading, then the combat if it failed or was not tried.
+    fn face_monster(&mut self, seat: usize, monster: &MonsterId, fight: bool) -> Flow<Faced> {
         let stats = self.monster_stats(monster)?;
         if !fight {
             self.log(format!(

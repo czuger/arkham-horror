@@ -6,6 +6,7 @@ use crate::decision::{Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::stats::of_check;
+use crate::shown::Exhibit;
 
 /// Result of a check.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -102,16 +103,17 @@ impl Game<'_> {
 
     /// Rolls dice and counts successes.
     pub fn roll_dice(&mut self, seat: usize, dice: u32) -> u32 {
-        let face = self.success_face(seat);
-        let six = if self.scratch.sixes_double { 2 } else { 1 };
-        (0..dice)
-            .map(|_| self.die())
-            .map(|value| match value {
-                6 => six,
-                value if value >= face => 1,
-                _ => 0,
-            })
-            .sum()
+        let success_from = self.success_face(seat);
+        let sixes_double = self.scratch.sixes_double;
+        let faces: Vec<u8> = (0..dice).map(|_| self.die()).collect();
+        let successes = Exhibit::successes(&faces, success_from, sixes_double);
+        self.show(Exhibit::Dice {
+            seat,
+            faces,
+            success_from,
+            sixes_double,
+        });
+        successes
     }
 
     /// Offers clue tokens one at a time while the check fails.

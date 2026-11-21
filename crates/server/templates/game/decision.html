@@ -5,6 +5,8 @@
   {% if !decision.hint.is_empty() %}<p class="hint">{{ decision.hint }}</p>{% endif %}
   {% if decision.on_sheet %}
   <p><a class="on-sheet" href="/partie/{{ id }}/investigateurs">Répondre sur votre fiche d'investigateur</a></p>
+  {% else if decision.in_combat %}
+  <p><a class="in-combat button" href="/partie/{{ id }}/combat">Aller à la page du combat</a></p>
   {% else %}
   <form id="decision" method="post" action="/partie/{{ id }}/reponse">
     <input type="hidden" name="coup" value="{{ decision.move_number }}">
@@ -19,7 +21,6 @@
   {% endif %}
 {% endif %}
   <p class="tools">
-    <a href="/partie/{{ id }}/journal">Journal complet</a>
     <span class="seed">Graine {{ seed }}</span>
     {% if can_undo %}
     <form method="post" action="/partie/{{ id }}/annuler" class="inline">

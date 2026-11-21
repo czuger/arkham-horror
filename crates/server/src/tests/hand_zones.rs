@@ -25,7 +25,7 @@ impl Responder for StopAt {
 }
 
 fn arming(decision: &Decision) -> bool {
-    crate::views::on_sheet(decision)
+    crate::views::prepares_combat(decision)
         && decision
             .options
             .iter()
@@ -33,7 +33,7 @@ fn arming(decision: &Decision) -> bool {
 }
 
 fn armed(decision: &Decision) -> bool {
-    crate::views::on_sheet(decision)
+    crate::views::prepares_combat(decision)
         && decision
             .options
             .iter()

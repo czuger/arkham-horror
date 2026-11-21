@@ -5,6 +5,7 @@ use data::{MonsterAbility, MonsterId, WeaponKind};
 use super::{clean_state, hold, run};
 use crate::rules::combat::Faced;
 use crate::rules::combat_gear::reduced_bonus;
+use crate::shown::{CombatEnd, Exhibit};
 
 #[test]
 fn resistance_halves_rounding_up_and_immunity_cancels() {
@@ -153,4 +154,39 @@ fn freed_hands_are_offered_again() {
     let inv = &state.investigators[0];
     assert_eq!(inv.in_hand, vec![data::CardId::new("revolver_38")]);
     assert!(!inv.holds(&data::CardId::new("dynamite")));
+}
+
+#[test]
+fn a_combat_is_shown_with_its_start_its_dice_and_its_end() {
+    let mut state = clean_state(1, "azathoth");
+    // Same zombie as above: evade fails, horror passes, attack passes.
+    let dice = [1, 1, 1, 1, 6, 1, 6];
+    let (result, _) = run(&mut state, &[0], &dice, |game| {
+        game.evade_or_fight(0, &MonsterId::new("zombie"), false)?;
+        Ok(game.shown.clone())
+    });
+    let shown = result.expect("combat");
+    let zombie = MonsterId::new("zombie");
+    assert_eq!(
+        shown.first().map(|item| &item.what),
+        Some(&Exhibit::CombatStart {
+            seat: 0,
+            foe: zombie
+        })
+    );
+    assert_eq!(
+        shown.last().map(|item| &item.what),
+        Some(&Exhibit::CombatEnd {
+            seat: 0,
+            end: CombatEnd::Defeated
+        })
+    );
+    let rolls: Vec<&Vec<u8>> = shown
+        .iter()
+        .filter_map(|item| match &item.what {
+            Exhibit::Dice { faces, .. } => Some(faces),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(rolls, [&vec![1, 1, 1, 1], &vec![6, 1], &vec![6]]);
 }

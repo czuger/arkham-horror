@@ -26,6 +26,8 @@ async fn current_page(app: &TestApp, game: &str) -> String {
     let page = app.get(game).await.body;
     if page.contains("class=\"on-sheet\"") {
         app.get(&format!("{game}{SHEET}")).await.body
+    } else if page.contains("class=\"in-combat") {
+        app.get(&format!("{game}/combat")).await.body
     } else {
         page
     }
@@ -303,4 +305,42 @@ async fn a_whole_game_is_played_through_the_forms() {
     );
     assert!(app.get("/").await.body.contains("class=\"over\""));
     println!("{answers} human answers");
+}
+
+/// Cards drawn show in the journal; a monster faced sends to the combat
+/// page, which shows the monster and every die rolled.
+#[tokio::test(flavor = "current_thread")]
+async fn drawn_cards_and_combat_dice_are_shown() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db")).await;
+    let mut cards_seen = false;
+    let mut combat_seen = false;
+    for seed in 1..20 {
+        let form = format!("investigateur=amanda_sharpe&ia=0&graine={seed}");
+        let game = new_game(&app, &form).await;
+        for _ in 0..300 {
+            let page = current_page(&app, &game).await;
+            let Some(coup) = move_number(&page) else {
+                break;
+            };
+            let reply = app
+                .post(&format!("{game}/reponse"), &format!("choix=0&coup={coup}"))
+                .await;
+            if reply.location.as_deref() == Some(&format!("{game}/combat")) {
+                let combat = app.get(&format!("{game}/combat")).await.body;
+                assert!(combat.contains("class=\"foe\""), "{combat}");
+                combat_seen |= combat.contains("class=\"die");
+            }
+            cards_seen |= app
+                .get(&game)
+                .await
+                .body
+                .contains("Carte Mythe</figcaption>");
+            if cards_seen && combat_seen {
+                return;
+            }
+        }
+    }
+    assert!(cards_seen, "no Mythos card shown");
+    assert!(combat_seen, "no combat with dice shown");
 }

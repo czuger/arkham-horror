@@ -5,6 +5,7 @@ use data::{GateCard, GateEncounter, OtherWorldId, Timing};
 use crate::decision::{Choice, DecisionKind};
 use crate::game::{Game, option_with};
 use crate::halt::Flow;
+use crate::shown::{Deck, Exhibit};
 use crate::state::{Phase, Place};
 
 /// Most redraws in a row, so a loop of redraw effects always ends.
@@ -70,6 +71,11 @@ impl<'a> Game<'a> {
             if found.iter().any(|(other, _)| other.id == card.id) {
                 continue;
             }
+            self.show(Exhibit::Card {
+                deck: Deck::Gate,
+                card: card.id.clone(),
+                seat: Some(seat),
+            });
             if let Some(encounter) = Self::world_paragraph(card, world) {
                 found.push((card, encounter));
             }

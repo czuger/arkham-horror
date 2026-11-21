@@ -5,6 +5,7 @@ use data::{CardId, LocationCard, LocationEncounter, LocationId, Timing};
 use crate::decision::{Choice, DecisionKind};
 use crate::game::{Game, option, option_with};
 use crate::halt::Flow;
+use crate::shown::{Deck, Exhibit};
 use crate::state::Place;
 
 /// Most redraws in a row, so a loop of redraw effects always ends.
@@ -60,6 +61,11 @@ impl<'a> Game<'a> {
                     .iter()
                     .any(|other: &&LocationCard| other.id == card.id)
             {
+                self.show(Exhibit::Card {
+                    deck: Deck::Location,
+                    card: card.id.clone(),
+                    seat: Some(seat),
+                });
                 drawn.push(card);
             }
         }

@@ -4,6 +4,7 @@ use data::{CardId, EnvironmentKind, LocationId, MythosCard, MythosKind, Ongoing}
 
 use crate::game::Game;
 use crate::halt::Flow;
+use crate::shown::{Deck, Exhibit};
 use crate::state::{MonsterPlace, Phase, Place};
 
 impl<'a> Game<'a> {
@@ -33,6 +34,11 @@ impl<'a> Game<'a> {
             }
             let id = self.state.mythos_deck.remove(0);
             let card = self.mythos_card(&id)?;
+            self.show(Exhibit::Card {
+                deck: Deck::Mythos,
+                card: id.clone(),
+                seat: None,
+            });
             if card.kind != MythosKind::Reshuffle {
                 return Ok(Some(card));
             }
