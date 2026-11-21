@@ -1,5 +1,8 @@
 <section class="board" aria-label="Plateau">
   <img src="/assets/{{ board.image }}" alt="Plateau d'Arkham" width="1064" height="1576">
+  {% for panel in board.panels %}
+  <span class="panel tip {{ panel.edge }}" tabindex="0" aria-label="{{ panel.name }}" style="left: {{ panel.left }}; top: {{ panel.top }}; width: {{ panel.width }}; height: {{ panel.height }}">{{ panel.tip|safe }}</span>
+  {% endfor %}
   {% for spot in board.spots %}
   <div class="spot{% if !spot.choices.is_empty() %} choice{% endif %} {{ spot.edge }}" style="left: {{ spot.left }}; top: {{ spot.top }}">
     {% for (index, label) in spot.choices %}
@@ -15,4 +18,9 @@
     </div>
   </div>
   {% endfor %}
+  {% if let Some(terror) = board.terror %}
+  <div class="spot terror-track west north" style="left: {{ terror.left }}; top: {{ terror.top }}">
+    <span class="tip" tabindex="0"><img class="terror" src="/assets/{{ terror.image }}" alt="Terreur : {{ terror.level }}">{{ terror.tip|safe }}</span>
+  </div>
+  {% endif %}
 </section>

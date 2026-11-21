@@ -74,6 +74,29 @@ pub fn gate(world: &str, place: &str, close_modifier: i8) -> Tip {
         .line(format!("Modificateur pour le fermer : {close_modifier:+}"))
 }
 
+/// The terror level and what it has done or will do to the town.
+pub fn terror(data: &GameData, level: u8) -> Tip {
+    let mut closings: Vec<(u8, &str)> = data
+        .board
+        .locations
+        .iter()
+        .filter_map(|l| l.closes_at_terror.map(|at| (at, l.name.as_str())))
+        .collect();
+    closings.sort_unstable();
+    let tip = Tip::new(format!("Terreur : {level}"))
+        .line("Chaque hausse : un Allié quitte la ville".to_owned());
+    let tip = closings.into_iter().fold(tip, |tip, (at, name)| {
+        let state = if level >= at { "fermé" } else { "ferme" };
+        tip.line(format!("{name} : {state} à {at}"))
+    });
+    let limit = if level >= 10 {
+        "Limite de monstres levée ; chaque nouvelle hausse ajoute 1 Destin"
+    } else {
+        "À 10 : plus de limite de monstres ; chaque hausse ajoute 1 Destin"
+    };
+    tip.line(limit.to_owned())
+}
+
 /// The Ancient One sheet: combat rating, defenses, worshippers, power, attack.
 pub fn ancient_one(sheet: &AncientOne) -> Tip {
     let rating = match sheet.combat_rating {

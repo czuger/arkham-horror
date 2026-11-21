@@ -5,15 +5,11 @@ use crate::views::names::{ancient_one, card};
 use crate::views::tip::Tip;
 use crate::views::tips;
 
-/// The state of the town: Ancient One, doom, terror, gates, cards in play.
+/// The state of the town: Ancient One, gates, monsters, cards in play.
 #[derive(Debug, Clone)]
 pub struct StatusView {
     /// The Ancient One: name and sheet image.
     pub ancient_one: ImageToken,
-    /// Doom tokens, and the length of the doom track.
-    pub doom: (u8, u8),
-    /// Terror level.
-    pub terror: u8,
     /// Turn number.
     pub turn: u32,
     /// Phase being played.
@@ -54,8 +50,6 @@ impl StatusView {
                     tips::ancient_one,
                 ),
             },
-            doom: (state.doom, sheet.map_or(0, |s| s.doom_track)),
-            terror: state.terror,
             turn: state.turn,
             phase: state.phase.label(),
             gates: state.gates.len(),

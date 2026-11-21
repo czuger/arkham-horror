@@ -1,9 +1,10 @@
-//! Pixel positions on the board image.
+//! Pixel positions on the board and sheet images.
 
 use serde::{Deserialize, Serialize};
 
-/// A point on the board image (`assets/plateau/arkham.jpg`, 1064×1576), in pixels
-/// from the top-left corner. Used only for display.
+/// A point on an image (the board `assets/plateau/arkham.jpg`, 1064×1576, or
+/// an Ancient One sheet), in pixels from the top-left corner. Used only for
+/// display.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Position {
     /// Horizontal coordinate.

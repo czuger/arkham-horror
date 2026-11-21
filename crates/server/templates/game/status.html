@@ -1,9 +1,7 @@
 <section class="status">
   <h2>Arkham — tour {{ status.turn }}, {{ status.phase }}</h2>
   <ul class="facts">
-    <li>Grand Ancien : <span class="tip" tabindex="0">{% if status.ancient_one.image.is_empty() %}{{ status.ancient_one.name }}{% else %}<a href="/assets/{{ status.ancient_one.image }}" target="_blank">{{ status.ancient_one.name }}</a>{% endif %}{{ status.ancient_one.tip|safe }}</span></li>
-    <li>Destin : {{ status.doom.0 }} / {{ status.doom.1 }}</li>
-    <li>Terreur : {{ status.terror }}</li>
+    <li>Grand Ancien : <span class="tip" tabindex="0"><a href="/partie/{{ id }}/grand-ancien">{{ status.ancient_one.name }}</a>{{ status.ancient_one.tip|safe }}</span></li>
     <li>Portails ouverts : {{ status.gates }} · Sceaux : {{ status.seals }}</li>
     <li>Monstres : {{ status.monsters.0 }} / {{ status.monsters.1 }} · Périphérie : {{ status.outskirts }}</li>
     {% if let Some(card) = status.environment %}<li>Environnement : <span class="tip" tabindex="0"><a href="/assets/{{ card.image }}" target="_blank">{{ card.name }}</a>{{ card.tip|safe }}</span></li>{% endif %}

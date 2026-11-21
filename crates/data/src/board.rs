@@ -7,6 +7,7 @@ use crate::location::Location;
 use crate::other_world::OtherWorld;
 use crate::special_area::{SpecialArea, SpecialAreaKind};
 use crate::street::Street;
+use crate::terror_track::TerrorTrack;
 
 /// Content of `data/board.ron`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -24,11 +25,13 @@ pub struct Board {
     pub other_worlds: Vec<OtherWorld>,
     /// Outskirts, Sky, Lost in Time and Space, Jail Cell.
     pub special_areas: Vec<SpecialArea>,
+    /// The terror track.
+    pub terror_track: TerrorTrack,
 }
 
 impl Board {
     /// Format version this code reads.
-    pub const VERSION: u32 = 1;
+    pub const VERSION: u32 = 2;
 
     /// Finds a location by id.
     pub fn location(&self, id: &LocationId) -> Option<&Location> {

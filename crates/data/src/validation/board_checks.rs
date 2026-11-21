@@ -4,6 +4,7 @@ use std::collections::HashSet;
 
 use crate::board::Board;
 use crate::special_area::SpecialAreaKind;
+use crate::terror_track::TerrorTrack;
 use crate::validation::issue::Issue;
 
 /// Runs every board check and appends the problems found to `issues`.
@@ -15,6 +16,7 @@ pub(crate) fn check_board(board: &Board, issues: &mut Vec<Issue>) {
     check_districts(board, issues);
     check_other_worlds(board, issues);
     check_special_areas(board, issues);
+    check_terror_track(board, issues);
 }
 
 /// Reports ids used twice within the same family.
@@ -144,6 +146,16 @@ fn check_special_areas(board: &Board, issues: &mut Vec<Issue>) {
     }
 }
 
+/// The terror track has one space per level, 0 to 10.
+fn check_terror_track(board: &Board, issues: &mut Vec<Issue>) {
+    if board.terror_track.spaces.len() != TerrorTrack::SPACES {
+        issues.push(Issue::Mismatch {
+            context: "échelle de Terreur".to_owned(),
+            reason: "il faut 11 cases, de 0 à 10",
+        });
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -151,6 +163,7 @@ mod tests {
     use crate::location::{Location, Stability};
     use crate::other_world::{EncounterColor, OtherWorld};
     use crate::position::Position;
+    use crate::rect::Rect;
     use crate::special_area::SpecialArea;
     use crate::street::Street;
 
@@ -175,6 +188,13 @@ mod tests {
             stability: Stability::Stable,
             ability: None,
             closes_at_terror: None,
+            icons: Vec::new(),
+            panel: Rect {
+                x: 0,
+                y: 0,
+                width: 1,
+                height: 1,
+            },
             position: ORIGIN,
         }
     }
@@ -190,7 +210,7 @@ mod tests {
     /// Two linked streets with one location each: passes every check.
     fn small_board() -> Board {
         Board {
-            version: 1,
+            version: Board::VERSION,
             image: String::new(),
             streets: vec![street("a", "b"), street("b", "a")],
             locations: vec![location("la", "a"), location("lb", "b")],
@@ -207,6 +227,10 @@ mod tests {
                 special(SpecialAreaKind::LostInTimeAndSpace),
                 special(SpecialAreaKind::JailCell),
             ],
+            terror_track: TerrorTrack {
+                marker: String::new(),
+                spaces: vec![ORIGIN; TerrorTrack::SPACES],
+            },
         }
     }
 

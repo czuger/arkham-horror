@@ -9,9 +9,13 @@
 //   noires dans l'autre (Quartier Nord → Centre-Ville → Quartier Est → …).
 // - Positions en pixels sur l'image 1064×1576, approximatives (à affiner au jalon J5).
 // - Autres Mondes : l'image est tournée ; la 1re zone est en bas, la 2e en haut.
+// - Lieux : `icons` = icônes de rencontre imprimées de part et d'autre de
+//   l'image (gauche puis droite), `sure: true` = couleurs inversées (moyen sûr) ;
+//   `position` = centre de l'icône. `panel` = zone blanche (nom et texte).
+//   Relevés le 21/11/2026 sur l'image, à vérifier sur le plateau réel.
 #![enable(implicit_some)]
 Board(
-    version: 1,
+    version: 2,
     image: "plateau/arkham.jpg",
     streets: [
         (
@@ -94,6 +98,11 @@ Board(
             name: "Gare",
             street: "northside",
             stability: Stable,
+            icons: [
+                (kind: UniqueItem, position: (x: 137, y: 94)),
+                (kind: CommonItem, position: (x: 205, y: 94)),
+            ],
+            panel: (x: 123, y: 102, width: 96, height: 16),
             position: (x: 165, y: 55),
         ),
         (
@@ -101,6 +110,11 @@ Board(
             name: "Journal",
             street: "northside",
             stability: Stable,
+            icons: [
+                (kind: Money, position: (x: 42, y: 208)),
+                (kind: Clue, position: (x: 110, y: 208)),
+            ],
+            panel: (x: 26, y: 216, width: 101, height: 17),
             position: (x: 75, y: 175),
         ),
         (
@@ -116,6 +130,11 @@ Board(
                 ],
             ),
             closes_at_terror: 6,
+            icons: [
+                (kind: UniqueItem, sure: true, position: (x: 38, y: 329)),
+                (kind: CommonItem, position: (x: 106, y: 329)),
+            ],
+            panel: (x: 20, y: 337, width: 104, height: 60),
             position: (x: 75, y: 300),
         ),
         // Centre-Ville
@@ -131,6 +150,11 @@ Board(
                     TakeCard(card: "bank_loan"),
                 ],
             ),
+            icons: [
+                (kind: Money, sure: true, position: (x: 282, y: 93)),
+                (kind: Blessing, position: (x: 350, y: 93)),
+            ],
+            panel: (x: 255, y: 81, width: 126, height: 73),
             position: (x: 315, y: 60),
         ),
         (
@@ -148,6 +172,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: Sanity, sure: true, position: (x: 428, y: 90)),
+                (kind: Clue, position: (x: 496, y: 90)),
+            ],
+            panel: (x: 395, y: 79, width: 132, height: 109),
             position: (x: 460, y: 60),
         ),
         (
@@ -155,6 +184,11 @@ Board(
             name: "Square de l'Indépendance",
             street: "downtown",
             stability: Unstable,
+            icons: [
+                (kind: Clue, position: (x: 572, y: 89)),
+                (kind: UniqueItem, position: (x: 642, y: 89)),
+            ],
+            panel: (x: 545, y: 94, width: 122, height: 18),
             position: (x: 605, y: 55),
         ),
         // Quartier Est
@@ -163,6 +197,11 @@ Board(
             name: "Relais Routier de Hibb",
             street: "easttown",
             stability: Unstable,
+            icons: [
+                (kind: Money, position: (x: 576, y: 245)),
+                (kind: CommonItem, position: (x: 644, y: 245)),
+            ],
+            panel: (x: 557, y: 253, width: 107, height: 15),
             position: (x: 605, y: 205),
         ),
         (
@@ -170,6 +209,11 @@ Board(
             name: "Restaurant de Velma",
             street: "easttown",
             stability: Stable,
+            icons: [
+                (kind: Money, position: (x: 726, y: 243)),
+                (kind: Stamina, position: (x: 794, y: 243)),
+            ],
+            panel: (x: 707, y: 251, width: 106, height: 15),
             position: (x: 760, y: 205),
         ),
         (
@@ -188,6 +232,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: CommonItem, position: (x: 729, y: 375)),
+                (kind: Clue, position: (x: 797, y: 375)),
+            ],
+            panel: (x: 709, y: 383, width: 108, height: 82),
             position: (x: 760, y: 350),
         ),
         // Quartier Marchand
@@ -196,6 +245,11 @@ Board(
             name: "Île Inexplorée",
             street: "merchant_district",
             stability: Unstable,
+            icons: [
+                (kind: Clue, position: (x: 34, y: 522)),
+                (kind: Spell, position: (x: 102, y: 522)),
+            ],
+            panel: (x: 17, y: 530, width: 103, height: 17),
             position: (x: 70, y: 485),
         ),
         (
@@ -213,6 +267,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: Money, sure: true, position: (x: 33, y: 646)),
+                (kind: CommonItem, position: (x: 101, y: 646)),
+            ],
+            panel: (x: 15, y: 654, width: 104, height: 61),
             position: (x: 70, y: 610),
         ),
         (
@@ -220,6 +279,11 @@ Board(
             name: "L'Innommable",
             street: "merchant_district",
             stability: Unstable,
+            icons: [
+                (kind: UniqueItem, position: (x: 178, y: 706)),
+                (kind: Clue, position: (x: 246, y: 706)),
+            ],
+            panel: (x: 159, y: 714, width: 107, height: 23),
             position: (x: 215, y: 665),
         ),
         // Quartier de la Rivière
@@ -228,6 +292,11 @@ Board(
             name: "Cimetière",
             street: "rivertown",
             stability: Unstable,
+            icons: [
+                (kind: Clue, position: (x: 731, y: 577)),
+                (kind: UniqueItem, position: (x: 799, y: 577)),
+            ],
+            panel: (x: 711, y: 572, width: 109, height: 28),
             position: (x: 765, y: 545),
         ),
         (
@@ -235,6 +304,11 @@ Board(
             name: "Caverne Noire",
             street: "rivertown",
             stability: Unstable,
+            icons: [
+                (kind: CommonItem, position: (x: 730, y: 708)),
+                (kind: Spell, position: (x: 801, y: 708)),
+            ],
+            panel: (x: 709, y: 704, width: 111, height: 28),
             position: (x: 765, y: 665),
         ),
         (
@@ -250,6 +324,11 @@ Board(
                 ],
             ),
             closes_at_terror: 3,
+            icons: [
+                (kind: Money, position: (x: 559, y: 698)),
+                (kind: CommonItem, sure: true, position: (x: 626, y: 698)),
+            ],
+            panel: (x: 526, y: 700, width: 126, height: 78),
             position: (x: 590, y: 670),
         ),
         // Université Miskatonic
@@ -268,6 +347,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: Clue, sure: true, position: (x: 34, y: 826)),
+                (kind: UniqueItem, position: (x: 100, y: 826)),
+            ],
+            panel: (x: 15, y: 819, width: 104, height: 74),
             position: (x: 65, y: 770),
         ),
         (
@@ -283,6 +367,11 @@ Board(
                     Draw(deck: Skill, count: 2, keep: 1),
                 ],
             ),
+            icons: [
+                (kind: Money, position: (x: 113, y: 994)),
+                (kind: Skill, sure: true, position: (x: 181, y: 994)),
+            ],
+            panel: (x: 95, y: 1002, width: 105, height: 59),
             position: (x: 145, y: 960),
         ),
         (
@@ -290,6 +379,11 @@ Board(
             name: "Bibliothèque",
             street: "miskatonic_u",
             stability: Stable,
+            icons: [
+                (kind: UniqueItem, position: (x: 247, y: 952)),
+                (kind: Spell, position: (x: 317, y: 952)),
+            ],
+            panel: (x: 232, y: 962, width: 110, height: 16),
             position: (x: 285, y: 915),
         ),
         // French Hill
@@ -298,6 +392,11 @@ Board(
             name: "La Maison de la Sorcière",
             street: "french_hill",
             stability: Unstable,
+            icons: [
+                (kind: Clue, position: (x: 731, y: 904)),
+                (kind: Spell, position: (x: 799, y: 904)),
+            ],
+            panel: (x: 711, y: 912, width: 109, height: 16),
             position: (x: 765, y: 870),
         ),
         (
@@ -309,6 +408,11 @@ Board(
                 name: "Cœur de la Loge",
                 text: "Si vous êtes Membre du Crépuscule d'Argent, vous regardez alors la notice du Cœur de la Loge quand vous faites une rencontre ici.",
             ),
+            icons: [
+                (kind: UniqueItem, position: (x: 592, y: 979)),
+                (kind: Clue, position: (x: 662, y: 979)),
+            ],
+            panel: (x: 573, y: 972, width: 109, height: 67),
             position: (x: 628, y: 935),
         ),
         // Quartier Résidentiel
@@ -327,6 +431,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: Clue, position: (x: 39, y: 1167)),
+                (kind: Stamina, sure: true, position: (x: 107, y: 1167)),
+            ],
+            panel: (x: 21, y: 1175, width: 104, height: 65),
             position: (x: 70, y: 1130),
         ),
         (
@@ -343,6 +452,11 @@ Board(
                 ],
             ),
             closes_at_terror: 9,
+            icons: [
+                (kind: Spell, sure: true, position: (x: 147, y: 1331)),
+                (kind: UniqueItem, position: (x: 215, y: 1331)),
+            ],
+            panel: (x: 129, y: 1339, width: 104, height: 49),
             position: (x: 178, y: 1305),
         ),
         (
@@ -350,6 +464,11 @@ Board(
             name: "Bois",
             street: "uptown",
             stability: Unstable,
+            icons: [
+                (kind: Money, position: (x: 332, y: 1354)),
+                (kind: CommonItem, position: (x: 400, y: 1354)),
+            ],
+            panel: (x: 313, y: 1362, width: 106, height: 16),
             position: (x: 365, y: 1310),
         ),
         // Quartier Sud
@@ -358,6 +477,11 @@ Board(
             name: "Société des Historiens",
             street: "southside",
             stability: Unstable,
+            icons: [
+                (kind: Skill, position: (x: 502, y: 1357)),
+                (kind: Spell, position: (x: 570, y: 1357)),
+            ],
+            panel: (x: 483, y: 1365, width: 106, height: 15),
             position: (x: 535, y: 1310),
         ),
         (
@@ -376,6 +500,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: Ally, sure: true, position: (x: 730, y: 1130)),
+                (kind: Stamina, position: (x: 798, y: 1130)),
+            ],
+            panel: (x: 710, y: 1138, width: 108, height: 75),
             position: (x: 765, y: 1095),
         ),
         (
@@ -393,6 +522,11 @@ Board(
                     ]),
                 ],
             ),
+            icons: [
+                (kind: Blessing, sure: true, position: (x: 671, y: 1323)),
+                (kind: Sanity, position: (x: 739, y: 1323)),
+            ],
+            panel: (x: 652, y: 1331, width: 106, height: 57),
             position: (x: 705, y: 1275),
         ),
     ],
@@ -460,4 +594,22 @@ Board(
         (kind: LostInTimeAndSpace, name: "Perdu dans le Temps et l'Espace", position: (x: 760, y: 1515)),
         (kind: JailCell, name: "Cellule de Prison", position: (x: 680, y: 425)),
     ],
+    // Échelle de Terreur, en bas à gauche : centre de chaque case, de 0 à 10
+    // (relevé le 21/11/2026 sur l'image du plateau).
+    terror_track: (
+        marker: "marqueurs/pion_terreur.jpg",
+        spaces: [
+            (x: 92, y: 1505),  // 0
+            (x: 138, y: 1490), // 1
+            (x: 190, y: 1485), // 2
+            (x: 245, y: 1487), // 3
+            (x: 297, y: 1492), // 4
+            (x: 345, y: 1512), // 5
+            (x: 115, y: 1533), // 6
+            (x: 166, y: 1523), // 7
+            (x: 218, y: 1523), // 8
+            (x: 272, y: 1526), // 9
+            (x: 322, y: 1538), // 10
+        ],
+    ),
 )

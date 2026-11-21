@@ -94,6 +94,16 @@ main:has(.game) { max-width: none; }
   border: 1px solid #000;
 }
 .gate { width: 30px; height: 30px; border-radius: 50%; }
+.doom-sheet { position: relative; max-width: 451px; }
+.doom-sheet > img { width: 100%; height: auto; display: block; }
+.doom-sheet > img.doom {
+  position: absolute; width: 15%; height: auto; transform: translate(-50%, -50%);
+  border-radius: 50%; box-shadow: 0 0 4px #000;
+}
+.terror {
+  width: 26px; height: auto; border-radius: 50%;
+  border: 2px solid #fff; box-shadow: 0 0 4px #000; display: block;
+}
 .clue {
   min-width: 18px; height: 18px; border-radius: 50%;
   background: #2e8b57; color: #fff; font: bold 11px sans-serif;
@@ -151,3 +161,20 @@ table.sliders td.here { background: #f0d9b5; font-weight: bold; }
 .spot.east .tip > .bubble { left: auto; right: 0; transform: none; }
 .spot.north .tip > .bubble { top: auto; bottom: calc(100% + 4px); }
 .side .tip > .bubble { left: 0; transform: none; }
+
+/* Location white areas: invisible hover zones over the board image. */
+.panel { position: absolute; border-radius: 3px; }
+.panel:hover, .panel:focus { z-index: 10; box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.8); outline: none; }
+.panel.west > .bubble { left: 0; transform: none; }
+.panel.east > .bubble { left: auto; right: 0; transform: none; }
+.panel.north > .bubble { top: auto; bottom: calc(100% + 4px); }
+.tip > .place-bubble { width: 20rem; }
+.place-bubble .diamond { font-size: 1rem; }
+.place-bubble .diamond.stable { color: #3cb371; }
+.place-bubble .diamond.unstable { color: #e04040; }
+.place-bubble .place-ability, .place-bubble .icons-head { margin-top: 0.3rem; }
+.tip > .bubble .icon-line { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+.place-bubble .icon {
+  flex: none; width: 30px; height: 30px; border-radius: 50%;
+  background-repeat: no-repeat; box-shadow: 0 0 0 1px #f4efe4;
+}

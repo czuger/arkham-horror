@@ -3,8 +3,10 @@
 use serde::{Deserialize, Serialize};
 
 use crate::ids::AncientOneId;
+use crate::image_size::ImageSize;
 use crate::monster::MonsterAbility;
 use crate::named_text::NamedText;
+use crate::position::Position;
 
 /// The combat rating printed on an Ancient One sheet.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -46,6 +48,10 @@ pub struct AncientOne {
     pub doom_track: u8,
     /// Sheet image, relative to the `assets/` folder.
     pub image: String,
+    /// Size of the sheet image.
+    pub image_size: ImageSize,
+    /// Centre of each doom track space on the sheet image, from the first one.
+    pub doom_spaces: Vec<Position>,
 }
 
 /// Content of `data/ancient_ones.ron`.
@@ -54,11 +60,13 @@ pub struct AncientOne {
 pub struct AncientOnes {
     /// Format version of the file.
     pub version: u32,
+    /// Doom token image, relative to the `assets/` folder.
+    pub doom_marker: String,
     /// The sheets.
     pub ancient_ones: Vec<AncientOne>,
 }
 
 impl AncientOnes {
     /// Format version this code reads.
-    pub const VERSION: u32 = 1;
+    pub const VERSION: u32 = 2;
 }

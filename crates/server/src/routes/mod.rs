@@ -1,3 +1,4 @@
+mod ancient_one;
 mod game;
 mod home;
 mod journal;
@@ -5,6 +6,7 @@ mod moves;
 mod new_game;
 mod robots;
 
+pub use ancient_one::ancient_one;
 pub use game::game;
 pub use home::home;
 pub use journal::journal;

@@ -64,6 +64,40 @@ async fn a_new_game_waits_for_the_human() {
 }
 
 #[tokio::test(flavor = "current_thread")]
+async fn the_ancient_one_page_shows_its_sheet() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db"));
+    let game = new_game(&app, NEW_GAME).await;
+    assert!(app.get(&game).await.body.contains("/grand-ancien\""));
+    let page = app.get(&format!("{game}/grand-ancien")).await;
+    assert_eq!(page.status, StatusCode::OK);
+    assert!(
+        page.body.contains("fiches/grands_anciens/"),
+        "{}",
+        page.body
+    );
+    assert_eq!(
+        app.get("/partie/99/grand-ancien").await.status,
+        StatusCode::NOT_FOUND
+    );
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn locations_show_their_text_and_icons_on_hover() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db"));
+    let game = new_game(&app, NEW_GAME).await;
+    let page = app.get(&game).await.body;
+    assert_eq!(page.matches("class=\"panel tip").count(), 26);
+    assert!(
+        page.contains("<b>Prêt Bancaire</b> : Au lieu de faire"),
+        "{page}"
+    );
+    assert!(page.contains("<b>Objet Unique</b> : on y trouve souvent"));
+    assert!(page.contains("Couleurs inversées : moyen sûr"));
+}
+
+#[tokio::test(flavor = "current_thread")]
 async fn answers_move_the_game_on_and_can_be_undone() {
     let dir = temp();
     let app = TestApp::open(&dir.path().join("db"));

@@ -12,15 +12,19 @@ mod dimension_symbol;
 mod game_data;
 mod gate_marker;
 mod ids;
+mod image_size;
 mod investigator;
 mod location;
 mod location_ability;
+mod location_icon;
 mod monster;
 mod named_text;
 mod other_world;
 mod position;
+mod rect;
 mod special_area;
 mod street;
+mod terror_track;
 mod validation;
 
 pub use ancient_one::{AncientOne, AncientOnes, CombatRating};
@@ -41,15 +45,19 @@ pub use gate_marker::{GateMarker, GateMarkers};
 pub use ids::{
     AncientOneId, CardId, InvestigatorId, LocationId, MonsterId, OtherWorldId, SpecialId, StreetId,
 };
+pub use image_size::ImageSize;
 pub use investigator::{
     FixedCard, FixedPossessions, Investigator, Investigators, RandomPossessions, SkillTracks,
 };
 pub use location::{Location, Stability};
 pub use location_ability::LocationAbility;
+pub use location_icon::{EncounterIcon, LocationIcon};
 pub use monster::{Check, Monster, MonsterAbility, Monsters, Movement};
 pub use named_text::NamedText;
 pub use other_world::{EncounterColor, OtherWorld};
 pub use position::Position;
+pub use rect::Rect;
 pub use special_area::{SpecialArea, SpecialAreaKind};
 pub use street::Street;
+pub use terror_track::TerrorTrack;
 pub use validation::Issue;

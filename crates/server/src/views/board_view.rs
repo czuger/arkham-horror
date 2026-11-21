@@ -4,13 +4,13 @@ use data::{GameData, Position, SpecialAreaKind};
 use engine::{Area, Choice, Decision, GameState, MonsterPlace, Place, View};
 
 use crate::session::HUMAN_SEAT;
+use crate::views::board_geometry::{BOARD_SIZE, edge, percent};
 use crate::views::image_token::ImageToken;
+use crate::views::location_panel::LocationPanel;
 use crate::views::names::{initials, investigator_name, monster};
 use crate::views::spot::{InvestigatorToken, Spot};
+use crate::views::terror_pawn::TerrorPawn;
 use crate::views::tips;
-
-/// Size in pixels of the board image the positions in `board.ron` refer to.
-const BOARD_SIZE: (f64, f64) = (1064.0, 1576.0);
 
 /// The board with every token and the places the current decision offers.
 #[derive(Debug, Clone)]
@@ -19,6 +19,10 @@ pub struct BoardView {
     pub image: String,
     /// The places with something to show.
     pub spots: Vec<Spot>,
+    /// The terror marker on its track.
+    pub terror: Option<TerrorPawn>,
+    /// The white area of every location, with its text and icons on hover.
+    pub panels: Vec<LocationPanel>,
 }
 
 impl BoardView {
@@ -39,8 +43,28 @@ impl BoardView {
                 .into_values()
                 .filter(|spot| !spot.is_empty())
                 .collect(),
+            terror: terror_pawn(data, state.terror),
+            panels: data
+                .board
+                .locations
+                .iter()
+                .map(|location| LocationPanel::new(&data.board.image, location))
+                .collect(),
         }
     }
+}
+
+/// The terror marker at its level on the track.
+fn terror_pawn(data: &GameData, level: u8) -> Option<TerrorPawn> {
+    let track = &data.board.terror_track;
+    let position = track.space(level)?;
+    Some(TerrorPawn {
+        level,
+        image: track.marker.clone(),
+        left: percent(position.x, BOARD_SIZE.0),
+        top: percent(position.y, BOARD_SIZE.1),
+        tip: tips::terror(data, level),
+    })
 }
 
 /// The spot of a place, created on first use.
@@ -62,26 +86,6 @@ fn blank(name: String, position: Position) -> Spot {
         edge: edge(position),
         ..Spot::default()
     }
-}
-
-/// Which way the bubbles of a spot open: towards the middle of the board.
-fn edge(position: Position) -> String {
-    let x = f64::from(position.x) / BOARD_SIZE.0;
-    let y = f64::from(position.y) / BOARD_SIZE.1;
-    let horizontal = if x < 0.3 {
-        "west"
-    } else if x > 0.7 {
-        "east"
-    } else {
-        ""
-    };
-    let vertical = if y > 0.5 { "north" } else { "" };
-    format!("{horizontal} {vertical}").trim().to_owned()
-}
-
-/// A pixel coordinate as a CSS percentage of the board size.
-fn percent(pixels: u16, size: f64) -> String {
-    format!("{:.2}%", f64::from(pixels) * 100.0 / size)
 }
 
 /// Key, French name and position of a place on the board image.

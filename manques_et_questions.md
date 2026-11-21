@@ -12,7 +12,7 @@ Depuis le 16/11/2026, les **images** de toutes les cartes et fiches du jeu de ba
 
 | # | Élément | Ce qu'on a | Ce qui manque | Priorité |
 |---|---|---|---|---|
-| M1 | ~~Graphe du plateau~~ | **Fait le 16/11/2026** : `data/board.ron` (lieux, rues, liaisons, flèches, Autres Mondes, cases spéciales, positions approximatives). Relevé sur l'image : à vérifier sur ton plateau. Icônes de rencontre non saisies (inutiles au moteur). | — | 🟢 |
+| M1 | ~~Graphe du plateau~~ | **Fait le 16/11/2026** : `data/board.ron` (lieux, rues, liaisons, flèches, Autres Mondes, cases spéciales, positions approximatives). Relevé sur l'image : à vérifier sur ton plateau. Icônes de rencontre saisies le 21/11/2026 (`icons`, avec leur position sur l'image, et la zone blanche `panel` de chaque lieu) pour les bulles de survol ; à vérifier sur ton plateau. | — | 🟢 |
 | M2 | Cartes Lieu (63) | images dans `assets/cartes/lieu/` | texte des rencontres | 🔴 |
 | M3 | Cartes Portail (49) | images dans `assets/cartes/portail/` | texte des rencontres | 🔴 |
 | M4 | Cartes Mythe (67) | images dans `assets/cartes/mythe/` | type, lieu du portail, lieu de l'Indice, flèches de mouvement, effet | 🔴 |
@@ -33,7 +33,7 @@ Manques nouveaux, constatés en préparant le plan :
 | # | Élément | Détail | Priorité |
 |---|---|---|---|
 | M21 | ~~**Nombres d'exemplaires**~~ | **Comblé le 16/11/2026** : contenu de la boîte et répartition par carte des sorts, objets uniques et monstres fournis par l'utilisateur (voir ci-dessous). Seuls les objets communs restent supposés à 2 exemplaires chacun. | 🟢 |
-| M22 | **Symboles** | Icônes de rencontre, symboles de dimension, lieu stable/instable, récompenses et pénalités : absents de l'aspiration (voir `assets/inventaire_assets.md` « Manquants »). Le moteur peut s'en passer (ce sont des données, pas des images), mais l'interface devra les redessiner ou s'en passer. | 🟢 |
+| M22 | **Symboles** | Icônes de rencontre, symboles de dimension, lieu stable/instable, récompenses et pénalités : absents de l'aspiration (voir `assets/inventaire_assets.md` « Manquants »). Le moteur peut s'en passer (ce sont des données, pas des images), mais l'interface devra les redessiner ou s'en passer. Icônes de rencontre : l'interface les découpe dans l'image du plateau (21/11/2026). | 🟢 |
 | M23 | **Dos des cartes Mythe** et pions des investigateurs | absents. L'interface utilisera un rectangle de couleur à la place. | 🟢 |
 | M24 | ~~Couleurs de rencontre des Autres Mondes~~ | **Vérifié le 16/11/2026** : les pages du wiki et le plateau concordent pour les 8 mondes. | — | 🟢 |
 

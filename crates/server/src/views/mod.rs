@@ -1,17 +1,23 @@
+mod board_geometry;
 mod board_view;
 mod decision_view;
+mod doom_track_view;
 mod image_token;
 mod journal_view;
+mod location_panel;
+mod location_tip;
 mod names;
 mod party_row;
 mod sheet_view;
 mod spot;
 mod status_view;
+mod terror_pawn;
 mod tip;
 mod tips;
 
 pub use board_view::BoardView;
 pub use decision_view::DecisionView;
+pub use doom_track_view::DoomTrackView;
 pub use journal_view::JournalView;
 pub use names::{investigator_name, sheet};
 pub use party_row::PartyRow;

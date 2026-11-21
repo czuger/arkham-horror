@@ -4,7 +4,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::ids::{LocationId, StreetId};
 use crate::location_ability::LocationAbility;
+use crate::location_icon::LocationIcon;
 use crate::position::Position;
+use crate::rect::Rect;
 
 /// Whether gates can open at a location.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -36,6 +38,10 @@ pub struct Location {
     /// Terror level at which the location closes for good, if any.
     #[serde(default)]
     pub closes_at_terror: Option<u8>,
+    /// Encounter icons printed beside the picture.
+    pub icons: Vec<LocationIcon>,
+    /// The white area under the picture (name, and ability text if any).
+    pub panel: Rect,
     /// Display position on the board image.
     pub position: Position,
 }

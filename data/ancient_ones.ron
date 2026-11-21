@@ -7,9 +7,12 @@
 // Précisions de la FAQ (regles/base.md §23.11) : « tant qu'il est plongé dans son
 // sommeil » vaut toute la partie, Bataille finale comprise ; Yog-Sothoth demande
 // 2 succès pour fermer un portail, le scellement coûte toujours 5 Indices.
+// Cases de l'échelle du destin : centre de chaque case, de 1 au réveil, en
+// pixels sur l'image de la fiche (relevé le 21/11/2026).
 #![enable(implicit_some)]
 AncientOnes(
-    version: 1,
+    version: 2,
+    doom_marker: "marqueurs/pion_destin.jpg",
     ancient_ones: [
         (
             id: "azathoth",
@@ -23,6 +26,12 @@ AncientOnes(
             attack: "C'est la fin ! Azathoth a détruit le monde.",
             doom_track: 14,
             image: "fiches/grands_anciens/azathoth.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 50, y: 465), (x: 142, y: 465), (x: 228, y: 465), (x: 313, y: 465), (x: 397, y: 465),
+                (x: 99, y: 520), (x: 182, y: 520), (x: 268, y: 520), (x: 353, y: 520), (x: 50, y: 575),
+                (x: 142, y: 575), (x: 228, y: 575), (x: 313, y: 575), (x: 397, y: 575),
+            ],
         ),
         (
             id: "cthulhu",
@@ -37,6 +46,12 @@ AncientOnes(
             attack: "Chaque investigateur diminue de 1 son maximum de Santé Mentale ou de Résistance (à son choix). Après les attaques de Cthulhu, on met 1 pion destin sur son échelle de destin si elle n'est pas déjà remplie.",
             doom_track: 13,
             image: "fiches/grands_anciens/cthulhu.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 99, y: 465), (x: 183, y: 465), (x: 266, y: 465), (x: 350, y: 465), (x: 57, y: 520),
+                (x: 140, y: 520), (x: 224, y: 520), (x: 308, y: 520), (x: 393, y: 520), (x: 97, y: 577),
+                (x: 180, y: 577), (x: 265, y: 577), (x: 350, y: 577),
+            ],
         ),
         (
             id: "hastur",
@@ -52,6 +67,12 @@ AncientOnes(
             attack: "Chaque investigateur doit réussir un test de Chance (+1) ou perdre 2 Santé Mentale. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
             doom_track: 13,
             image: "fiches/grands_anciens/hastur.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 99, y: 465), (x: 183, y: 465), (x: 266, y: 465), (x: 350, y: 465), (x: 57, y: 520),
+                (x: 140, y: 520), (x: 224, y: 520), (x: 308, y: 520), (x: 393, y: 520), (x: 97, y: 577),
+                (x: 180, y: 577), (x: 265, y: 577), (x: 350, y: 577),
+            ],
         ),
         (
             id: "ithaqua",
@@ -66,6 +87,12 @@ AncientOnes(
             attack: "Chaque investigateur doit réussir un test de Vigueur (+1) ou perdre 2 Résistance. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
             doom_track: 11,
             image: "fiches/grands_anciens/ithaqua.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 99, y: 463), (x: 183, y: 463), (x: 266, y: 463), (x: 350, y: 463), (x: 140, y: 520),
+                (x: 224, y: 520), (x: 308, y: 520), (x: 99, y: 576), (x: 183, y: 576), (x: 266, y: 576),
+                (x: 350, y: 576),
+            ],
         ),
         (
             id: "nyarlathotep",
@@ -81,6 +108,12 @@ AncientOnes(
             attack: "Chaque investigateur doit réussir un test de Savoir (+1) ou perdre 1 pion Indice. Un investigateur qui se retrouve sans pion Indice est dévoré. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
             doom_track: 11,
             image: "fiches/grands_anciens/nyarlathotep.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 99, y: 463), (x: 183, y: 463), (x: 266, y: 463), (x: 350, y: 463), (x: 140, y: 520),
+                (x: 224, y: 520), (x: 308, y: 520), (x: 99, y: 576), (x: 183, y: 576), (x: 266, y: 576),
+                (x: 350, y: 576),
+            ],
         ),
         (
             id: "shub_niggurath",
@@ -96,6 +129,12 @@ AncientOnes(
             attack: "Chaque investigateur doit réussir un test de Discrétion (+1) ou perdre 1 trophée de monstre. Un investigateur qui se retrouve sans trophée de monstre est dévoré. Le modificateur décroît de 1 à chaque tour.",
             doom_track: 12,
             image: "fiches/grands_anciens/shub_niggurath.jpg",
+            image_size: (width: 752, height: 1044),
+            doom_spaces: [
+                (x: 227, y: 770), (x: 372, y: 770), (x: 515, y: 770), (x: 155, y: 865), (x: 300, y: 865),
+                (x: 442, y: 865), (x: 587, y: 865), (x: 85, y: 965), (x: 227, y: 965), (x: 372, y: 965),
+                (x: 515, y: 965), (x: 660, y: 965),
+            ],
         ),
         (
             id: "yig",
@@ -110,6 +149,11 @@ AncientOnes(
             attack: "Chaque investigateur doit réussir un test de Vitesse (+1) ou perdre 1 Santé Mentale et 1 Résistance. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
             doom_track: 10,
             image: "fiches/grands_anciens/yig.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 59, y: 505), (x: 142, y: 505), (x: 228, y: 505), (x: 313, y: 505), (x: 397, y: 505),
+                (x: 59, y: 572), (x: 142, y: 572), (x: 228, y: 572), (x: 313, y: 572), (x: 397, y: 572),
+            ],
         ),
         (
             id: "yog_sothoth",
@@ -125,6 +169,12 @@ AncientOnes(
             attack: "Chaque investigateur doit réussir un test de Volonté (+1) ou perdre 1 trophée de portail. Un investigateur qui se retrouve sans trophée de portail est dévoré. Le modificateur de ce test diminue de 1 à chaque tour (+0 au deuxième tour, -1 au troisième, etc.).",
             doom_track: 12,
             image: "fiches/grands_anciens/yog_sothoth.jpg",
+            image_size: (width: 451, height: 620),
+            doom_spaces: [
+                (x: 140, y: 465), (x: 224, y: 465), (x: 308, y: 465), (x: 99, y: 520), (x: 183, y: 520),
+                (x: 266, y: 520), (x: 350, y: 520), (x: 57, y: 576), (x: 140, y: 576), (x: 224, y: 576),
+                (x: 308, y: 576), (x: 393, y: 576),
+            ],
         ),
     ],
 )

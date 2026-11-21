@@ -5,7 +5,8 @@ use crate::monster::MonsterAbility;
 use crate::validation::board_checks::report_duplicates;
 use crate::validation::issue::Issue;
 
-/// Ids are unique, defenses are resistances or immunities, doom tracks are not empty.
+/// Ids are unique, defenses are resistances or immunities, doom tracks are not
+/// empty and have one drawn space per token.
 pub(crate) fn check_ancient_ones(ancient_ones: &AncientOnes, issues: &mut Vec<Issue>) {
     report_duplicates(
         "Grand Ancien",
@@ -24,6 +25,12 @@ pub(crate) fn check_ancient_ones(ancient_ones: &AncientOnes, issues: &mut Vec<Is
         if sheet.doom_track == 0 {
             issues.push(Issue::Zero {
                 context: format!("échelle du destin de « {} »", sheet.id),
+            });
+        }
+        if sheet.doom_spaces.len() != usize::from(sheet.doom_track) {
+            issues.push(Issue::Mismatch {
+                context: format!("échelle du destin de « {} »", sheet.id),
+                reason: "il faut une case par pion destin",
             });
         }
     }
