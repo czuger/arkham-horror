@@ -1,7 +1,9 @@
 use engine::{MonsterPlace, Status, View};
 
+use crate::views::image_token::ImageToken;
 use crate::views::names::{ancient_one, card};
-use crate::views::spot::ImageToken;
+use crate::views::tip::Tip;
+use crate::views::tips;
 
 /// The state of the town: Ancient One, doom, terror, gates, cards in play.
 #[derive(Debug, Clone)]
@@ -47,6 +49,10 @@ impl StatusView {
             ancient_one: ImageToken {
                 name: sheet.map_or_else(|| state.ancient_one.to_string(), |s| s.name.clone()),
                 image: sheet.map(|s| s.image.clone()).unwrap_or_default(),
+                tip: sheet.map_or_else(
+                    || Tip::new(state.ancient_one.to_string()),
+                    tips::ancient_one,
+                ),
             },
             doom: (state.doom, sheet.map_or(0, |s| s.doom_track)),
             terror: state.terror,

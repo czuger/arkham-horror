@@ -161,6 +161,7 @@ Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2.
   → **Constat (16/11/2026)** : avec PoloDB, 3 threads d'appoint seulement (voir T1). Le jeu tourne en current_thread.
 - **Q5** Le JS « quand c'est nécessaire » : uniquement des scripts maison de quelques lignes, ou une petite bibliothèque comme htmx est acceptable ? *(Recommandé : scripts maison, aucune bibliothèque.)*
   → **Réponse (16/11/2026) : une bibliothèque est acceptée, et même préférable ; Vue est possible si c'est mieux.** Choix retenu : **htmx** (voir `plan_creation_jeu.md` §6.4). Vue reste en réserve si le plateau demande une interaction trop riche pour htmx.
+  → **Précision (21/11/2026) : JavaScript est permis ; ce qui est refusé, c'est un client lourd** (pas d'application dans le navigateur, pas de règles ni d'état de partie côté navigateur). Jouer sans JavaScript n'est plus exigé.
 - **Q6** Édition Rust 2024 et version stable la plus récente ?
   → **Réponse (16/11/2026) : oui, la dernière version.** Édition 2024, Rust 1.100.0, épinglé dans `rust-toolchain.toml`.
 

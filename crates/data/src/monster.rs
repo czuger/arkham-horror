@@ -20,6 +20,19 @@ pub enum Movement {
     Special,
 }
 
+impl Movement {
+    /// French name of the movement type.
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Fast => "rapide",
+            Self::Stationary => "immobile",
+            Self::Flying => "volant",
+            Self::Special => "spécial",
+        }
+    }
+}
+
 /// A keyword ability printed in bold on the combat side of a token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum MonsterAbility {
@@ -43,6 +56,24 @@ pub enum MonsterAbility {
     Nightmarish(u8),
     /// Irrésistible N: lose N Stamina even after passing the Combat check.
     Overwhelming(u8),
+}
+
+impl MonsterAbility {
+    /// French name of the ability, as printed (« Cauchemardesque 1 »).
+    pub fn label(&self) -> String {
+        match self {
+            Self::Ambush => "Embuscade".into(),
+            Self::Endless => "Inépuisable".into(),
+            Self::Undead => "Mort-vivant".into(),
+            Self::Mask => "Masque".into(),
+            Self::PhysicalResistance => "Résistance Physique".into(),
+            Self::PhysicalImmunity => "Immunité Physique".into(),
+            Self::MagicalResistance => "Résistance Magique".into(),
+            Self::MagicalImmunity => "Immunité Magique".into(),
+            Self::Nightmarish(n) => format!("Cauchemardesque {n}"),
+            Self::Overwhelming(n) => format!("Irrésistible {n}"),
+        }
+    }
 }
 
 /// A check printed on the combat side: its modifier and the damage of a failure.

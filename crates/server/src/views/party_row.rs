@@ -4,6 +4,8 @@ use engine::View;
 
 use crate::session::HUMAN_SEAT;
 use crate::views::names::investigator_name;
+use crate::views::tip::Tip;
+use crate::views::tips;
 
 /// One investigator in the table of every investigator.
 #[derive(Debug, Clone)]
@@ -30,6 +32,8 @@ pub struct PartyRow {
     pub plan: String,
     /// Whether they left the game.
     pub eliminated: bool,
+    /// Bubble shown on hover over the name.
+    pub tip: Tip,
 }
 
 impl PartyRow {
@@ -52,6 +56,7 @@ impl PartyRow {
                 cards: inv.cards.len(),
                 plan: plan(view, seat),
                 eliminated: inv.eliminated,
+                tip: tips::investigator(view, seat),
             })
             .collect()
     }

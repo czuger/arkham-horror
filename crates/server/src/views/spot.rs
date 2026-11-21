@@ -1,3 +1,6 @@
+use crate::views::image_token::ImageToken;
+use crate::views::tip::Tip;
+
 /// One place drawn on the board, with what stands there.
 #[derive(Debug, Clone, Default)]
 pub struct Spot {
@@ -19,6 +22,9 @@ pub struct Spot {
     pub sealed: bool,
     /// Whether the location is closed.
     pub closed: bool,
+    /// CSS classes telling which way the bubbles open, so they stay inside
+    /// the window (« west north »…).
+    pub edge: String,
     /// Answers of the current decision that pick this place: index and label.
     pub choices: Vec<(usize, String)>,
 }
@@ -39,19 +45,10 @@ impl Spot {
 /// An investigator pawn.
 #[derive(Debug, Clone)]
 pub struct InvestigatorToken {
-    /// Full name, shown on hover.
-    pub name: String,
+    /// Bubble shown on hover.
+    pub tip: Tip,
     /// Initials printed on the pawn.
     pub initials: String,
     /// Whether it is the human's investigator.
     pub human: bool,
-}
-
-/// A token shown by its image (monster or gate).
-#[derive(Debug, Clone)]
-pub struct ImageToken {
-    /// French name, shown on hover.
-    pub name: String,
-    /// Image path under `/assets/`.
-    pub image: String,
 }

@@ -128,3 +128,26 @@ table.sliders td.here { background: #f0d9b5; font-weight: bold; }
 .party tr.human { font-weight: bold; }
 .party tr.eliminated { color: #999; text-decoration: line-through; }
 .seed { color: #7a6b58; font-size: 0.85rem; }
+
+/* Hover bubbles, CSS only: shown on hover or keyboard focus. */
+.tip { position: relative; pointer-events: auto; cursor: help; }
+.tip > .bubble {
+  display: none;
+  position: absolute; z-index: 20;
+  top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+  width: max-content; max-width: 20rem;
+  padding: 0.4rem 0.6rem; border-radius: 6px;
+  background: #2b2118; color: #f4efe4;
+  font: normal 0.8rem/1.35 Georgia, "Times New Roman", serif;
+  text-align: left; text-shadow: none; white-space: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.tip > .bubble strong { display: block; margin-bottom: 0.15rem; }
+.tip > .bubble span { display: block; }
+.tip:hover > .bubble, .tip:focus > .bubble, .tip:focus-within > .bubble { display: block; }
+.spot:hover, .spot:focus-within { z-index: 10; }
+.spot.west .tip > .bubble { left: 0; transform: none; }
+.spot.east .tip > .bubble { left: auto; right: 0; transform: none; }
+.spot.north .tip > .bubble { top: auto; bottom: calc(100% + 4px); }
+.side .tip > .bubble { left: 0; transform: none; }

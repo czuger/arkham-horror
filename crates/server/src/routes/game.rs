@@ -40,7 +40,7 @@ pub async fn game(
         htmx: state.htmx,
         id,
         seed: session.progress.setup.seed,
-        board: BoardView::new(&state.data, &outcome.state, decision),
+        board: BoardView::new(view, decision),
         sheet: SheetView::new(view, HUMAN_SEAT),
         party: PartyRow::all(view),
         status: StatusView::new(view, &outcome.status),

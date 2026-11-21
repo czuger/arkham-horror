@@ -46,22 +46,6 @@ fn is_combat_spell(ability: &Ability) -> bool {
 /// Special spells cast during a combat.
 const COMBAT_SPECIALS: [&str; 2] = ["enchant_weapon", "red_sign"];
 
-/// French name of a monster ability.
-fn ability_name(ability: &MonsterAbility) -> String {
-    match ability {
-        MonsterAbility::Ambush => "Embuscade".into(),
-        MonsterAbility::Endless => "Inépuisable".into(),
-        MonsterAbility::Undead => "Mort-vivant".into(),
-        MonsterAbility::Mask => "Masque".into(),
-        MonsterAbility::PhysicalResistance => "Résistance Physique".into(),
-        MonsterAbility::PhysicalImmunity => "Immunité Physique".into(),
-        MonsterAbility::MagicalResistance => "Résistance Magique".into(),
-        MonsterAbility::MagicalImmunity => "Immunité Magique".into(),
-        MonsterAbility::Nightmarish(n) => format!("Cauchemardesque {n}"),
-        MonsterAbility::Overwhelming(n) => format!("Irrésistible {n}"),
-    }
-}
-
 impl Game<'_> {
     /// Before the Combat check: take weapons and cast combat spells, one at a
     /// time, as long as hands are free; cards already in hand can be let go.
@@ -205,7 +189,7 @@ impl Game<'_> {
             .iter()
             .enumerate()
             .filter(|(_, ability)| !matches!(ability, MonsterAbility::MagicalImmunity))
-            .map(|(index, ability)| option(Choice::Option(index), ability_name(ability)))
+            .map(|(index, ability)| option(Choice::Option(index), ability.label()))
             .collect();
         self.log(format!(
             "Force de {} : {}.",
@@ -223,7 +207,7 @@ impl Game<'_> {
             let ignored = combat.stats.abilities.remove(index);
             combat.gear.defenses.retain(|defense| defense != &ignored);
             combat.gear.rate();
-            self.log(format!("{} est ignorée.", ability_name(&ignored)));
+            self.log(format!("{} est ignorée.", ignored.label()));
         }
         Ok(())
     }

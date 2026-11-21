@@ -6,7 +6,7 @@ Cadre retenu :
 
 - **Serveur** : axum + tokio, **sur un seul thread** (runtime « current_thread »).
 - **Base de données** : PoloDB (`polodb_core`) embarquée dans le serveur, stockage sur disque dans un dossier. Pas de serveur de base de données séparé. *(Décision du 16/11/2026 : SurrealDB, retenue d'abord, est abandonnée : trop de contraintes — 22 threads d'appoint, licence BSL, compilation longue, alertes de sécurité.)*
-- **Interface** : pages HTML rendues par le serveur, formulaires classiques, avec **htmx** pour rafraîchir des morceaux de page sans tout recharger. **Pas de client JavaScript lourd** : pas d'application dans le navigateur, le serveur garde toute la logique.
+- **Interface** : pages HTML rendues par le serveur, formulaires classiques, avec **htmx** pour rafraîchir des morceaux de page sans tout recharger. JavaScript permis (scripts maison, petites bibliothèques), mais **pas de client JavaScript lourd** : pas d'application dans le navigateur, le serveur garde toute la logique.
 - **Jeu** : un humain joue un investigateur, le système joue les autres investigateurs (IA) et le Mythe. Les tours des IA sont joués **d'un bloc** ; l'humain les suit dans le journal. **Jeu de base seul**, usage privé.
 - **Hébergement** : hors périmètre (environnement dédié de l'utilisateur). Le projet doit **fonctionner en local**.
 
@@ -183,7 +183,7 @@ Les données du jeu (cartes, plateau…) restent dans les fichiers : la base ne 
 
 Les cartes et jetons sont montrés par leur image d'`assets/`, avec le texte en dessous (utile pour la lisibilité et pour l'accessibilité).
 
-### 6.4 JavaScript : htmx, et quelques scripts maison
+### 6.4 JavaScript : htmx et scripts maison, pas de client lourd
 
 Choix : **htmx**, une petite bibliothèque (un seul fichier, servi en local depuis le dépôt, pas de CDN) qui permet à un lien ou un formulaire de ne remplacer qu'un morceau de la page. Elle convient mieux que Vue ici parce que toute la logique reste côté serveur : il n'y a aucun état à maintenir dans le navigateur, donc rien à synchroniser. Vue reste en réserve si le plateau finit par demander une interaction trop riche (glisser-déposer, animations), ce qui n'est pas prévu.
 
@@ -193,7 +193,9 @@ Ce que htmx prendra en charge :
 - ouvrir le détail d'une carte ou d'un monstre dans un panneau, sans quitter la partie ;
 - faire défiler le journal des tours d'IA sans recharger la page.
 
-Quelques scripts maison, facultatifs, de quelques lignes : zoom et déplacement du plateau, surlignage des lieux atteignables au survol. Tout doit rester jouable sans JS, avec rechargement complet des pages.
+Des scripts maison quand ils rendent l'interface meilleure : bulles d'aide, zoom et déplacement du plateau, surlignage des lieux atteignables au survol.
+
+Consigne de l'utilisateur (21/11/2026) : JavaScript est permis (scripts maison ou petites bibliothèques servies en local, pas de CDN). Ce qui est refusé, c'est un **client lourd** : pas d'application dans le navigateur (React, Vue, SPA…), pas de règles du jeu ni d'état de partie côté navigateur ; le serveur garde toute la logique et rend le HTML. Jouer sans JavaScript n'est plus exigé.
 
 ### 6.5 Accès et sécurité
 
@@ -253,7 +255,7 @@ Les jalons J1 et J3 dépendent de la transcription des cartes, que je fais à pa
 - [ ] Règles tranchées consignées dans `regles/decisions.md`
 - [ ] Simulations IA sans plantage
 - [ ] Partie complète jouée dans le navigateur en local, avec reprise et annulation
-- [ ] Jouable sans JavaScript (rechargement complet) et avec htmx
+- [ ] Jouable dans le navigateur, avec ou sans htmx
 - [ ] Sauvegarde de la base testée (copie puis restauration)
 - [ ] Mode d'emploi d'installation locale écrit et suivi sur une machine neuve
 - [ ] Version étiquetée et journal des modifications à jour

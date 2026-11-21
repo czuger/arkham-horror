@@ -32,7 +32,7 @@ Technical facts found at J0 (details in `manques_et_questions.md` §2):
 
 | File | Role |
 |---|---|
-| `plan_creation_jeu.md` | **The current plan (2026-11-16). Read this first.** Architecture (axum + tokio single-thread server, embedded database — now PoloDB, server-rendered HTML with minimal JS), crate layout, data format, engine design (decision/response model), AI, milestones J0–J6, tests, hosting. |
+| `plan_creation_jeu.md` | **The current plan (2026-11-16). Read this first.** Architecture (axum + tokio single-thread server, embedded database — now PoloDB, server-rendered HTML, JS allowed but no heavy client), crate layout, data format, engine design (decision/response model), AI, milestones J0–J6, tests, hosting. |
 | `manques_et_questions.md` | Up-to-date list of missing data (M1–M24), technical points to verify (T1–T6), rules R1–R27 (settled, see `regles/decisions.md`) and questions for the user (Q1–Q23); §2 also records the J0 measurements. |
 | `plan_mise_en_ligne.md` | The earlier plan (WASM client, no server). Its architecture is superseded; its Parts 2–3 (missing data M1–M20, open questions) are kept for reference. |
 | `J5.md` | J5 notes: what the server does, how games are saved and replayed, what is left. |
@@ -57,7 +57,7 @@ One executable holds everything: rules engine, AIs, web server and embedded data
 
 - **Server**: axum + tokio on a **single thread** (`current_thread` runtime). No game state in memory: each request loads the game from the DB, applies the answer, lets the AIs play up to the next human decision, then saves.
 - **Database**: PoloDB embedded (collections `partie`, `action`, `evenement`). Game data (cards, board…) stays in versioned RON files under `data/`, never in the DB or the code.
-- **UI**: server-rendered HTML with **askama** (user's choice, 2026-11-16), classic forms with POST → redirect → GET, plus **htmx** (served locally, no CDN) to swap page fragments. **No heavy JavaScript** and no client-side state; a few small hand-written optional scripts at most. Must stay playable without JS. Card and token images come from `assets/`.
+- **UI**: server-rendered HTML with **askama** (user's choice, 2026-11-16), classic forms with POST → redirect → GET, plus **htmx** (served locally, no CDN) to swap page fragments. JavaScript is allowed (user's decision, 2026-11-21): hand-written scripts or small libraries served locally (no CDN) when they improve the interface (bubbles, board zoom, partial updates…). What is refused is a **heavy client**: no in-browser application (no React/Vue/SPA), no game rules or game state in the browser; the server keeps all the logic and renders the HTML. Playing without JS is no longer required. Card and token images come from `assets/`.
 - AI turns and the Mythos phase are played **in one block** after each human answer; the human follows them in the journal.
 - **Hosting and access control are out of scope** (the user has a dedicated environment). The project only has to run locally: listen on `127.0.0.1`, no login page.
 - Cargo workspace: `data` (types + loading + consistency checks), `engine` (rules: deterministic, serializable, no I/O), `ai` (policies answering decisions), `server` (axum), `simulator` (CLI for mass AI-only games; kept out of the server because it would block the single thread).

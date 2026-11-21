@@ -5,7 +5,7 @@
     <tbody>
     {% for row in party %}
       <tr class="{% if row.human %}human{% endif %}{% if row.eliminated %} eliminated{% endif %}">
-        <td>{{ row.name }}{% if row.first %} <span title="Premier joueur">①</span>{% endif %}</td>
+        <td><span class="tip" tabindex="0">{{ row.name }}{{ row.tip|safe }}</span>{% if row.first %} <span title="Premier joueur">①</span>{% endif %}</td>
         <td>{{ row.place }}</td>
         <td>{{ row.sanity.0 }}/{{ row.sanity.1 }}</td>
         <td>{{ row.stamina.0 }}/{{ row.stamina.1 }}</td>

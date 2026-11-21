@@ -19,11 +19,11 @@
   <h3>Cartes</h3>
   <ul class="cards">
     {% for (card, exhausted) in sheet.cards %}
-    <li>{% if card.image.is_empty() %}{{ card.name }}{% else %}<a href="/assets/{{ card.image }}" target="_blank">{{ card.name }}</a>{% endif %}{% if *exhausted %} (épuisée){% endif %}</li>
+    <li><span class="tip" tabindex="0">{% if card.image.is_empty() %}{{ card.name }}{% else %}<a href="/assets/{{ card.image }}" target="_blank">{{ card.name }}</a>{% endif %}{{ card.tip|safe }}</span>{% if *exhausted %} (épuisée){% endif %}</li>
     {% endfor %}
   </ul>
   {% if !sheet.monster_trophies.is_empty() || sheet.gate_trophies > 0 %}
-  <p>Trophées : {{ sheet.monster_trophies.join(", ") }}{% if sheet.gate_trophies > 0 %} · {{ sheet.gate_trophies }} portail(s){% endif %}</p>
+  <p>Trophées : {% for trophy in sheet.monster_trophies %}{% if !loop.first %}, {% endif %}<span class="tip" tabindex="0">{{ trophy.name }}{{ trophy.tip|safe }}</span>{% endfor %}{% if sheet.gate_trophies > 0 %} · {{ sheet.gate_trophies }} portail(s){% endif %}</p>
   {% endif %}
   <p class="ability"><strong>{{ sheet.ability.0 }}</strong> : {{ sheet.ability.1 }}</p>
 </section>

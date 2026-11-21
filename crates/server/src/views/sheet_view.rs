@@ -1,8 +1,8 @@
 use data::Resource;
 use engine::{InvestigatorState, View};
 
-use crate::views::names::{card, monster_name, sheet};
-use crate::views::spot::ImageToken;
+use crate::views::image_token::ImageToken;
+use crate::views::names::{card, monster, sheet};
 
 /// The human investigator's sheet: values, sliders, cards and trophies.
 #[derive(Debug, Clone)]
@@ -29,8 +29,8 @@ pub struct SheetView {
     pub sliders: Vec<SliderView>,
     /// Cards held: name, image, and whether exhausted.
     pub cards: Vec<(ImageToken, bool)>,
-    /// Monster trophies, by name.
-    pub monster_trophies: Vec<String>,
+    /// Monster trophies.
+    pub monster_trophies: Vec<ImageToken>,
     /// Gate trophies.
     pub gate_trophies: usize,
     /// Statuses worth a line (delayed, arrested…).
@@ -73,7 +73,7 @@ impl SheetView {
             monster_trophies: inv
                 .monster_trophies
                 .iter()
-                .map(|id| monster_name(data, id))
+                .filter_map(|id| monster(view, id))
                 .collect(),
             gate_trophies: inv.gate_trophies.len(),
             flags: flags(inv),
