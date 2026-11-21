@@ -70,7 +70,7 @@ impl Game<'_> {
             let place = self.inv(seat).place.clone();
             let points = self.scratch.movement_points;
             let usable = self.usable_abilities(seat, &movement_timing)?;
-            let options = self.movement_options(&place, points, &usable);
+            let options = self.movement_options(seat, &place, points, &usable);
             let prompt = format!(
                 "Mouvement depuis {} ({points} point(s))",
                 self.place_name(&place)
@@ -106,6 +106,7 @@ impl Game<'_> {
     /// Options of one movement step: stop, a neighbour, or a card ability.
     fn movement_options(
         &self,
+        seat: usize,
         place: &Place,
         points: u32,
         usable: &[Usable<'_>],
@@ -126,10 +127,9 @@ impl Game<'_> {
             .enumerate()
             .filter(|(_, e)| !combat_only(e.ability))
         {
-            options.push(option(
-                Choice::Option(index),
-                format!("Utiliser {}", self.card_name(&entry.card)),
-            ));
+            if let Ok(offered) = self.ability_option(seat, index, entry) {
+                options.push(offered);
+            }
         }
         options
     }

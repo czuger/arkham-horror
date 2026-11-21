@@ -4,9 +4,16 @@ mod app_error;
 mod app_state;
 mod config;
 mod database;
+mod game_row;
+mod progress;
 mod router;
 mod routes;
+mod same_origin;
+mod session;
 mod startup;
+#[cfg(test)]
+mod tests;
+mod views;
 
 use std::error::Error;
 

@@ -7,7 +7,7 @@ use crate::halt::Flow;
 
 /// The values of a monster as they stand now.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct MonsterStats {
+pub struct MonsterStats {
     /// Modifier to Evade checks.
     pub awareness: i32,
     /// Horror check, if any.

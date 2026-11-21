@@ -1,10 +1,12 @@
 use std::path::Path;
-use std::time::{SystemTime, UNIX_EPOCH};
 
+use polodb_core::bson::doc;
 use polodb_core::{CollectionT, Database as PoloDatabase};
-use serde::{Deserialize, Serialize};
 
-const VISITS: &str = "visit";
+use crate::game_row::GameRow;
+
+/// Collection of the saved games.
+const GAMES: &str = "partie";
 
 /// Handle on the embedded PoloDB database.
 ///
@@ -24,11 +26,6 @@ pub enum DatabaseError {
     Polo(#[from] polodb_core::Error),
 }
 
-#[derive(Serialize, Deserialize)]
-struct Visit {
-    at_unix_secs: u64,
-}
-
 impl Database {
     /// Opens the database stored in the folder `path`, creating it if needed.
     ///
@@ -41,21 +38,86 @@ impl Database {
         })
     }
 
-    /// Records one visit of the home page and returns the total visit count.
-    ///
-    /// Milestone J0 check that the server reads and writes the database.
+    fn games(&self) -> polodb_core::Collection<GameRow> {
+        self.db.collection::<GameRow>(GAMES)
+    }
+
+    /// Number for a new game: one more than the highest so far.
     ///
     /// # Errors
     ///
-    /// Returns [`DatabaseError::Polo`] if the write or the count fails.
-    pub fn record_visit(&self) -> Result<u64, DatabaseError> {
-        let visits = self.db.collection::<Visit>(VISITS);
-        // A clock before 1970 is not worth failing a page for: count it as 0.
-        let at_unix_secs = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_or(0, |elapsed| elapsed.as_secs());
-        visits.insert_one(Visit { at_unix_secs })?;
-        Ok(visits.count_documents()?)
+    /// Returns [`DatabaseError::Polo`] if the read fails.
+    pub fn next_game_id(&self) -> Result<i64, DatabaseError> {
+        let last = self
+            .games()
+            .find(doc! {})
+            .sort(doc! { "id": -1 })
+            .run()?
+            .next()
+            .transpose()?;
+        Ok(last.map_or(1, |row| row.id + 1))
+    }
+
+    /// Saves a new game.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DatabaseError::Polo`] if the write fails.
+    pub fn insert_game(&self, row: &GameRow) -> Result<(), DatabaseError> {
+        self.games().insert_one(row)?;
+        Ok(())
+    }
+
+    /// The game with this number, if any.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DatabaseError::Polo`] if the read fails.
+    pub fn game(&self, id: i64) -> Result<Option<GameRow>, DatabaseError> {
+        Ok(self.games().find_one(doc! { "id": id })?)
+    }
+
+    /// Every game, newest first.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DatabaseError::Polo`] if the read fails.
+    pub fn all_games(&self) -> Result<Vec<GameRow>, DatabaseError> {
+        let rows = self
+            .games()
+            .find(doc! {})
+            .sort(doc! { "id": -1 })
+            .run()?
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(rows)
+    }
+
+    /// Overwrites a saved game (found by its number).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DatabaseError::Polo`] if the write fails.
+    pub fn update_game(&self, row: &GameRow) -> Result<(), DatabaseError> {
+        self.games().update_one(
+            doc! { "id": row.id },
+            doc! { "$set": {
+                "title": &row.title,
+                "summary": &row.summary,
+                "over": row.over,
+                "record": &row.record,
+            } },
+        )?;
+        Ok(())
+    }
+
+    /// Deletes a saved game.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`DatabaseError::Polo`] if the write fails.
+    pub fn delete_game(&self, id: i64) -> Result<(), DatabaseError> {
+        self.games().delete_one(doc! { "id": id })?;
+        Ok(())
     }
 }
 
@@ -63,12 +125,12 @@ impl Database {
 mod tests {
     use std::time::Instant;
 
-    use polodb_core::bson::doc;
+    use serde::{Deserialize, Serialize};
 
     use super::*;
 
     #[derive(Serialize, Deserialize)]
-    struct GameRow {
+    struct BlobRow {
         name: String,
         state: String,
     }
@@ -79,32 +141,54 @@ mod tests {
         (dir, db)
     }
 
-    #[test]
-    fn visits_are_counted() {
-        let (_dir, db) = temp_database();
-        assert_eq!(db.record_visit().expect("visit"), 1);
-        assert_eq!(db.record_visit().expect("visit"), 2);
+    fn row(id: i64) -> GameRow {
+        GameRow {
+            id,
+            created_unix: 0,
+            title: format!("partie {id}"),
+            summary: String::new(),
+            over: false,
+            record: "{}".to_owned(),
+        }
     }
 
     #[test]
-    fn visits_survive_reopening() {
+    fn games_are_numbered_and_listed_newest_first() {
+        let (_dir, db) = temp_database();
+        assert_eq!(db.next_game_id().expect("id"), 1);
+        db.insert_game(&row(1)).expect("insert");
+        db.insert_game(&row(2)).expect("insert");
+        assert_eq!(db.next_game_id().expect("id"), 3);
+        let ids: Vec<i64> = db.all_games().expect("list").iter().map(|r| r.id).collect();
+        assert_eq!(ids, vec![2, 1]);
+        db.delete_game(2).expect("delete");
+        assert_eq!(db.next_game_id().expect("id"), 2);
+    }
+
+    #[test]
+    fn games_survive_reopening() {
         let dir = tempfile::tempdir().expect("temp dir");
         let path = dir.path().join("test.db");
         let db = Database::open(&path).expect("open");
-        db.record_visit().expect("visit");
+        db.insert_game(&row(1)).expect("insert");
+        let mut changed = row(1);
+        changed.record = "[1,2,3]".to_owned();
+        changed.over = true;
+        db.update_game(&changed).expect("update");
         drop(db);
         let db = Database::open(&path).expect("reopen");
-        assert_eq!(db.record_visit().expect("visit"), 2);
+        assert_eq!(db.game(1).expect("read"), Some(changed));
+        assert_eq!(db.game(9).expect("read"), None);
     }
 
     /// T4: a game state stored as a ~50 KB JSON string, rewritten on every move.
     #[test]
     fn large_state_blob_round_trip() {
         let (_dir, db) = temp_database();
-        let games = db.db.collection::<GameRow>("game");
+        let games = db.db.collection::<BlobRow>("game");
         let state = "x".repeat(50 * 1024);
         games
-            .insert_one(GameRow {
+            .insert_one(BlobRow {
                 name: "test".to_owned(),
                 state: String::new(),
             })

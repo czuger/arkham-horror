@@ -2,11 +2,23 @@
 
 use data::{CardFilter, CardId, Deck, InvestigatorCard, Ongoing};
 
-use crate::decision::{Choice, DecisionKind, DecisionOption};
+use crate::decision::{CardAim, Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 
 impl Game<'_> {
+    /// Asks which investigator card to pick, and why.
+    pub fn pick_card(
+        &mut self,
+        seat: usize,
+        aim: CardAim,
+        prompt: &str,
+        options: Vec<DecisionOption>,
+    ) -> Flow<Choice> {
+        let context = Context::Cards(aim);
+        self.ask_about(seat, DecisionKind::PickCard, context, prompt, options)
+    }
+
     /// Draws `count` cards (plus the sheet's extra card) and keeps `keep` of
     /// them (`count` when `None`); the others go to the bottom of the deck.
     pub fn draw_and_keep(
@@ -25,8 +37,7 @@ impl Game<'_> {
         for _ in 0..keep {
             let options = self.card_options(&drawn);
             let prompt = "Quelle carte gardez-vous ?";
-            let Choice::Card(card) = self.ask(seat, DecisionKind::PickCard, prompt, options)?
-            else {
+            let Choice::Card(card) = self.pick_card(seat, CardAim::Keep, prompt, options)? else {
                 break;
             };
             if let Some(index) = drawn.iter().position(|candidate| candidate == &card) {
@@ -46,12 +57,9 @@ impl Game<'_> {
             return Ok(());
         }
         let options = self.card_options(&cards);
-        if let Choice::Card(card) = self.ask(
-            seat,
-            DecisionKind::PickCard,
-            "Quelle carte prenez-vous ?",
-            options,
-        )? && let Some(taken) = self.take_from_deck(&card)?
+        if let Choice::Card(card) =
+            self.pick_card(seat, CardAim::Keep, "Quelle carte prenez-vous ?", options)?
+            && let Some(taken) = self.take_from_deck(&card)?
         {
             self.give_card(seat, taken)?;
         }
@@ -78,12 +86,8 @@ impl Game<'_> {
                     ));
                 }
             }
-            let Choice::Card(card) = self.ask(
-                seat,
-                DecisionKind::PickCard,
-                "Que voulez-vous acheter ?",
-                options,
-            )?
+            let Choice::Card(card) =
+                self.pick_card(seat, CardAim::Buy, "Que voulez-vous acheter ?", options)?
             else {
                 return Ok(());
             };
@@ -109,7 +113,7 @@ impl Game<'_> {
             }
         }
         if let Choice::Card(card) =
-            self.ask(seat, DecisionKind::PickCard, "Vendre une carte ?", options)?
+            self.pick_card(seat, CardAim::Sell, "Vendre une carte ?", options)?
         {
             let value = u32::from(self.card(&card)?.price.unwrap_or(0)) * u32::from(multiplier);
             self.discard_card(seat, &card)?;
@@ -127,9 +131,9 @@ impl Game<'_> {
                 return Ok(());
             }
             let options = self.card_options(&matching);
-            if let Choice::Card(card) = self.ask(
+            if let Choice::Card(card) = self.pick_card(
                 seat,
-                DecisionKind::PickCard,
+                CardAim::Lose,
                 "Quelle carte défaussez-vous ?",
                 options,
             )? {

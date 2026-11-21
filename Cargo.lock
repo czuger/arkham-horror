@@ -27,6 +27,10 @@ dependencies = [
 [[package]]
 name = "ai"
 version = "0.1.0"
+dependencies = [
+ "data",
+ "engine",
+]
 
 [[package]]
 name = "askama"
@@ -1026,11 +1030,15 @@ dependencies = [
 name = "server"
 version = "0.1.0"
 dependencies = [
+ "ai",
  "askama",
  "axum",
+ "data",
+ "engine",
  "http-body-util",
  "polodb_core",
  "serde",
+ "serde_json",
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
@@ -1075,6 +1083,7 @@ dependencies = [
 name = "simulator"
 version = "0.1.0"
 dependencies = [
+ "ai",
  "data",
  "engine",
 ]

@@ -21,13 +21,14 @@ impl Game<'_> {
     }
 
     /// Wakes the Ancient One: the turn stops at once.
-    pub fn awaken<T>(&mut self, reason: &str) -> Flow<T> {
+    pub fn awaken<T>(&mut self, reason: &'static str) -> Flow<T> {
         if self.state.battle.is_some() {
             return Err(Halt::Broken(format!(
                 "réveil pendant la bataille : {reason}"
             )));
         }
         self.log(format!("Le Grand Ancien se réveille : {reason} !"));
+        self.tally.awakening = Some(reason);
         Err(Halt::Awakened)
     }
 

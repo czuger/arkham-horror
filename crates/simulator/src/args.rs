@@ -6,10 +6,15 @@ use engine::Setup;
 /// Help text.
 pub const USAGE: &str = "Usage :
   simulator jouer [--graine N] [--joueurs N] [--investigateur ID]... [--grand-ancien ID]
-      Joue une partie en mode texte : vous répondez à chaque décision par son numéro.
-  simulator masse [--parties N] [--graine N] [--joueurs N] [--grand-ancien ID] [--couverture FICHIER]
-      Joue N parties avec des réponses au hasard et affiche le bilan, avec la part
-      des cartes jouées ; FICHIER reçoit la liste de celles jamais jouées.
+      Joue une partie en mode texte : vous jouez le premier investigateur et
+      répondez à chaque décision par son numéro ; l'IA joue les autres.
+  simulator regarder [--graine N] [--joueurs N] [--investigateur ID]... [--grand-ancien ID]
+      Affiche le journal d'une partie jouée entièrement par l'IA.
+  simulator masse [--parties N] [--graine N] [--joueurs N] [--grand-ancien ID]
+                  [--hasard] [--couverture FICHIER]
+      Joue N parties jouées par l'IA (ou au hasard avec --hasard) et affiche le
+      bilan, avec la part des cartes jouées ; FICHIER reçoit la liste de celles
+      jamais jouées.
 Les données sont lues dans le dossier ARKHAM_DATA (par défaut : data).";
 
 /// What to do.
@@ -18,6 +23,8 @@ pub enum Command {
     Help,
     /// Play one game in text mode.
     Play(Setup),
+    /// Show the journal of one game played by the AI.
+    Watch(Setup),
     /// Play many games with random answers.
     Bulk {
         /// Number of games.
@@ -26,6 +33,8 @@ pub enum Command {
         setup: Setup,
         /// File listing the cards never played.
         missing_file: Option<std::path::PathBuf>,
+        /// Random answers instead of the AI.
+        random: bool,
     },
 }
 
@@ -37,7 +46,12 @@ pub fn parse(mut args: impl Iterator<Item = String>) -> Result<Command, String> 
     let mut setup = Setup::random(seed_from_clock(), 1);
     let mut games = 100;
     let mut missing_file = None;
+    let mut random = false;
     while let Some(flag) = args.next() {
+        if flag == "--hasard" {
+            random = true;
+            continue;
+        }
         let value = args
             .next()
             .ok_or_else(|| format!("valeur manquante après {flag}"))?;
@@ -57,10 +71,12 @@ pub fn parse(mut args: impl Iterator<Item = String>) -> Result<Command, String> 
     setup.players = setup.players.max(setup.investigators.len());
     match verb.as_str() {
         "jouer" => Ok(Command::Play(setup)),
+        "regarder" => Ok(Command::Watch(setup)),
         "masse" => Ok(Command::Bulk {
             games,
             setup,
             missing_file,
+            random,
         }),
         "aide" | "--help" | "-h" => Ok(Command::Help),
         other => Err(format!("commande inconnue : {other}")),

@@ -1,0 +1,8 @@
+<section class="recent">
+  <h2>Depuis votre dernier choix</h2>
+  <ol class="journal">
+    {% if journal.truncated %}<li class="old">…</li>{% endif %}
+    {% for line in journal.older %}<li class="old">{{ line }}</li>{% endfor %}
+    {% for line in journal.new %}<li class="new">{{ line }}</li>{% endfor %}
+  </ol>
+</section>

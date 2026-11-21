@@ -33,6 +33,8 @@ pub struct Outcome {
     pub events: Vec<String>,
     /// Cards and encounter paragraphs played (keys of [`crate::coverage_keys`]).
     pub covered: std::collections::BTreeSet<String>,
+    /// Counts of notable events.
+    pub tally: crate::tally::Tally,
 }
 
 /// Plays a game from its setup, asking `responder` for every decision,
@@ -86,6 +88,7 @@ pub fn play(
         answers: game.answers,
         events: game.events,
         covered: game.covered,
+        tally: game.tally,
     })
 }
 

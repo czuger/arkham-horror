@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Nouvelle partie — Horreur à Arkham{% endblock %}
+{% block content %}
+<h1>Nouvelle partie</h1>
+{% if !error.is_empty() %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="/nouvelle" class="setup">
+  <label>Votre investigateur
+    <select name="investigateur" required>
+      {% for (id, name) in investigators %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Nombre d'investigateurs IA
+    <select name="ia">
+      {% for count in ai_counts %}<option value="{{ count }}"{% if *count == default_ais %} selected{% endif %}>{{ count }}</option>{% endfor %}
+    </select>
+  </label>
+  <fieldset>
+    <legend>Investigateurs des IA (seuls les premiers servent, selon le nombre choisi)</legend>
+    {% for slot in 1..=7 %}
+    <label>IA {{ slot }}
+      <select name="ia{{ slot }}">
+        <option value="">Au hasard</option>
+        {% for (id, name) in investigators %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
+      </select>
+    </label>
+    {% endfor %}
+  </fieldset>
+  <label>Grand Ancien
+    <select name="grand_ancien">
+      <option value="">Au hasard</option>
+      {% for (id, name) in ancient_ones %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Graine (facultative, pour rejouer la même partie)
+    <input name="graine" inputmode="numeric" pattern="[0-9]*">
+  </label>
+  <button type="submit">Commencer</button>
+</form>
+{% endblock %}

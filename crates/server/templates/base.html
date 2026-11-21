@@ -6,8 +6,13 @@
   <meta name="robots" content="noindex, nofollow">
   <title>{% block title %}Horreur à Arkham{% endblock %}</title>
   <link rel="stylesheet" href="/static/style.css">
+  {% if htmx %}<script src="/static/htmx.min.js" defer></script>{% endif %}
 </head>
-<body>
+<body{% if htmx %} hx-boost="true"{% endif %}>
+  <header class="top">
+    <a href="/" class="brand">Horreur à Arkham</a>
+    <a href="/nouvelle">Nouvelle partie</a>
+  </header>
   <main>
     {% block content %}{% endblock %}
   </main>

@@ -1,0 +1,18 @@
+<section class="board" aria-label="Plateau">
+  <img src="/assets/{{ board.image }}" alt="Plateau d'Arkham" width="1064" height="1576">
+  {% for spot in board.spots %}
+  <div class="spot{% if !spot.choices.is_empty() %} choice{% endif %}" style="left: {{ spot.left }}; top: {{ spot.top }}" title="{{ spot.name }}">
+    {% for (index, label) in spot.choices %}
+    <button type="submit" form="decision" name="choix" value="{{ index }}" class="go" title="{{ label }}">{{ spot.name }}</button>
+    {% endfor %}
+    <div class="tokens">
+      {% if let Some(gate) = spot.gate %}<img class="gate" src="/assets/{{ gate.image }}" alt="{{ gate.name }}" title="{{ gate.name }}">{% endif %}
+      {% if spot.sealed %}<span class="seal" title="Scellé">✶</span>{% endif %}
+      {% if spot.closed %}<span class="closed" title="Lieu fermé">✕</span>{% endif %}
+      {% if spot.clues > 0 %}<span class="clue" title="{{ spot.clues }} Indice(s)">{{ spot.clues }}</span>{% endif %}
+      {% for monster in spot.monsters %}<span class="monster" style="background-image: url('/assets/{{ monster.image }}')" title="{{ monster.name }}"></span>{% endfor %}
+      {% for pawn in spot.investigators %}<span class="pawn{% if pawn.human %} human{% endif %}" title="{{ pawn.name }}">{{ pawn.initials }}</span>{% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</section>

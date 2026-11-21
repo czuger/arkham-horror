@@ -1,0 +1,30 @@
+{% if let Some(sheet) = sheet %}
+<section class="sheet">
+  <h2><a href="/assets/{{ sheet.image }}" target="_blank">{{ sheet.name }}</a>, {{ sheet.title }}</h2>
+  <p>À : {{ sheet.place }}</p>
+  <ul class="facts">
+    <li>Santé Mentale : {{ sheet.sanity.0 }} / {{ sheet.sanity.1 }}</li>
+    <li>Résistance : {{ sheet.stamina.0 }} / {{ sheet.stamina.1 }}</li>
+    <li>Argent : {{ sheet.money }} $ · Indices : {{ sheet.clues }} · Concentration : {{ sheet.focus }}</li>
+  </ul>
+  {% if !sheet.flags.is_empty() %}<p class="flags">{{ sheet.flags.join(" · ") }}</p>{% endif %}
+  <table class="sliders">
+    {% for slider in sheet.sliders %}
+    <tr>
+      <th>{{ slider.skills }}</th>
+      {% for (left, right, here) in slider.stops %}<td{% if *here %} class="here"{% endif %}>{{ left }} / {{ right }}</td>{% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+  <h3>Cartes</h3>
+  <ul class="cards">
+    {% for (card, exhausted) in sheet.cards %}
+    <li>{% if card.image.is_empty() %}{{ card.name }}{% else %}<a href="/assets/{{ card.image }}" target="_blank">{{ card.name }}</a>{% endif %}{% if *exhausted %} (épuisée){% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% if !sheet.monster_trophies.is_empty() || sheet.gate_trophies > 0 %}
+  <p>Trophées : {{ sheet.monster_trophies.join(", ") }}{% if sheet.gate_trophies > 0 %} · {{ sheet.gate_trophies }} portail(s){% endif %}</p>
+  {% endif %}
+  <p class="ability"><strong>{{ sheet.ability.0 }}</strong> : {{ sheet.ability.1 }}</p>
+</section>
+{% endif %}

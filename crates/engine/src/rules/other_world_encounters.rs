@@ -3,7 +3,7 @@
 use data::{GateCard, GateEncounter, OtherWorldId, Timing};
 
 use crate::decision::{Choice, DecisionKind};
-use crate::game::{Game, option};
+use crate::game::{Game, option_with};
 use crate::halt::Flow;
 use crate::state::{Phase, Place};
 
@@ -83,7 +83,13 @@ impl<'a> Game<'a> {
         let options = found
             .iter()
             .enumerate()
-            .map(|(index, (_, encounter))| option(Choice::Option(index), encounter.text.clone()))
+            .map(|(index, (_, encounter))| {
+                option_with(
+                    Choice::Option(index),
+                    encounter.text.clone(),
+                    &encounter.effects,
+                )
+            })
             .collect();
         let prompt = "Quelle rencontre suivez-vous ?";
         let Choice::Option(index) = self.ask(seat, DecisionKind::CardChoice, prompt, options)?

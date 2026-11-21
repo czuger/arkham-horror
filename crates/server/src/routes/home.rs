@@ -4,19 +4,27 @@ use axum::response::Html;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
+use crate::game_row::GameRow;
 
 #[derive(Template)]
 #[template(path = "home.html")]
 struct HomePage {
-    visits: u64,
+    htmx: bool,
+    games: Vec<GameRow>,
 }
 
-/// Home page. For now (milestone J0) it only counts visits in the database.
+/// Home page: games in progress and over, and a link to start one.
 ///
 /// # Errors
 ///
 /// Fails if the database or the template fails.
 pub async fn home(State(state): State<AppState>) -> Result<Html<String>, AppError> {
-    let visits = state.db.record_visit()?;
-    Ok(Html(HomePage { visits }.render()?))
+    let games = state.db.all_games()?;
+    Ok(Html(
+        HomePage {
+            htmx: state.htmx,
+            games,
+        }
+        .render()?,
+    ))
 }

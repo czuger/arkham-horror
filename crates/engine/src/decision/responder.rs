@@ -1,14 +1,14 @@
 //! Who answers the decisions.
 
 use crate::decision::decision::Decision;
-use crate::state::GameState;
+use crate::view::View;
 
 /// Answers decisions: a human through the server, an AI policy, or a
 /// recorded list of answers.
 pub trait Responder {
     /// Index of the chosen option, or `None` when no answer is available
     /// yet: the game then stops and waits for it.
-    fn answer(&mut self, state: &GameState, decision: &Decision) -> Option<usize>;
+    fn answer(&mut self, view: &View<'_, '_>, decision: &Decision) -> Option<usize>;
 }
 
 /// Never answers: the game stops at the first decision.
@@ -16,7 +16,7 @@ pub trait Responder {
 pub struct Waiting;
 
 impl Responder for Waiting {
-    fn answer(&mut self, _state: &GameState, _decision: &Decision) -> Option<usize> {
+    fn answer(&mut self, _view: &View<'_, '_>, _decision: &Decision) -> Option<usize> {
         None
     }
 }
@@ -40,12 +40,12 @@ impl<'a> Replay<'a> {
 }
 
 impl Responder for Replay<'_> {
-    fn answer(&mut self, state: &GameState, decision: &Decision) -> Option<usize> {
+    fn answer(&mut self, view: &View<'_, '_>, decision: &Decision) -> Option<usize> {
         if let Some(&answer) = self.answers.get(self.next) {
             self.next += 1;
             return Some(answer);
         }
-        self.then.answer(state, decision)
+        self.then.answer(view, decision)
     }
 }
 
@@ -54,7 +54,7 @@ impl Responder for Replay<'_> {
 pub struct FirstOption;
 
 impl Responder for FirstOption {
-    fn answer(&mut self, _state: &GameState, _decision: &Decision) -> Option<usize> {
+    fn answer(&mut self, _view: &View<'_, '_>, _decision: &Decision) -> Option<usize> {
         Some(0)
     }
 }

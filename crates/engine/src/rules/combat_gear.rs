@@ -1,8 +1,8 @@
 //! Weapons and spells in combat, within the two-hand limit.
 
-use data::{Ability, CardId, Effect, MonsterAbility, Timing, WeaponKind};
+use data::{Ability, CardId, Effect, MonsterAbility, MonsterId, Timing, WeaponKind};
 
-use crate::decision::{Choice, DecisionKind, DecisionOption};
+use crate::decision::{Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::combat::{Combat, Equipped, Gear};
@@ -65,7 +65,13 @@ fn ability_name(ability: &MonsterAbility) -> String {
 impl Game<'_> {
     /// Before the Combat check: take weapons and cast combat spells, one at a
     /// time, as long as hands are free; cards already in hand can be let go.
-    pub fn prepare_combat(&mut self, seat: usize, gear: &mut Gear) -> Flow<()> {
+    /// `foe` is the monster fought, `None` against the Ancient One.
+    pub fn prepare_combat(
+        &mut self,
+        seat: usize,
+        foe: Option<&MonsterId>,
+        gear: &mut Gear,
+    ) -> Flow<()> {
         loop {
             let options = self.gear_options(seat, gear)?;
             let prompt = format!(
@@ -73,7 +79,11 @@ impl Game<'_> {
                 gear.hands(),
                 gear.bonus()
             );
-            match self.ask(seat, DecisionKind::PrepareCombat, prompt, options)? {
+            let context = Context::Combat {
+                foe: foe.cloned(),
+                bonus: gear.bonus(),
+            };
+            match self.ask_about(seat, DecisionKind::PrepareCombat, context, prompt, options)? {
                 Choice::Card(card) => self.equip(seat, gear, card)?,
                 Choice::Drop(card) => {
                     gear.equipped.retain(|equipped| equipped.card != card);

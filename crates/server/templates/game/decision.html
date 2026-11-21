@@ -1,0 +1,26 @@
+<section class="decision" id="decision-zone">
+{% if let Some(decision) = decision %}
+  <h2>{{ decision.who }} : à vous</h2>
+  <p class="prompt">{{ decision.prompt }}</p>
+  {% if !decision.hint.is_empty() %}<p class="hint">{{ decision.hint }}</p>{% endif %}
+  <form id="decision" method="post" action="/partie/{{ id }}/reponse">
+    <input type="hidden" name="coup" value="{{ decision.move_number }}">
+    {% for (index, label) in decision.options %}
+    <button type="submit" name="choix" value="{{ index }}">{{ label }}</button>
+    {% endfor %}
+  </form>
+{% else %}
+  {% if let Some((label, victory)) = status.ending %}
+  <h2 class="{% if *victory %}victory{% else %}defeat{% endif %}">{{ label }}</h2>
+  {% endif %}
+{% endif %}
+  <p class="tools">
+    <a href="/partie/{{ id }}/journal">Journal complet</a>
+    <span class="seed">Graine {{ seed }}</span>
+    {% if can_undo %}
+    <form method="post" action="/partie/{{ id }}/annuler" class="inline">
+      <button type="submit" class="small">Annuler le dernier coup</button>
+    </form>
+    {% endif %}
+  </p>
+</section>

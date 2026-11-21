@@ -2,7 +2,10 @@
 
 use serde::{Deserialize, Serialize};
 
+use data::Effect;
+
 use crate::decision::choice::Choice;
+use crate::decision::context::Context;
 
 /// What the decision is about. The AI uses it to pick a policy.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -54,6 +57,9 @@ pub struct Decision {
     pub prompt: String,
     /// The legal answers. The answer is an index into this list.
     pub options: Vec<DecisionOption>,
+    /// What the decision is about.
+    #[serde(default)]
+    pub context: Context,
 }
 
 /// One legal answer with its French label.
@@ -63,6 +69,10 @@ pub struct DecisionOption {
     pub choice: Choice,
     /// Its label, in French.
     pub label: String,
+    /// Card effects this answer leads to, when it picks a card paragraph or
+    /// option (empty otherwise).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub effects: Vec<Effect>,
 }
 
 impl Decision {

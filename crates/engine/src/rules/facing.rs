@@ -2,7 +2,7 @@
 
 use data::MonsterId;
 
-use crate::decision::{Choice, DecisionKind};
+use crate::decision::{Choice, Context, DecisionKind};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::combat::Faced;
@@ -31,7 +31,9 @@ impl Game<'_> {
             option(Choice::Fight(0), "Combattre"),
         ];
         let prompt = format!("{} vous fait face.", self.monster_name(&monster));
-        let fight = self.ask(seat, DecisionKind::FaceMonster, prompt, options)? == Choice::Fight(0);
+        let context = Context::Monsters(vec![monster.clone()]);
+        let fight = self.ask_about(seat, DecisionKind::FaceMonster, context, prompt, options)?
+            == Choice::Fight(0);
         let result = self.evade_or_fight(seat, &monster, fight);
         if result != Ok(Faced::Defeated) {
             self.state.monster_cup.push(monster);
@@ -85,9 +87,10 @@ impl Game<'_> {
             options.push(option(Choice::Evade(index), format!("S'échapper : {name}")));
             options.push(option(Choice::Fight(index), format!("Combattre : {name}")));
         }
-        match self.ask(
+        match self.ask_about(
             seat,
             DecisionKind::FaceMonster,
+            Context::Monsters(waiting.to_vec()),
             "Monstres à affronter",
             options,
         )? {

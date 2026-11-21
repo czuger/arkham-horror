@@ -2,7 +2,7 @@
 
 use data::{CardFilter, CardId, Deck, Price, Resource};
 
-use crate::decision::{Choice, DecisionKind};
+use crate::decision::{CardAim, Choice};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::card_effects::filter_accepts;
@@ -48,12 +48,8 @@ impl Game<'_> {
                     options.push(option(Choice::Card(card.clone()), label));
                 }
             }
-            let Choice::Card(card) = self.ask(
-                seat,
-                DecisionKind::PickCard,
-                "Que voulez-vous acheter ?",
-                options,
-            )?
+            let Choice::Card(card) =
+                self.pick_card(seat, CardAim::Buy, "Que voulez-vous acheter ?", options)?
             else {
                 return Ok(());
             };
@@ -116,12 +112,8 @@ impl Game<'_> {
                 options.push(option(Choice::Card(card.clone()), label));
             }
         }
-        let Choice::Card(card) = self.ask(
-            seat,
-            DecisionKind::PickCard,
-            "Que voulez-vous acheter ?",
-            options,
-        )?
+        let Choice::Card(card) =
+            self.pick_card(seat, CardAim::Buy, "Que voulez-vous acheter ?", options)?
         else {
             return Ok(false);
         };

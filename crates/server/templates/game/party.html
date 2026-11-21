@@ -1,0 +1,20 @@
+<section class="party">
+  <h2>Investigateurs</h2>
+  <table>
+    <thead><tr><th>Nom</th><th>Lieu</th><th>San</th><th>Rés</th><th>$</th><th>Ind.</th><th>Cartes</th><th>Projet</th></tr></thead>
+    <tbody>
+    {% for row in party %}
+      <tr class="{% if row.human %}human{% endif %}{% if row.eliminated %} eliminated{% endif %}">
+        <td>{{ row.name }}{% if row.first %} <span title="Premier joueur">①</span>{% endif %}</td>
+        <td>{{ row.place }}</td>
+        <td>{{ row.sanity.0 }}/{{ row.sanity.1 }}</td>
+        <td>{{ row.stamina.0 }}/{{ row.stamina.1 }}</td>
+        <td>{{ row.money }}</td>
+        <td>{{ row.clues }}</td>
+        <td>{{ row.cards }}</td>
+        <td>{{ row.plan }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>

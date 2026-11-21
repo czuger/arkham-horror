@@ -127,7 +127,7 @@ impl Game<'_> {
             defenses: ancient.defenses.clone(),
             ..Gear::default()
         };
-        self.prepare_combat(seat, &mut gear)?;
+        self.prepare_combat(seat, None, &mut gear)?;
         let players = u32::try_from(self.state.players()).unwrap_or(1);
         let kept = self
             .state

@@ -17,7 +17,11 @@ fn data() -> GameData {
 struct Scrambled(u64);
 
 impl engine::Responder for Scrambled {
-    fn answer(&mut self, _state: &engine::GameState, decision: &engine::Decision) -> Option<usize> {
+    fn answer(
+        &mut self,
+        _view: &engine::View<'_, '_>,
+        decision: &engine::Decision,
+    ) -> Option<usize> {
         self.0 = self
             .0
             .wrapping_mul(6_364_136_223_846_793_005)

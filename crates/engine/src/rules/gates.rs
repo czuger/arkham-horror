@@ -28,6 +28,7 @@ impl Game<'_> {
             return self.awaken("il n'y a plus de marqueur Portail");
         }
         let marker = self.state.gate_stack.remove(0);
+        self.tally.gates_opened += 1;
         self.state.gates.push(OpenGate {
             location: location.clone(),
             marker,
@@ -84,8 +85,10 @@ impl Game<'_> {
             self.name(seat),
             self.location(location)?.name
         ));
+        self.tally.gates_closed += 1;
         self.return_monsters_of_gate(gate.marker)?;
         if matches!(how, Closing::SealedWithClues | Closing::SealedWithElderSign) {
+            self.tally.gates_sealed += 1;
             self.seal(location, how == Closing::SealedWithElderSign)?;
         }
         self.check_gate_victory()

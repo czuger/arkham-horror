@@ -2,7 +2,7 @@
 
 use data::{CheckKind, Moment, MonsterAbility, MonsterId, MonsterTrait, Resource};
 
-use crate::decision::{Choice, DecisionKind};
+use crate::decision::{Choice, Context, DecisionKind};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::monster_stats::MonsterStats;
@@ -196,19 +196,11 @@ impl Game<'_> {
 
     /// One round: arm, then fight or flee. Returns how the combat ended, if it did.
     fn combat_round(&mut self, seat: usize, combat: &mut Combat) -> Flow<Option<Faced>> {
-        self.prepare_combat(seat, &mut combat.gear)?;
+        self.prepare_combat(seat, Some(&combat.monster), &mut combat.gear)?;
         self.weaken_monster(seat, combat)?;
         let can_flee = !combat.stats.has(MonsterAbility::Ambush);
         self.hopeless_combat(seat, combat, can_flee)?;
-        let mut options = vec![option(Choice::Attack, "Combattre")];
-        if can_flee {
-            options.push(option(Choice::Flee, "Fuir"));
-        }
-        let prompt = format!(
-            "Combat contre {} : combattre ou fuir ?",
-            self.monster_name(&combat.monster)
-        );
-        if self.ask(seat, DecisionKind::FightOrFlee, prompt, options)? == Choice::Flee {
+        if self.wants_to_flee(seat, combat, can_flee)? {
             if self
                 .check(seat, CheckKind::Evade, combat.stats.awareness, 1)?
                 .passed
@@ -241,6 +233,26 @@ impl Game<'_> {
         }
         self.monster_hits(seat, &combat.monster, &combat.stats)?;
         Ok(None)
+    }
+
+    /// Asks whether to fight or flee this round.
+    fn wants_to_flee(&mut self, seat: usize, combat: &Combat, can_flee: bool) -> Flow<bool> {
+        let mut options = vec![option(Choice::Attack, "Combattre")];
+        if can_flee {
+            options.push(option(Choice::Flee, "Fuir"));
+        }
+        let prompt = format!(
+            "Combat contre {} : combattre ou fuir ?",
+            self.monster_name(&combat.monster)
+        );
+        let context = Context::Combat {
+            foe: Some(combat.monster.clone()),
+            bonus: combat.gear.bonus(),
+        };
+        Ok(
+            self.ask_about(seat, DecisionKind::FightOrFlee, context, prompt, options)?
+                == Choice::Flee,
+        )
     }
 
     /// The Combat check: Fight (Lore against The Black Pharaoh), weapons and

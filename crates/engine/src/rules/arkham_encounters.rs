@@ -2,7 +2,7 @@
 
 use data::{CardId, CheckKind, LocationId, Resource, SpecialId};
 
-use crate::decision::{Choice, DecisionKind};
+use crate::decision::{Choice, Context, DecisionKind};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::gates::Closing;
@@ -55,7 +55,7 @@ impl<'a> Game<'a> {
             return Ok(false);
         }
         let prompt = format!("Utiliser « {} » au lieu de la rencontre ?", ability.name);
-        if !self.ask_yes_no(seat, DecisionKind::Optional, prompt)? {
+        if !self.ask_yes_with(seat, prompt, &ability.effects)? {
             return Ok(false);
         }
         self.log(format!("{} utilise « {} ».", self.name(seat), ability.name));
@@ -92,12 +92,13 @@ impl<'a> Game<'a> {
                 format!("Sceller avec {}", self.card_name(card)),
             ));
         }
-        match self.ask(
-            seat,
-            DecisionKind::CloseGate,
-            "Le portail est devant vous.",
-            options,
-        )? {
+        let context = Context::Gate {
+            modifier: i32::from(modifier),
+            needed: u32::from(self.close_difficulty()),
+            seal_cost: if sealable { self.seal_cost() } else { u16::MAX },
+        };
+        let prompt = "Le portail est devant vous.";
+        match self.ask_about(seat, DecisionKind::CloseGate, context, prompt, options)? {
             Choice::CloseWith(kind) => {
                 self.close_with_check(seat, location, kind, modifier, sealable)
             }

@@ -6,6 +6,7 @@ const DEFAULT_ADDR: &str = "127.0.0.1:3000";
 const DEFAULT_DB: &str = "arkham.db";
 const DEFAULT_ASSETS: &str = "assets";
 const DEFAULT_STATIC: &str = "static";
+const DEFAULT_DATA: &str = "data";
 
 /// Server settings, read from environment variables.
 ///
@@ -15,6 +16,7 @@ const DEFAULT_STATIC: &str = "static";
 /// | `ARKHAM_DB` | `arkham.db` |
 /// | `ARKHAM_ASSETS` | `assets` |
 /// | `ARKHAM_STATIC` | `static` |
+/// | `ARKHAM_DATA` | `data` |
 #[derive(Debug, Clone)]
 pub struct Config {
     /// Address and port the server listens on.
@@ -25,6 +27,8 @@ pub struct Config {
     pub assets_dir: PathBuf,
     /// Folder of the CSS and JavaScript files.
     pub static_dir: PathBuf,
+    /// Folder of the game data files (`data/` in the repository).
+    pub data_dir: PathBuf,
 }
 
 /// Invalid configuration value.
@@ -59,6 +63,7 @@ impl Config {
             db_path: env_or("ARKHAM_DB", DEFAULT_DB).into(),
             assets_dir: env_or("ARKHAM_ASSETS", DEFAULT_ASSETS).into(),
             static_dir: env_or("ARKHAM_STATIC", DEFAULT_STATIC).into(),
+            data_dir: env_or("ARKHAM_DATA", DEFAULT_DATA).into(),
         })
     }
 }

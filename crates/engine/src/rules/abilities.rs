@@ -1,9 +1,9 @@
 //! Card abilities: when they can be used, their costs, and casting spells.
 
-use data::{Ability, CardId, Cost, Ongoing, Timing};
+use data::{Ability, CardId, Cost, Effect, Ongoing, Resource, Timing};
 
-use crate::decision::{Choice, DecisionKind};
-use crate::game::{Game, option};
+use crate::decision::{Choice, DecisionKind, DecisionOption};
+use crate::game::{Game, option, option_with};
 use crate::halt::Flow;
 use crate::rules::stats::of_check;
 use crate::state::HeldCard;
@@ -69,6 +69,34 @@ impl<'a> Game<'a> {
         Ok(true)
     }
 
+    /// « Use this card » option, with the costs written as effects (Sanity
+    /// for a spell, money, discarding the card) ahead of the ability's own.
+    pub fn ability_option(
+        &self,
+        seat: usize,
+        index: usize,
+        entry: &Usable<'_>,
+    ) -> Flow<DecisionOption> {
+        let mut effects = Vec::new();
+        if entry.ability.cast {
+            let cost = self.spell_cost(seat, &entry.card)?;
+            effects.push(Effect::Lose(
+                Resource::Sanity,
+                u8::try_from(cost).unwrap_or(u8::MAX),
+            ));
+        }
+        for cost in &entry.ability.cost {
+            match cost {
+                Cost::DiscardThis => effects.push(Effect::DiscardThis),
+                Cost::Pay(resource, amount) => effects.push(Effect::Pay(*resource, *amount)),
+                _ => {}
+            }
+        }
+        effects.extend(entry.ability.effects.iter().cloned());
+        let label = format!("Utiliser {}", self.card_name(&entry.card));
+        Ok(option_with(Choice::Option(index), label, &effects))
+    }
+
     /// Offers the usable abilities matching a timing, one at a time, until
     /// the player declines. Returns whether at least one was used.
     pub fn offer_abilities(
@@ -85,10 +113,7 @@ impl<'a> Game<'a> {
             }
             let mut options = vec![option(Choice::Done, "Ne rien utiliser")];
             for (index, entry) in usable.iter().enumerate() {
-                options.push(option(
-                    Choice::Option(index),
-                    format!("Utiliser {}", self.card_name(&entry.card)),
-                ));
+                options.push(self.ability_option(seat, index, entry)?);
             }
             let Choice::Option(index) =
                 self.ask(seat, DecisionKind::UseAbility, prompt, options)?
@@ -144,10 +169,7 @@ impl<'a> Game<'a> {
         }
         let mut options = vec![option(Choice::Done, "Ne rien utiliser")];
         for (index, entry) in usable.iter().enumerate() {
-            options.push(option(
-                Choice::Option(index),
-                format!("Utiliser {}", self.card_name(&entry.card)),
-            ));
+            options.push(self.ability_option(seat, index, entry)?);
         }
         let Choice::Option(index) = self.ask(seat, DecisionKind::UseAbility, prompt, options)?
         else {

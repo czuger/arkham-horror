@@ -35,7 +35,7 @@ pub(crate) fn data() -> &'static GameData {
 struct Scripted(VecDeque<usize>);
 
 impl Responder for Scripted {
-    fn answer(&mut self, _state: &GameState, _decision: &Decision) -> Option<usize> {
+    fn answer(&mut self, _view: &crate::view::View<'_, '_>, _decision: &Decision) -> Option<usize> {
         self.0.pop_front()
     }
 }

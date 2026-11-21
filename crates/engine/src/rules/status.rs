@@ -2,7 +2,7 @@
 
 use data::{CardId, Deck, LocationId};
 
-use crate::decision::{Choice, DecisionKind};
+use crate::decision::{CardAim, Choice};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::state::{Area, Place};
@@ -78,6 +78,7 @@ impl Game<'_> {
             "tombe inconscient"
         };
         self.log(format!("{} {word}.", self.name(seat)));
+        self.tally.knocked_out += 1;
         self.lose_half_belongings(seat)?;
         let inv = self.inv_mut(seat);
         inv.encounters_over = true;
@@ -113,7 +114,7 @@ impl Game<'_> {
                 options.push(option(Choice::Card(card.clone()), self.card_name(&card)));
             }
             if let Choice::Card(card) =
-                self.ask(seat, DecisionKind::PickCard, "Objet à défausser", options)?
+                self.pick_card(seat, CardAim::Lose, "Objet à défausser", options)?
             {
                 self.log(format!(
                     "{} défausse {}.",
@@ -154,6 +155,7 @@ impl Game<'_> {
             "{} est perdu dans le temps et l'espace.",
             self.name(seat)
         ));
+        self.tally.lost_in_time += 1;
         self.move_to(seat, Place::LostInTimeAndSpace);
         self.inv_mut(seat).delayed = true;
         self.on_lost_in_time(seat)
@@ -172,6 +174,7 @@ impl Game<'_> {
     /// new investigator who starts next turn.
     pub fn devour(&mut self, seat: usize) -> Flow<()> {
         self.log(format!("{} est dévoré.", self.name(seat)));
+        self.tally.devoured += 1;
         let cards: Vec<CardId> = self
             .inv(seat)
             .cards

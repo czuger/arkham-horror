@@ -5,11 +5,28 @@ mod bulk;
 mod coverage_report;
 mod interactive;
 mod random_responder;
+mod stats;
 
 use std::path::Path;
 use std::process::ExitCode;
 
 use args::{Command, parse};
+
+/// Plays one game with the AI on every seat and prints its journal.
+fn watch(data: &data::GameData, setup: &engine::Setup) -> Result<(), String> {
+    let mut policy = ai::Policy::new();
+    let outcome = engine::play(data, setup, &mut policy).map_err(|error| error.to_string())?;
+    for event in &outcome.events {
+        println!("{event}");
+    }
+    println!(
+        "\nGraine {}, {} tour(s), {} décision(s).",
+        setup.seed,
+        outcome.state.turn,
+        outcome.answers.len()
+    );
+    Ok(())
+}
 
 fn main() -> ExitCode {
     let command = match parse(std::env::args().skip(1)) {
@@ -33,11 +50,13 @@ fn main() -> ExitCode {
             Ok(())
         }
         Command::Play(setup) => interactive::run(&data, &setup),
+        Command::Watch(setup) => watch(&data, &setup),
         Command::Bulk {
             games,
             setup,
             missing_file,
-        } => bulk::run(&data, &setup, games, missing_file.as_deref()),
+            random,
+        } => bulk::run(&data, &setup, games, missing_file.as_deref(), random),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,

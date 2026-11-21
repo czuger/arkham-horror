@@ -176,19 +176,28 @@ Reprises de `regles/base.md` §22 et de `plan_mise_en_ligne.md` §3.2.
 ### Jeu et IA
 
 - **Q10** Nombre d'IA : fixé à la création de la partie, entre 1 et 7 ? *(Recommandé : oui, choisi à chaque partie.)*
+  → **Pris par défaut (21/11/2026) : oui, choisi à chaque partie, de 1 à 7.**
 - **Q11** Investigateurs des IA : tirés au hasard ou choisis par toi ? *(Recommandé : au choix, avec « hasard » par défaut.)*
+  → **Réponse (21/11/2026) : au choix, « hasard » par défaut.**
 - **Q12** Les IA sont-elles totalement autonomes, ou veux-tu pouvoir leur donner un ordre (« va à tel lieu », « donne-moi tel objet ») ? *(Recommandé pour la première version : autonomes, échanges proposés par l'IA et acceptés par toi.)*
+  → **Réponse (21/11/2026) : IA autonomes ; les échanges viendront plus tard, avec le réglage de l'IA (pas dans J5).**
 - **Q13** Le Grand Ancien : tiré au hasard ou choisi ?
+  → **Réponse (21/11/2026) : au choix, « hasard » par défaut.**
 - **Q14** Veux-tu voir les décisions des IA pas à pas (une page par action d'IA, avec un bouton « suivant »), ou d'un bloc (le serveur joue tous les tours d'IA et tu ne vois que le journal) ? *(Recommandé : d'un bloc, avec un journal détaillé, et une option « pas à pas » plus tard.)*
   → **Réponse (16/11/2026) : d'un bloc.**
 - **Q15** Les dés : montrés dans le journal (« 3 dés : 2, 5, 6 ») ? *(Recommandé : oui.)*
+  → **Pris par défaut (21/11/2026) : oui.**
 - **Q16** Annulation d'un coup : autorisée sans limite (confort, usage privé), ou interdite pour garder l'esprit du jeu ?
+  → **Réponse (21/11/2026) : sans limite.**
 
 ### Interface
 
 - **Q17** Navigateur de bureau seulement, ou aussi téléphone et tablette ? Cela change la façon d'afficher le plateau.
+  → **Réponse (21/11/2026) : ordinateur seulement.**
 - **Q18** Français uniquement ? *(Recommandé : oui.)*
+  → **Pris par défaut (21/11/2026) : oui.**
 - **Q19** Affichage des cartes : image seule, texte seul, ou les deux ? *(Recommandé : les deux.)*
+  → **Pris par défaut (21/11/2026) : les deux.**
 
 ### Hébergement
 

@@ -3,7 +3,7 @@
 use data::{CardId, ChoiceOption, Condition, Effect};
 
 use crate::decision::{Choice, DecisionKind};
-use crate::game::{Game, option};
+use crate::game::{Game, option, option_with};
 use crate::halt::Flow;
 
 impl<'a> Game<'a> {
@@ -108,7 +108,7 @@ impl<'a> Game<'a> {
             return Ok(());
         }
         let prompt = format!("Voulez-vous : {} ?", choice.label);
-        if self.ask_yes_no(seat, DecisionKind::Optional, prompt)? {
+        if self.ask_yes_with(seat, prompt, &choice.effects)? {
             return self.apply_effects(seat, &choice.effects, this);
         }
         Ok(())
@@ -156,7 +156,11 @@ impl<'a> Game<'a> {
         let mut offered = Vec::new();
         for (index, choice) in options.iter().enumerate() {
             if self.can_start(seat, &choice.effects)? {
-                offered.push(option(Choice::Option(index), choice.label.clone()));
+                offered.push(option_with(
+                    Choice::Option(index),
+                    choice.label.clone(),
+                    &choice.effects,
+                ));
             }
         }
         if offered.is_empty() {

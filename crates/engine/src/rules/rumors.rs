@@ -152,7 +152,7 @@ impl<'a> Game<'a> {
             return Ok(false);
         }
         let prompt = format!("« {} » : {} ?", card.name, action.label);
-        if !self.ask_yes_no(seat, DecisionKind::Optional, prompt)? {
+        if !self.ask_yes_with(seat, prompt, &action.effects)? {
             return Ok(false);
         }
         self.apply_effects(seat, &action.effects, Some(&active.card))?;

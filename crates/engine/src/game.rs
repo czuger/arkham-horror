@@ -5,9 +5,10 @@ use data::{
     MonsterId, OtherWorld, OtherWorldId, Street, StreetId,
 };
 
-use crate::decision::{Choice, Decision, DecisionKind, DecisionOption, Responder};
+use crate::decision::{Choice, Context, Decision, DecisionKind, DecisionOption, Responder};
 use crate::halt::{Flow, Halt};
 use crate::state::{GameState, InvestigatorState, Place};
+use crate::view::View;
 
 /// A game being played. Rule code lives in `impl Game` blocks under `rules/`.
 pub(crate) struct Game<'a> {
@@ -15,8 +16,8 @@ pub(crate) struct Game<'a> {
     pub data: &'a GameData,
     /// The state.
     pub state: GameState,
-    /// Who answers decisions.
-    responder: &'a mut dyn Responder,
+    /// Who answers decisions; taken out while it answers.
+    responder: Option<&'a mut dyn Responder>,
     /// Answers accepted so far, in order.
     pub answers: Vec<usize>,
     /// Journal lines, in French.
@@ -25,6 +26,8 @@ pub(crate) struct Game<'a> {
     pub scratch: Scratch,
     /// Cards and paragraphs played so far (see [`crate::coverage`]).
     pub covered: std::collections::BTreeSet<String>,
+    /// Counts of notable events.
+    pub tally: crate::tally::Tally,
     /// Dice results forced by unit tests, used before the generator.
     #[cfg(test)]
     pub loaded_dice: std::collections::VecDeque<u8>,
@@ -76,11 +79,12 @@ impl<'a> Game<'a> {
         Self {
             data,
             state,
-            responder,
+            responder: Some(responder),
             answers: Vec::new(),
             events: Vec::new(),
             scratch: Scratch::default(),
             covered: std::collections::BTreeSet::new(),
+            tally: crate::tally::Tally::default(),
             #[cfg(test)]
             loaded_dice: std::collections::VecDeque::new(),
         }
@@ -109,6 +113,18 @@ impl<'a> Game<'a> {
         prompt: impl Into<String>,
         options: Vec<DecisionOption>,
     ) -> Flow<Choice> {
+        self.ask_about(who, kind, Context::None, prompt, options)
+    }
+
+    /// Asks a decision, with facts about what it is about.
+    pub fn ask_about(
+        &mut self,
+        who: usize,
+        kind: DecisionKind,
+        context: Context,
+        prompt: impl Into<String>,
+        options: Vec<DecisionOption>,
+    ) -> Flow<Choice> {
         match options.len() {
             0 => return Err(Halt::Broken("décision sans option".to_owned())),
             1 => return Ok(options[0].choice.clone()),
@@ -119,8 +135,16 @@ impl<'a> Game<'a> {
             kind,
             prompt: prompt.into(),
             options,
+            context,
         };
-        let Some(answer) = self.responder.answer(&self.state, &decision) else {
+        let Some(responder) = self.responder.take() else {
+            return Err(Halt::Broken(
+                "réponse demandée pendant une réponse".to_owned(),
+            ));
+        };
+        let answer = responder.answer(&View::new(self), &decision);
+        self.responder = Some(responder);
+        let Some(answer) = answer else {
             return Err(Halt::Waiting(decision));
         };
         let Some(option) = decision.options.get(answer) else {
@@ -144,6 +168,20 @@ impl<'a> Game<'a> {
     ) -> Flow<bool> {
         let options = vec![option(Choice::Yes, "Oui"), option(Choice::Done, "Non")];
         Ok(self.ask(who, kind, prompt, options)? == Choice::Yes)
+    }
+
+    /// Asks whether to apply some card effects.
+    pub fn ask_yes_with(
+        &mut self,
+        who: usize,
+        prompt: impl Into<String>,
+        effects: &[data::Effect],
+    ) -> Flow<bool> {
+        let options = vec![
+            option_with(Choice::Yes, "Oui", effects),
+            option(Choice::Done, "Non"),
+        ];
+        Ok(self.ask(who, DecisionKind::Optional, prompt, options)? == Choice::Yes)
     }
 
     /// The investigator at a seat.
@@ -263,6 +301,20 @@ pub(crate) fn option(choice: Choice, label: impl Into<String>) -> DecisionOption
     DecisionOption {
         choice,
         label: label.into(),
+        effects: Vec::new(),
+    }
+}
+
+/// Builds a decision option that leads to card effects.
+pub(crate) fn option_with(
+    choice: Choice,
+    label: impl Into<String>,
+    effects: &[data::Effect],
+) -> DecisionOption {
+    DecisionOption {
+        choice,
+        label: label.into(),
+        effects: effects.to_vec(),
     }
 }
 

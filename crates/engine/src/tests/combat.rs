@@ -100,7 +100,7 @@ fn a_card_in_hand_can_be_let_go_for_another() {
     // Take the Dynamite (2 hands), let it go, take the Revolver, attack.
     let mut gear = crate::rules::combat::Gear::default();
     let (result, _) = run(&mut state, &[2, 1, 1, 0], &[], |game| {
-        game.prepare_combat(0, &mut gear)
+        game.prepare_combat(0, None, &mut gear)
     });
     assert_eq!(result, Ok(()));
     assert_eq!((gear.bonus(), gear.hands()), (3, 1));

@@ -1,9 +1,12 @@
-//! One game in text mode: the player answers every decision by number.
+//! One game in text mode: the player answers the first investigator's
+//! decisions by number, the AI plays the others.
 
 use std::io::{BufRead, Write};
 
 use data::GameData;
-use engine::{Decision, Replay, Setup, Status, Waiting, play};
+use engine::{Decision, Replay, Setup, Status, play};
+
+use ai::Seated;
 
 /// Plays a game, replaying the answers given so far at each step.
 pub fn run(data: &GameData, setup: &Setup) -> Result<(), String> {
@@ -16,9 +19,10 @@ pub fn run(data: &GameData, setup: &Setup) -> Result<(), String> {
     let stdin = std::io::stdin();
     let mut lines = stdin.lock().lines();
     loop {
-        let mut waiting = Waiting;
-        let mut replay = Replay::new(&answers, &mut waiting);
+        let mut seated = Seated::new(0);
+        let mut replay = Replay::new(&answers, &mut seated);
         let outcome = play(data, setup, &mut replay).map_err(|error| error.to_string())?;
+        answers.clone_from(&outcome.answers);
         for event in outcome.events.iter().skip(shown) {
             println!("{event}");
         }

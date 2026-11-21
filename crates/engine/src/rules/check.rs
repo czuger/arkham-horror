@@ -2,7 +2,7 @@
 
 use data::{CheckKind, Ongoing};
 
-use crate::decision::{Choice, DecisionKind, DecisionOption};
+use crate::decision::{Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::stats::of_check;
@@ -127,7 +127,13 @@ impl Game<'_> {
                 roll.successes,
                 roll.difficulty
             );
-            match self.ask(seat, DecisionKind::SpendClues, prompt, options)? {
+            let context = Context::Check {
+                kind: roll.kind,
+                successes: roll.successes,
+                needed: roll.difficulty,
+                closing_gate: self.scratch.closing_gate,
+            };
+            match self.ask_about(seat, DecisionKind::SpendClues, context, prompt, options)? {
                 Choice::SpendClue => self.inv_mut(seat).clues -= 1,
                 Choice::SubstituteClue(card) => {
                     self.log(format!(

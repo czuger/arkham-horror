@@ -11,6 +11,10 @@ name = "arkham"
 path = "src/main.rs"
 
 [dependencies]
+ai = { path = "../ai" }
+data = { path = "../data" }
+engine = { path = "../engine" }
+serde_json = "1.0.154"
 askama.workspace = true
 axum.workspace = true
 serde.workspace = true

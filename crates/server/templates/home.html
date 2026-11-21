@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Horreur à Arkham</h1>
-<p>Bonjour ! Le serveur fonctionne.</p>
-<p>Cette page a été vue {{ visits }} fois (compteur enregistré dans la base).</p>
+<h1>Parties</h1>
+<p><a class="button" href="/nouvelle">Nouvelle partie</a></p>
+{% if games.is_empty() %}
+<p>Aucune partie pour l'instant.</p>
+{% else %}
+<table class="games">
+  <thead><tr><th>N°</th><th>Partie</th><th>Où en est-elle</th><th></th></tr></thead>
+  <tbody>
+  {% for game in games %}
+    <tr{% if game.over %} class="over"{% endif %}>
+      <td>{{ game.id }}</td>
+      <td><a href="/partie/{{ game.id }}">{{ game.title }}</a></td>
+      <td>{{ game.summary }}</td>
+      <td>
+        <form method="post" action="/partie/{{ game.id }}/supprimer" class="inline">
+          <button type="submit" class="small">Supprimer</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
 {% endblock %}

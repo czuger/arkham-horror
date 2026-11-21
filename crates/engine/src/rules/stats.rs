@@ -33,7 +33,7 @@ pub(crate) fn check_name(kind: CheckKind) -> &'static str {
 }
 
 /// « de Vitesse », « d'Horreur »…: the check name after « test ».
-pub(crate) fn of_check(kind: CheckKind) -> String {
+pub fn of_check(kind: CheckKind) -> String {
     let name = check_name(kind);
     if name.starts_with(['H', 'É']) {
         format!("d'{name}")

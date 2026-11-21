@@ -2,7 +2,7 @@
 
 use data::{CheckKind, Deck, MonsterId, Resource};
 
-use crate::decision::{Choice, DecisionKind};
+use crate::decision::{CardAim, Choice};
 use crate::game::{Game, option};
 use crate::halt::{Flow, Halt};
 use crate::rules::combat::{Combat, Faced};
@@ -84,7 +84,7 @@ impl Game<'_> {
             return Ok(());
         }
         let prompt = "La Chose Très Ancienne vous prend une Arme ou un Sort.";
-        if let Choice::Card(card) = self.ask(seat, DecisionKind::PickCard, prompt, options)? {
+        if let Choice::Card(card) = self.pick_card(seat, CardAim::Lose, prompt, options)? {
             self.discard_card(seat, &card)?;
         }
         Ok(())
@@ -93,6 +93,7 @@ impl Game<'_> {
     /// Where a defeated monster goes: Mi-Go and Warlock go back to the box
     /// with a reward, the others become trophies.
     pub fn monster_defeated_special(&mut self, seat: usize, monster: &MonsterId) -> Flow<()> {
+        self.tally.monsters_defeated += 1;
         match monster.as_str() {
             "mi_go" => {
                 self.log("Le Mi-Go est remis dans la boîte.");

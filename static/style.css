@@ -10,3 +10,121 @@ main {
   margin: 0 auto;
   padding: 1rem;
 }
+
+a { color: #6b2a12; }
+h1, h2, h3 { margin: 0.4em 0; }
+h2 { font-size: 1.1rem; }
+h3 { font-size: 1rem; }
+
+.top {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+  padding: 0.5rem 1rem;
+  background: #2b2118;
+}
+.top a { color: #f4efe4; text-decoration: none; }
+.top .brand { font-weight: bold; font-size: 1.2rem; }
+
+button, .button {
+  font: inherit;
+  padding: 0.3rem 0.7rem;
+  margin: 0.15rem 0;
+  border: 1px solid #6b2a12;
+  border-radius: 4px;
+  background: #fffaf0;
+  color: #2b2118;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button:hover, .button:hover { background: #f0d9b5; }
+button.small { font-size: 0.85rem; padding: 0.1rem 0.5rem; }
+form.inline { display: inline; }
+.error { color: #a00; font-weight: bold; }
+
+table.games { border-collapse: collapse; width: 100%; }
+table.games td, table.games th { padding: 0.3rem 0.6rem; border-bottom: 1px solid #d8cbb3; text-align: left; }
+table.games tr.over { color: #7a6b58; }
+
+form.setup { display: flex; flex-direction: column; gap: 0.6rem; max-width: 34rem; }
+form.setup label { display: flex; flex-direction: column; gap: 0.2rem; }
+form.setup fieldset { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+
+main:has(.game) { max-width: none; }
+.game { display: flex; gap: 1rem; align-items: flex-start; }
+.side { flex: 1 1 26rem; min-width: 24rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.side section { background: #fffaf0; border: 1px solid #d8cbb3; border-radius: 6px; padding: 0.5rem 0.8rem; }
+
+/* The board fits the window height (image ratio 1064 × 1576). */
+.board {
+  position: relative;
+  flex: 0 0 auto;
+  width: max(560px, min(1064px, calc((100vh - 4rem) * 0.675)));
+}
+.board > img { width: 100%; height: auto; display: block; }
+.spot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.spot .tokens { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; max-width: 110px; }
+.spot button.go {
+  pointer-events: auto;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  background: #ffe066;
+  border: 2px solid #b8860b;
+  box-shadow: 0 0 6px #ffd700;
+}
+.pawn {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #375a7f; color: #fff; font: bold 11px sans-serif;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+}
+.pawn.human { background: #b22222; }
+.monster {
+  width: 28px; height: 28px; border-radius: 4px;
+  background-size: 200% 100%; background-position: 0 0;
+  border: 1px solid #000;
+}
+.gate { width: 30px; height: 30px; border-radius: 50%; }
+.clue {
+  min-width: 18px; height: 18px; border-radius: 50%;
+  background: #2e8b57; color: #fff; font: bold 11px sans-serif;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.seal, .closed { font-size: 20px; color: #ffd700; text-shadow: 0 0 3px #000; }
+.closed { color: #c00; }
+
+.decision form#decision { display: flex; flex-direction: column; align-items: stretch; }
+.decision form#decision button { text-align: left; }
+.prompt { font-weight: bold; }
+.hint { font-style: italic; }
+.victory { color: #1f6f2f; }
+.defeat { color: #8b0000; }
+.tools { margin: 0.5rem 0 0; display: flex; gap: 1rem; align-items: baseline; }
+
+.journal { margin: 0; padding-left: 1.2rem; max-height: 22rem; overflow-y: auto; font-size: 0.9rem; }
+.journal.full { max-height: none; }
+.journal .old { color: #7a6b58; }
+.journal .new { color: #2b2118; }
+
+.facts { margin: 0; padding-left: 1.2rem; }
+.flags { color: #8b0000; }
+table.sliders { border-collapse: collapse; font-size: 0.85rem; }
+table.sliders th { text-align: left; padding-right: 0.5rem; font-weight: normal; }
+table.sliders td { padding: 0.1rem 0.4rem; border: 1px solid #d8cbb3; }
+table.sliders td.here { background: #f0d9b5; font-weight: bold; }
+.cards { margin: 0; padding-left: 1.2rem; }
+.ability { font-size: 0.85rem; }
+.party table { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
+.party td, .party th { padding: 0.15rem 0.3rem; border-bottom: 1px solid #eee2cc; text-align: left; }
+.party tr.human { font-weight: bold; }
+.party tr.eliminated { color: #999; text-decoration: line-through; }
+.seed { color: #7a6b58; font-size: 0.85rem; }

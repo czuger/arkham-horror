@@ -25,7 +25,7 @@ pub(crate) mod investigator_powers;
 pub(crate) mod location_encounters;
 pub(crate) mod monster_movement;
 pub(crate) mod monster_specials;
-pub(crate) mod monster_stats;
+pub mod monster_stats;
 pub(crate) mod monsters;
 pub(crate) mod movement;
 pub(crate) mod mythos;
