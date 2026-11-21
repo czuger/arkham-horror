@@ -11,12 +11,26 @@
 // - Autres Mondes : l'image est tournée ; la 1re zone est en bas, la 2e en haut.
 // - Lieux : `icons` = icônes de rencontre imprimées de part et d'autre de
 //   l'image (gauche puis droite), `sure: true` = couleurs inversées (moyen sûr) ;
-//   `position` = centre de l'icône. `panel` = zone blanche (nom et texte).
-//   Relevés le 21/11/2026 sur l'image, à vérifier sur le plateau réel.
+//   `panel` = zone blanche (nom et texte). Relevés le 21/11/2026 sur l'image,
+//   à vérifier sur le plateau réel.
+// - `icon_images` : l'image de chaque icône de rencontre, découpée dans la
+//   légende du livret (`marqueurs/legende_icones_rencontre.png`).
 #![enable(implicit_some)]
 Board(
-    version: 2,
+    version: 3,
     image: "plateau/arkham.jpg",
+    icon_images: {
+        Ally: "marqueurs/icones_rencontre/allie.png",
+        Sanity: "marqueurs/icones_rencontre/sante_mentale.png",
+        Blessing: "marqueurs/icones_rencontre/benediction.png",
+        Skill: "marqueurs/icones_rencontre/competence.png",
+        Clue: "marqueurs/icones_rencontre/indice.png",
+        Spell: "marqueurs/icones_rencontre/sort.png",
+        CommonItem: "marqueurs/icones_rencontre/objet_commun.png",
+        Money: "marqueurs/icones_rencontre/argent.png",
+        Stamina: "marqueurs/icones_rencontre/resistance.png",
+        UniqueItem: "marqueurs/icones_rencontre/objet_unique.png",
+    },
     streets: [
         (
             id: "northside",
@@ -99,8 +113,8 @@ Board(
             street: "northside",
             stability: Stable,
             icons: [
-                (kind: UniqueItem, position: (x: 137, y: 94)),
-                (kind: CommonItem, position: (x: 205, y: 94)),
+                (kind: UniqueItem),
+                (kind: CommonItem),
             ],
             panel: (x: 123, y: 102, width: 96, height: 16),
             position: (x: 165, y: 55),
@@ -111,8 +125,8 @@ Board(
             street: "northside",
             stability: Stable,
             icons: [
-                (kind: Money, position: (x: 42, y: 208)),
-                (kind: Clue, position: (x: 110, y: 208)),
+                (kind: Money),
+                (kind: Clue),
             ],
             panel: (x: 26, y: 216, width: 101, height: 17),
             position: (x: 75, y: 175),
@@ -131,8 +145,8 @@ Board(
             ),
             closes_at_terror: 6,
             icons: [
-                (kind: UniqueItem, sure: true, position: (x: 38, y: 329)),
-                (kind: CommonItem, position: (x: 106, y: 329)),
+                (kind: UniqueItem, sure: true),
+                (kind: CommonItem),
             ],
             panel: (x: 20, y: 337, width: 104, height: 60),
             position: (x: 75, y: 300),
@@ -151,8 +165,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Money, sure: true, position: (x: 282, y: 93)),
-                (kind: Blessing, position: (x: 350, y: 93)),
+                (kind: Money, sure: true),
+                (kind: Blessing),
             ],
             panel: (x: 255, y: 81, width: 126, height: 73),
             position: (x: 315, y: 60),
@@ -173,8 +187,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Sanity, sure: true, position: (x: 428, y: 90)),
-                (kind: Clue, position: (x: 496, y: 90)),
+                (kind: Sanity, sure: true),
+                (kind: Clue),
             ],
             panel: (x: 395, y: 79, width: 132, height: 109),
             position: (x: 460, y: 60),
@@ -185,8 +199,8 @@ Board(
             street: "downtown",
             stability: Unstable,
             icons: [
-                (kind: Clue, position: (x: 572, y: 89)),
-                (kind: UniqueItem, position: (x: 642, y: 89)),
+                (kind: Clue),
+                (kind: UniqueItem),
             ],
             panel: (x: 545, y: 94, width: 122, height: 18),
             position: (x: 605, y: 55),
@@ -198,8 +212,8 @@ Board(
             street: "easttown",
             stability: Unstable,
             icons: [
-                (kind: Money, position: (x: 576, y: 245)),
-                (kind: CommonItem, position: (x: 644, y: 245)),
+                (kind: Money),
+                (kind: CommonItem),
             ],
             panel: (x: 557, y: 253, width: 107, height: 15),
             position: (x: 605, y: 205),
@@ -210,8 +224,8 @@ Board(
             street: "easttown",
             stability: Stable,
             icons: [
-                (kind: Money, position: (x: 726, y: 243)),
-                (kind: Stamina, position: (x: 794, y: 243)),
+                (kind: Money),
+                (kind: Stamina),
             ],
             panel: (x: 707, y: 251, width: 106, height: 15),
             position: (x: 760, y: 205),
@@ -233,8 +247,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: CommonItem, position: (x: 729, y: 375)),
-                (kind: Clue, position: (x: 797, y: 375)),
+                (kind: CommonItem),
+                (kind: Clue),
             ],
             panel: (x: 709, y: 383, width: 108, height: 82),
             position: (x: 760, y: 350),
@@ -246,8 +260,8 @@ Board(
             street: "merchant_district",
             stability: Unstable,
             icons: [
-                (kind: Clue, position: (x: 34, y: 522)),
-                (kind: Spell, position: (x: 102, y: 522)),
+                (kind: Clue),
+                (kind: Spell),
             ],
             panel: (x: 17, y: 530, width: 103, height: 17),
             position: (x: 70, y: 485),
@@ -268,8 +282,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Money, sure: true, position: (x: 33, y: 646)),
-                (kind: CommonItem, position: (x: 101, y: 646)),
+                (kind: Money, sure: true),
+                (kind: CommonItem),
             ],
             panel: (x: 15, y: 654, width: 104, height: 61),
             position: (x: 70, y: 610),
@@ -280,8 +294,8 @@ Board(
             street: "merchant_district",
             stability: Unstable,
             icons: [
-                (kind: UniqueItem, position: (x: 178, y: 706)),
-                (kind: Clue, position: (x: 246, y: 706)),
+                (kind: UniqueItem),
+                (kind: Clue),
             ],
             panel: (x: 159, y: 714, width: 107, height: 23),
             position: (x: 215, y: 665),
@@ -293,8 +307,8 @@ Board(
             street: "rivertown",
             stability: Unstable,
             icons: [
-                (kind: Clue, position: (x: 731, y: 577)),
-                (kind: UniqueItem, position: (x: 799, y: 577)),
+                (kind: Clue),
+                (kind: UniqueItem),
             ],
             panel: (x: 711, y: 572, width: 109, height: 28),
             position: (x: 765, y: 545),
@@ -305,8 +319,8 @@ Board(
             street: "rivertown",
             stability: Unstable,
             icons: [
-                (kind: CommonItem, position: (x: 730, y: 708)),
-                (kind: Spell, position: (x: 801, y: 708)),
+                (kind: CommonItem),
+                (kind: Spell),
             ],
             panel: (x: 709, y: 704, width: 111, height: 28),
             position: (x: 765, y: 665),
@@ -325,8 +339,8 @@ Board(
             ),
             closes_at_terror: 3,
             icons: [
-                (kind: Money, position: (x: 559, y: 698)),
-                (kind: CommonItem, sure: true, position: (x: 626, y: 698)),
+                (kind: Money),
+                (kind: CommonItem, sure: true),
             ],
             panel: (x: 526, y: 700, width: 126, height: 78),
             position: (x: 590, y: 670),
@@ -348,8 +362,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Clue, sure: true, position: (x: 34, y: 826)),
-                (kind: UniqueItem, position: (x: 100, y: 826)),
+                (kind: Clue, sure: true),
+                (kind: UniqueItem),
             ],
             panel: (x: 15, y: 819, width: 104, height: 74),
             position: (x: 65, y: 770),
@@ -368,8 +382,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Money, position: (x: 113, y: 994)),
-                (kind: Skill, sure: true, position: (x: 181, y: 994)),
+                (kind: Money),
+                (kind: Skill, sure: true),
             ],
             panel: (x: 95, y: 1002, width: 105, height: 59),
             position: (x: 145, y: 960),
@@ -380,8 +394,8 @@ Board(
             street: "miskatonic_u",
             stability: Stable,
             icons: [
-                (kind: UniqueItem, position: (x: 247, y: 952)),
-                (kind: Spell, position: (x: 317, y: 952)),
+                (kind: UniqueItem),
+                (kind: Spell),
             ],
             panel: (x: 232, y: 962, width: 110, height: 16),
             position: (x: 285, y: 915),
@@ -393,8 +407,8 @@ Board(
             street: "french_hill",
             stability: Unstable,
             icons: [
-                (kind: Clue, position: (x: 731, y: 904)),
-                (kind: Spell, position: (x: 799, y: 904)),
+                (kind: Clue),
+                (kind: Spell),
             ],
             panel: (x: 711, y: 912, width: 109, height: 16),
             position: (x: 765, y: 870),
@@ -409,8 +423,8 @@ Board(
                 text: "Si vous êtes Membre du Crépuscule d'Argent, vous regardez alors la notice du Cœur de la Loge quand vous faites une rencontre ici.",
             ),
             icons: [
-                (kind: UniqueItem, position: (x: 592, y: 979)),
-                (kind: Clue, position: (x: 662, y: 979)),
+                (kind: UniqueItem),
+                (kind: Clue),
             ],
             panel: (x: 573, y: 972, width: 109, height: 67),
             position: (x: 628, y: 935),
@@ -432,8 +446,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Clue, position: (x: 39, y: 1167)),
-                (kind: Stamina, sure: true, position: (x: 107, y: 1167)),
+                (kind: Clue),
+                (kind: Stamina, sure: true),
             ],
             panel: (x: 21, y: 1175, width: 104, height: 65),
             position: (x: 70, y: 1130),
@@ -453,8 +467,8 @@ Board(
             ),
             closes_at_terror: 9,
             icons: [
-                (kind: Spell, sure: true, position: (x: 147, y: 1331)),
-                (kind: UniqueItem, position: (x: 215, y: 1331)),
+                (kind: Spell, sure: true),
+                (kind: UniqueItem),
             ],
             panel: (x: 129, y: 1339, width: 104, height: 49),
             position: (x: 178, y: 1305),
@@ -465,8 +479,8 @@ Board(
             street: "uptown",
             stability: Unstable,
             icons: [
-                (kind: Money, position: (x: 332, y: 1354)),
-                (kind: CommonItem, position: (x: 400, y: 1354)),
+                (kind: Money),
+                (kind: CommonItem),
             ],
             panel: (x: 313, y: 1362, width: 106, height: 16),
             position: (x: 365, y: 1310),
@@ -478,8 +492,8 @@ Board(
             street: "southside",
             stability: Unstable,
             icons: [
-                (kind: Skill, position: (x: 502, y: 1357)),
-                (kind: Spell, position: (x: 570, y: 1357)),
+                (kind: Skill),
+                (kind: Spell),
             ],
             panel: (x: 483, y: 1365, width: 106, height: 15),
             position: (x: 535, y: 1310),
@@ -501,8 +515,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Ally, sure: true, position: (x: 730, y: 1130)),
-                (kind: Stamina, position: (x: 798, y: 1130)),
+                (kind: Ally, sure: true),
+                (kind: Stamina),
             ],
             panel: (x: 710, y: 1138, width: 108, height: 75),
             position: (x: 765, y: 1095),
@@ -523,8 +537,8 @@ Board(
                 ],
             ),
             icons: [
-                (kind: Blessing, sure: true, position: (x: 671, y: 1323)),
-                (kind: Sanity, position: (x: 739, y: 1323)),
+                (kind: Blessing, sure: true),
+                (kind: Sanity),
             ],
             panel: (x: 652, y: 1331, width: 106, height: 57),
             position: (x: 705, y: 1275),

@@ -22,6 +22,7 @@ mod named_text;
 mod other_world;
 mod position;
 mod rect;
+mod sheet_markers;
 mod special_area;
 mod street;
 mod terror_track;
@@ -48,6 +49,7 @@ pub use ids::{
 pub use image_size::ImageSize;
 pub use investigator::{
     FixedCard, FixedPossessions, Investigator, Investigators, RandomPossessions, SkillTracks,
+    SliderSpots,
 };
 pub use location::{Location, Stability};
 pub use location_ability::LocationAbility;
@@ -57,6 +59,7 @@ pub use named_text::NamedText;
 pub use other_world::{EncounterColor, OtherWorld};
 pub use position::Position;
 pub use rect::Rect;
+pub use sheet_markers::SheetMarkers;
 pub use special_area::{SpecialArea, SpecialAreaKind};
 pub use street::Street;
 pub use terror_track::TerrorTrack;

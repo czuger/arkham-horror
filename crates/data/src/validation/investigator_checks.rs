@@ -29,6 +29,7 @@ pub(crate) fn check_investigators(
         }
         check_positive_values(sheet, issues);
         check_tracks(sheet, issues);
+        check_slider_spots(sheet, issues);
     }
 }
 
@@ -55,6 +56,32 @@ fn check_tracks(sheet: &Investigator, issues: &mut Vec<Issue>) {
                 investigator: sheet.id.to_string(),
                 skill,
                 found: values.len(),
+            });
+        }
+    }
+}
+
+/// Three sliders, each with one spot per stop, all inside the sheet image.
+fn check_slider_spots(sheet: &Investigator, issues: &mut Vec<Issue>) {
+    let context = || format!("curseurs de la fiche de « {} »", sheet.id);
+    if sheet.sliders.len() != 3 {
+        issues.push(Issue::Mismatch {
+            context: context(),
+            reason: "il faut trois curseurs",
+        });
+    }
+    let size = sheet.image_size;
+    for slider in &sheet.sliders {
+        if slider.x.len() != SkillTracks::STOPS {
+            issues.push(Issue::Mismatch {
+                context: context(),
+                reason: "il faut une position par cran",
+            });
+        }
+        if slider.y >= size.height || slider.x.iter().any(|x| *x >= size.width) {
+            issues.push(Issue::Mismatch {
+                context: context(),
+                reason: "position hors de l'image",
             });
         }
     }

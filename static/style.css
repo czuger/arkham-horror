@@ -174,7 +174,38 @@ table.sliders td.here { background: #f0d9b5; font-weight: bold; }
 .place-bubble .diamond.unstable { color: #e04040; }
 .place-bubble .place-ability, .place-bubble .icons-head { margin-top: 0.3rem; }
 .tip > .bubble .icon-line { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
-.place-bubble .icon {
-  flex: none; width: 30px; height: 30px; border-radius: 50%;
-  background-repeat: no-repeat; box-shadow: 0 0 0 1px #f4efe4;
+.place-bubble .icon { flex: none; width: 30px; height: 30px; border-radius: 50%; }
+/* Reversed colours on the board: a sure way to get it here. */
+.place-bubble .icon.sure { filter: invert(1); box-shadow: 0 0 0 1px #f4efe4; }
+
+/* Investigator sheets: the sheet with its sliders, the tokens beside it. */
+.mat { background: #fffaf0; border: 1px solid #d8cbb3; border-radius: 6px; padding: 0.5rem 0.8rem; margin-bottom: 1rem; }
+.mat.eliminated { opacity: 0.6; }
+.mat h2 small { font-weight: normal; color: #7a6b58; }
+.mat-body { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
+.investigator-sheet { position: relative; flex: 0 0 auto; width: min(450px, 100%); }
+.investigator-sheet > img { width: 100%; height: auto; display: block; }
+.investigator-sheet > img.slider {
+  position: absolute; width: 9%; height: auto; transform: translate(-50%, -50%);
+  mix-blend-mode: multiply;
 }
+.mat-tokens { flex: 1 1 18rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.pile .tokens { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 2rem; }
+.pile img.san { width: 40px; height: auto; }
+.pile img.res { width: 34px; height: auto; }
+.pile img.clue-token { width: 30px; height: auto; border-radius: 50%; }
+/* The money image stacks the $1, $5 and $10 bills top to bottom. */
+.bill { width: 74px; height: 37px; background-size: 100% 300%; border-radius: 2px; box-shadow: 0 0 2px #000; }
+.bill-1 { background-position: 0 0; }
+.bill-5 { background-position: 0 50%; }
+.bill-10 { background-position: 0 100%; }
+.monster-trophy {
+  width: 56px; height: 56px; border-radius: 4px; border: 1px solid #000;
+  background-size: 200% 100%; background-position: 0 0; display: inline-block;
+}
+.gate-trophy { width: 56px; height: 56px; border-radius: 50%; display: block; }
+
+/* Landscape board at its pixel size: the portrait image is turned a quarter right. */
+main:has(.landscape) { max-width: none; overflow-x: auto; }
+.landscape { position: relative; overflow: hidden; }
+.landscape > img { position: absolute; left: 0; top: 0; transform-origin: 0 0; max-width: none; }

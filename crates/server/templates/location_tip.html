@@ -3,5 +3,5 @@
 {% if let Some(ability) = ability %}<span class="place-ability"><b>{{ ability.0 }}</b> : {{ ability.1 }}</span>{% endif %}
 {% if let Some(level) = closes_at_terror %}<span>Ferme pour de bon quand la Terreur atteint {{ level }}.</span>{% endif %}
 {% if !icons.is_empty() %}<span class="icons-head">Pictogrammes (rencontres les plus fréquentes) :</span>{% endif %}
-{% for icon in icons %}<span class="icon-line"><i class="icon" style="background-image: url('/assets/{{ board_image }}'); background-size: {{ icon.size }}; background-position: {{ icon.offset }}"></i><span><b>{{ icon.label }}</b> : {{ icon.meaning }}.{% if icon.sure %} Couleurs inversées : moyen sûr d'en obtenir ici, grâce à la capacité du lieu.{% endif %}</span></span>{% endfor %}
+{% for icon in icons %}<span class="icon-line">{% if !icon.image.is_empty() %}<img class="icon{% if icon.sure %} sure{% endif %}" src="/assets/{{ icon.image }}" alt="">{% endif %}<span><b>{{ icon.label }}</b> : {{ icon.meaning }}.{% if icon.sure %} Couleurs inversées : moyen sûr d'en obtenir ici, grâce à la capacité du lieu.{% endif %}</span></span>{% endfor %}
 </span>

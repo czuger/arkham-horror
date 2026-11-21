@@ -48,7 +48,7 @@ impl BoardView {
                 .board
                 .locations
                 .iter()
-                .map(|location| LocationPanel::new(&data.board.image, location))
+                .map(|location| LocationPanel::new(&data.board, location))
                 .collect(),
         }
     }
@@ -63,6 +63,7 @@ fn terror_pawn(data: &GameData, level: u8) -> Option<TerrorPawn> {
         image: track.marker.clone(),
         left: percent(position.x, BOARD_SIZE.0),
         top: percent(position.y, BOARD_SIZE.1),
+        point: (position.x, position.y),
         tip: tips::terror(data, level),
     })
 }
@@ -83,6 +84,7 @@ fn blank(name: String, position: Position) -> Spot {
         name,
         left: percent(position.x, BOARD_SIZE.0),
         top: percent(position.y, BOARD_SIZE.1),
+        point: (position.x, position.y),
         edge: edge(position),
         ..Spot::default()
     }

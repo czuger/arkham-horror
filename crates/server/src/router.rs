@@ -29,6 +29,8 @@ pub fn build_router(config: &Config, state: AppState) -> Router {
         .route("/partie/{id}/supprimer", post(routes::delete))
         .route("/partie/{id}/journal", get(routes::journal))
         .route("/partie/{id}/grand-ancien", get(routes::ancient_one))
+        .route("/partie/{id}/investigateurs", get(routes::investigators))
+        .route("/partie/{id}/plateau", get(routes::landscape_board))
         .route("/robots.txt", get(routes::robots))
         .nest_service("/assets", ServeDir::new(&config.assets_dir))
         .nest_service("/static", ServeDir::new(&config.static_dir))

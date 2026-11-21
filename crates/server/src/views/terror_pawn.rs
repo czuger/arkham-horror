@@ -11,6 +11,8 @@ pub struct TerrorPawn {
     pub left: String,
     /// Vertical position, in percent of the board height.
     pub top: String,
+    /// Position in pixels on the board image, as read from `board.ron`.
+    pub point: (u16, u16),
     /// Bubble shown on hover.
     pub tip: Tip,
 }

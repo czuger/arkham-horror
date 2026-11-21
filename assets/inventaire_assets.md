@@ -32,15 +32,17 @@ Images rangées par thème pour le futur client web. **Jeu de base uniquement** 
 | `fiches/investigateurs/` — Fiches d'investigateur | 16 |
 | `fiches/grands_anciens/` — Feuilles de Grand Ancien | 8 |
 | `monstres/` — Jetons Monstre (une image = les deux faces) | 29 |
-| `marqueurs/` — Marqueurs et pions | 21 |
+| `marqueurs/` — Marqueurs et pions | 32 |
 | `errata/` — Versions corrigées (errata officiels du wiki) | 34 |
 | `regles/` — Schémas explicatifs | 6 |
 | `illustrations/` — Illustrations | 1 |
-| **Total** | **399** |
+| **Total** | **410** |
 
 ## Manquants
 
 Images du jeu de base que le wiki référence mais qui sont **absentes du dossier aspiré** (ou inutilisables). À réaspirer si on en a besoin.
+
+Les 10 icônes de rencontre (`Icone*.jpg` ci-dessous) sont remplacées depuis le 21/11/2026 par `marqueurs/icones_rencontre/`, découpées dans une légende fournie par l'utilisateur.
 
 | Image attendue | Page du wiki | Remarque |
 |---|---|---|
@@ -515,6 +517,17 @@ Autres manques constatés (rien dans les sources locales) :
 | `marqueurs/premier_joueur.jpg` | 261x190 | `images__6__68__Premier_Joueur.jpg` (page `Marqueurs,_Jetons_&_Pions.html`) | Premier Joueur |
 | `marqueurs/res.jpg` | 107x97 | `images__2__2e__RES.jpg` (page `Marqueurs,_Jetons_&_Pions.html`) | Résistance |
 | `marqueurs/san.jpg` | 116x80 | `images__4__4e__SAN.jpg` (page `Marqueurs,_Jetons_&_Pions.html`) | Santé Mentale |
+| `marqueurs/legende_icones_rencontre.png` | 289x158 | capture d'écran fournie par l'utilisateur le 21/11/2026 (légende des icônes de rencontre) | Icônes de rencontre |
+| `marqueurs/icones_rencontre/allie.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Alliés |
+| `marqueurs/icones_rencontre/argent.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Argent |
+| `marqueurs/icones_rencontre/benediction.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Bénédiction |
+| `marqueurs/icones_rencontre/competence.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Compétences |
+| `marqueurs/icones_rencontre/indice.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Pions Indice |
+| `marqueurs/icones_rencontre/objet_commun.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Objets Communs |
+| `marqueurs/icones_rencontre/objet_unique.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Objets Uniques |
+| `marqueurs/icones_rencontre/resistance.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Résistance |
+| `marqueurs/icones_rencontre/sante_mentale.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Santé Mentale |
+| `marqueurs/icones_rencontre/sort.png` | 26x26 | découpée dans `legende_icones_rencontre.png` (bord rond transparent) | Sorts |
 
 ### Versions corrigées (errata officiels du wiki)
 

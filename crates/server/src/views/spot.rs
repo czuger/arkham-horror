@@ -10,6 +10,8 @@ pub struct Spot {
     pub left: String,
     /// Vertical position, in percent of the board height.
     pub top: String,
+    /// Position in pixels on the board image, as read from `board.ron`.
+    pub point: (u16, u16),
     /// Investigators standing there.
     pub investigators: Vec<InvestigatorToken>,
     /// Monsters standing there.

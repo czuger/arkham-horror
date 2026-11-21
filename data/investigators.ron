@@ -7,9 +7,20 @@
 // - skills : valeur de chaque compétence pour les 4 crans de son curseur, de
 //   gauche à droite. Vitesse/Discrétion, Vigueur/Volonté et Savoir/Chance vont par paires.
 // - fixed.cards : noms imprimés sur la fiche, à relier aux cartes au jalon J3.
+// - sliders : pour chaque curseur (Vitesse/Discrétion, Vigueur/Volonté,
+//   Savoir/Chance), hauteur du milieu de la paire de lignes et centre de chaque
+//   cran, en pixels sur l'image de la fiche (relevé le 21/11/2026 d'après la
+//   position des chiffres bleus et rouges).
 #![enable(implicit_some)]
 Investigators(
-    version: 1,
+    version: 2,
+    markers: (
+        slider: "marqueurs/pion_coulissant.jpg",
+        sanity: "marqueurs/san.jpg",
+        stamina: "marqueurs/res.jpg",
+        money: "marqueurs/dollars.jpg",
+        clue: "marqueurs/pion_indice.jpg",
+    ),
     investigators: [
         (
             id: "amanda_sharpe",
@@ -31,6 +42,12 @@ Investigators(
                 text: "N'importe quelle phase : quand Amanda pioche une ou plusieurs cartes du paquet de Compétences, elle pioche une carte de plus et défausse une des cartes.",
             ),
             image: "fiches/investigateurs/amanda_sharpe.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 460, x: [108, 200, 290, 378]),
+                (y: 522, x: [153, 244, 334, 423]),
+                (y: 586, x: [108, 199, 290, 379]),
+            ],
         ),
         (
             id: "ashcan_pete",
@@ -52,6 +69,12 @@ Investigators(
                 text: "Quand Pete pioche du paquet Objets Communs, Objets Uniques ou Sorts, il peut piocher la carte du dessus ou du dessous. Pete peut regarder la carte du dessous de ces paquets à tout moment.",
             ),
             image: "fiches/investigateurs/ashcan_pete.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 462, x: [107, 198, 288, 378]),
+                (y: 524, x: [151, 242, 332, 423]),
+                (y: 588, x: [108, 197, 286, 378]),
+            ],
         ),
         (
             id: "bob_jenkins",
@@ -73,6 +96,12 @@ Investigators(
                 text: "N'importe quelle phase : quand Bob pioche une ou plusieurs cartes du paquet d'Objets Communs, il pioche une carte de plus et défausse une des cartes.",
             ),
             image: "fiches/investigateurs/bob_jenkins.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 460, x: [110, 200, 291, 381]),
+                (y: 522, x: [154, 245, 336, 426]),
+                (y: 586, x: [110, 202, 290, 380]),
+            ],
         ),
         (
             id: "carolyn_fern",
@@ -94,6 +123,12 @@ Investigators(
                 text: "Entretien : Le Dr Fern peut restaurer 1 point de Santé Mentale à elle-même ou à un autre personnage se trouvant au même endroit qu'elle. Elle ne peut pas augmenter la Santé Mentale d'un personnage au-delà de son maximum.",
             ),
             image: "fiches/investigateurs/carolyn_fern.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 464, x: [110, 198, 290, 380]),
+                (y: 526, x: [154, 244, 334, 424]),
+                (y: 590, x: [110, 200, 290, 380]),
+            ],
         ),
         (
             id: "darrell_simmons",
@@ -115,6 +150,12 @@ Investigators(
                 text: "Rencontre en Ville : pour la pioche de rencontres de lieu à Arkham, Darrell pioche deux cartes et en choisit une. Cette capacité ne fonctionne pas pour les rencontres de portail dans les Autres Mondes.",
             ),
             image: "fiches/investigateurs/darrell_simmons.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 464, x: [108, 198, 286, 378]),
+                (y: 528, x: [152, 242, 333, 424]),
+                (y: 592, x: [108, 198, 288, 379]),
+            ],
         ),
         (
             id: "dexter_drake",
@@ -136,6 +177,12 @@ Investigators(
                 text: "N'importe quelle phase : quand « Le Grand » Drake pioche une ou plusieurs cartes du paquet de Sorts, il pioche une carte de plus puis défausse une de ces cartes.",
             ),
             image: "fiches/investigateurs/dexter_drake.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 460, x: [108, 199, 289, 378]),
+                (y: 522, x: [154, 243, 332, 424]),
+                (y: 586, x: [108, 198, 288, 379]),
+            ],
         ),
         (
             id: "gloria_goldberg",
@@ -157,6 +204,12 @@ Investigators(
                 text: "Rencontre dans l'Autre Monde : lors de la pioche de rencontres de portail dans l'Autre Monde, Gloria pioche deux cartes qui correspondent à la couleur de l'un des symboles rencontre de cet Autre Monde, puis elle choisit celle qu'elle veut. Cette capacité ne fonctionne pas pour les rencontres à Arkham.",
             ),
             image: "fiches/investigateurs/gloria_goldberg.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 466, x: [110, 200, 288, 380]),
+                (y: 528, x: [155, 246, 334, 426]),
+                (y: 592, x: [109, 201, 290, 380]),
+            ],
         ),
         (
             id: "harvey_walters",
@@ -178,6 +231,12 @@ Investigators(
                 text: "N'importe quelle phase : Harvey réduit de 1 toutes ses pertes de Santé Mentale, jusqu'à un minimum de 0.",
             ),
             image: "fiches/investigateurs/harvey_walters.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 464, x: [111, 201, 291, 382]),
+                (y: 527, x: [156, 244, 335, 426]),
+                (y: 591, x: [110, 200, 290, 380]),
+            ],
         ),
         (
             id: "jenny_barnes",
@@ -199,6 +258,12 @@ Investigators(
                 text: "Entretien : Jenny gagne 1 $.",
             ),
             image: "fiches/investigateurs/jenny_barnes.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 461, x: [111, 201, 291, 380]),
+                (y: 524, x: [155, 245, 336, 426]),
+                (y: 587, x: [110, 200, 292, 380]),
+            ],
         ),
         (
             id: "joe_diamond",
@@ -220,6 +285,12 @@ Investigators(
                 text: "N'importe quelle phase : Joe lance un dé supplémentaire quand il dépense un pion Indice.",
             ),
             image: "fiches/investigateurs/base_ficheinvestigateur_joediamond.jpg",
+            image_size: (width: 750, height: 1055),
+            sliders: [
+                (y: 770, x: [185, 334, 484, 634]),
+                (y: 874, x: [260, 410, 560, 709]),
+                (y: 983, x: [184, 334, 484, 634]),
+            ],
         ),
         (
             id: "kate_winthrop",
@@ -241,6 +312,12 @@ Investigators(
                 text: "N'importe quelle phase : Les monstres et les portails ne peuvent pas apparaître à l'endroit où se trouve Kate à cause de son stabilisateur de flux. Les monstres et les portails ne disparaissent cependant pas quand elle rentre dans un lieu, et les monstres peuvent entrer normalement dans le lieu où elle se trouve. Ne placez pas de pion Indice sur le Département Scientifique au début du jeu.",
             ),
             image: "fiches/investigateurs/kate_winthrop.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 464, x: [109, 200, 290, 380]),
+                (y: 528, x: [154, 245, 334, 425]),
+                (y: 590, x: [110, 200, 290, 380]),
+            ],
         ),
         (
             id: "mandy_thompson",
@@ -262,6 +339,12 @@ Investigators(
                 text: "N'importe quelle phase : une fois par tour, Mandy peut activer cette capacité après qu'un investigateur (y compris elle) ait fait un test de Compétence. Cet investigateur peut relancer les dés qui n'étaient pas des succès.",
             ),
             image: "fiches/investigateurs/mandy_thompson.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 460, x: [106, 196, 287, 376]),
+                (y: 522, x: [150, 241, 330, 422]),
+                (y: 586, x: [106, 196, 286, 376]),
+            ],
         ),
         (
             id: "michael_mcglen",
@@ -289,6 +372,12 @@ Investigators(
                 text: "N'importe quelle phase : Michael réduit de 1 toutes ses pertes de Résistance, jusqu'à un minimum de 0.",
             ),
             image: "fiches/investigateurs/michael_mcglen.jpg",
+            image_size: (width: 435, height: 599),
+            sliders: [
+                (y: 443, x: [109, 195, 282, 370]),
+                (y: 504, x: [152, 239, 326, 412]),
+                (y: 566, x: [109, 196, 282, 370]),
+            ],
         ),
         (
             id: "monterey_jack",
@@ -317,6 +406,12 @@ Investigators(
                 text: "N'importe quelle phase : quand Monterey pioche une ou plusieurs cartes du paquet d'Objets Uniques, il pioche une carte de plus et défausse une des cartes.",
             ),
             image: "fiches/investigateurs/monterey_jack.jpg",
+            image_size: (width: 450, height: 620),
+            sliders: [
+                (y: 465, x: [110, 200, 292, 381]),
+                (y: 528, x: [154, 245, 335, 426]),
+                (y: 591, x: [110, 200, 292, 381]),
+            ],
         ),
         (
             id: "sister_mary",
@@ -345,6 +440,12 @@ Investigators(
                 text: "N'importe quelle phase : Sœur Marie n'est jamais perdue dans le temps et l'espace. À la place, si sa Santé Mentale descend à 0, elle retourne à l'Asile d'Arkham. Si sa Résistance descend à 0, elle retourne à l'Hôpital Sainte-Marie. Si ni sa Résistance, ni sa Santé Mentale ne sont à 0, elle retourne à l'Église Méridionale.",
             ),
             image: "fiches/investigateurs/soeur_marie.jpg",
+            image_size: (width: 746, height: 1048),
+            sliders: [
+                (y: 770, x: [181, 330, 479, 628]),
+                (y: 874, x: [255, 404, 553, 701]),
+                (y: 980, x: [182, 331, 480, 628]),
+            ],
         ),
         (
             id: "vincent_lee",
@@ -366,6 +467,12 @@ Investigators(
                 text: "Entretien : Vincent Lee peut restaurer 1 point de Résistance à lui-même ou à un autre personnage se trouvant au même endroit que lui. Il ne peut pas augmenter la Résistance d'un personnage au-delà de son maximum.",
             ),
             image: "fiches/investigateurs/vincent_lee.jpg",
+            image_size: (width: 435, height: 599),
+            sliders: [
+                (y: 444, x: [107, 193, 282, 368]),
+                (y: 504, x: [149, 237, 324, 411]),
+                (y: 566, x: [106, 193, 281, 367]),
+            ],
         ),
     ],
 )

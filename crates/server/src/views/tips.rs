@@ -74,6 +74,11 @@ pub fn gate(world: &str, place: &str, close_modifier: i8) -> Tip {
         .line(format!("Modificateur pour le fermer : {close_modifier:+}"))
 }
 
+/// A gate marker kept as a trophy after closing the gate.
+pub fn gate_trophy(world: &str) -> Tip {
+    Tip::new(format!("Portail vers {world}")).line("Trophée : portail fermé".to_owned())
+}
+
 /// The terror level and what it has done or will do to the town.
 pub fn terror(data: &GameData, level: u8) -> Tip {
     let mut closings: Vec<(u8, &str)> = data

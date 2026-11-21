@@ -1,9 +1,12 @@
 //! The Arkham board as a graph.
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::ids::{LocationId, OtherWorldId, StreetId};
 use crate::location::Location;
+use crate::location_icon::EncounterIcon;
 use crate::other_world::OtherWorld;
 use crate::special_area::{SpecialArea, SpecialAreaKind};
 use crate::street::Street;
@@ -17,6 +20,8 @@ pub struct Board {
     pub version: u32,
     /// Board image, relative to the `assets/` folder.
     pub image: String,
+    /// Image of each encounter icon, relative to the `assets/` folder.
+    pub icon_images: BTreeMap<EncounterIcon, String>,
     /// The street areas.
     pub streets: Vec<Street>,
     /// The locations.
@@ -31,7 +36,7 @@ pub struct Board {
 
 impl Board {
     /// Format version this code reads.
-    pub const VERSION: u32 = 2;
+    pub const VERSION: u32 = 3;
 
     /// Finds a location by id.
     pub fn location(&self, id: &LocationId) -> Option<&Location> {

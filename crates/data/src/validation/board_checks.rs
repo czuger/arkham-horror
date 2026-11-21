@@ -3,6 +3,7 @@
 use std::collections::HashSet;
 
 use crate::board::Board;
+use crate::location_icon::EncounterIcon;
 use crate::special_area::SpecialAreaKind;
 use crate::terror_track::TerrorTrack;
 use crate::validation::issue::Issue;
@@ -17,6 +18,7 @@ pub(crate) fn check_board(board: &Board, issues: &mut Vec<Issue>) {
     check_other_worlds(board, issues);
     check_special_areas(board, issues);
     check_terror_track(board, issues);
+    check_icon_images(board, issues);
 }
 
 /// Reports ids used twice within the same family.
@@ -156,6 +158,18 @@ fn check_terror_track(board: &Board, issues: &mut Vec<Issue>) {
     }
 }
 
+/// Every encounter icon has an image.
+fn check_icon_images(board: &Board, issues: &mut Vec<Issue>) {
+    for icon in EncounterIcon::ALL {
+        if !board.icon_images.contains_key(&icon) {
+            issues.push(Issue::Mismatch {
+                context: format!("icône de rencontre {}", icon.label()),
+                reason: "pas d'image dans `icon_images`",
+            });
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -212,6 +226,10 @@ mod tests {
         Board {
             version: Board::VERSION,
             image: String::new(),
+            icon_images: EncounterIcon::ALL
+                .into_iter()
+                .map(|icon| (icon, String::new()))
+                .collect(),
             streets: vec![street("a", "b"), street("b", "a")],
             locations: vec![location("la", "a"), location("lb", "b")],
             other_worlds: vec![OtherWorld {
@@ -243,6 +261,13 @@ mod tests {
     #[test]
     fn small_board_is_valid() {
         assert_eq!(issues(&small_board()), []);
+    }
+
+    #[test]
+    fn icon_without_image_is_reported() {
+        let mut board = small_board();
+        board.icon_images.remove(&EncounterIcon::Spell);
+        assert_eq!(issues(&board).len(), 1);
     }
 
     #[test]

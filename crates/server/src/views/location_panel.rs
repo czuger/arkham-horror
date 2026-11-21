@@ -1,4 +1,4 @@
-use data::{Location, Position};
+use data::{Board, Location, Position};
 
 use crate::views::board_geometry::{BOARD_SIZE, edge, percent};
 use crate::views::location_tip::LocationTip;
@@ -24,8 +24,8 @@ pub struct LocationPanel {
 }
 
 impl LocationPanel {
-    /// The hover zone of a location, on the board image `board_image`.
-    pub fn new(board_image: &str, location: &Location) -> Self {
+    /// The hover zone of a location of `board`.
+    pub fn new(board: &Board, location: &Location) -> Self {
         let panel = location.panel;
         let centre = Position {
             x: panel.x.saturating_add(panel.width / 2),
@@ -38,7 +38,7 @@ impl LocationPanel {
             width: percent(panel.width, BOARD_SIZE.0),
             height: percent(panel.height, BOARD_SIZE.1),
             edge: edge(centre),
-            tip: LocationTip::new(board_image, location),
+            tip: LocationTip::new(board, location),
         }
     }
 }

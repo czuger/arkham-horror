@@ -1,157 +1,81 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code in this repository.
 
-## Project status
+## Project
 
-A browser adaptation of **Arkham Horror 2nd edition** (French edition, *Horreur à Arkham*), for private use: **solo mode** (one human player, the other investigators played by AIs), **base game only**.
+Browser adaptation of **Arkham Horror 2nd edition** (French edition, *Horreur à Arkham*), private use, **solo mode** (one human, the other investigators played by AIs), **base game only**. Project documents (`.md`) are in French, plain style; keep new ones so. Base-game images are in `assets/` (`assets/inventaire_assets.md` lists them, with a « Manquants » section).
 
-Milestone **J0 (foundation) is done** (2026-11-16): a Cargo workspace under `crates/` (`data`, `engine`, `ai` are empty library stubs; `simulator` is a stub binary; `server` builds the `arkham` binary, which serves a « bonjour » page that counts visits in PoloDB). Milestone **J1 (data) is done** (2026-11-16): `data/` holds `board.ron`, `gate_markers.ron`, `monsters.ron`, `investigators.ron`, `ancient_ones.ron`, and a 39-card sample in `location_cards.ron`, `gate_cards.ron`, `mythos_cards.ron`, `investigator_cards.ron`, all loaded and cross-checked by the `data` crate (`GameData::load`, `check`, `check_assets`; tests in `crates/data/tests/` load the real files). The card-effect vocabulary (types in `crates/data/src/cards/`) is described in French in `vocabulaire_cartes.md`. Milestone **J2 (engine) is done** (2026-11-16): `engine` plays whole games on the card sample; `simulator jouer` plays one in text mode, `simulator masse` plays many with random answers. Rule gaps met while coding (R9–R17) were settled by the user the same day and are in `regles/decisions.md`. Milestone **J3 (all cards) is done** (2026-11-20): the 267 base-game cards are in `data/*_cards.ron` (raw transcription in `J3_releve_cartes.md`, progress notes in `J3.md`), board-location abilities are in `board.ron`, the 16 investigator abilities are coded by id in `rules/investigator_powers.rs`, 16 cards use a coded special effect; 30,000 random games play every encounter, card and ability at least once. Rule gaps R18–R27 were settled on 2026-11-20. Milestone **J4 (AIs) has a first version** (2026-11-20, notes and statistics in `J4.md`; the user postponed tuning the AI's strength): the `ai` crate holds `ai::Policy`, a priority-based `Responder`; `simulator masse` plays with it (`--hasard` for random answers), `simulator regarder` prints an all-AI game's journal, `simulator jouer` lets the human play seat 0 against AI seats. Trades between investigators (Q12) are postponed. Milestone **J5 (server) has a first version** (2026-11-21, notes in `J5.md`): home, new game, game page (board with clickable places, sheet, status, decision form, recent journal), full journal, unlimited undo, resume after restart; still to do: the user plays a whole game in the browser, and `static/htmx.min.js` is absent (never download it; pages load it only if the user drops it there). The repository also holds planning and reference documents, all written in French, plus the base-game images in `assets/`. Keep new project documents in French, matching their plain style.
+Milestones (plan in `plan_creation_jeu.md`, J0–J6):
+
+- **J0 foundation** (2026-11-16): Cargo workspace under `crates/`: `data`, `engine`, `ai` (libs), `simulator` (CLI), `server` (binary `arkham`).
+- **J1 data** (2026-11-16): `data/*.ron` (board, gate markers, monsters, investigators, Ancient Ones, cards) loaded and cross-checked by `GameData::load`, `check`, `check_assets`. Effect vocabulary: types in `crates/data/src/cards/`, described in `vocabulaire_cartes.md` (update it when the vocabulary changes).
+- **J2 engine** (2026-11-16): plays whole games.
+- **J3 all cards** (2026-11-20): all 267 cards in `data/*_cards.ron` (raw text in `J3_releve_cartes.md`, notes in `J3.md`); location abilities in `board.ron`; 16 investigator abilities in `rules/investigator_powers.rs`; 16 cards with a coded special effect.
+- **J4 AI, first version** (2026-11-20, `J4.md`): `ai::Policy`, priority-based. AI strength tuning and trades between investigators (Q12) postponed.
+- **J5 server, first version** (2026-11-21, `J5.md`): home, new game, game page, journal, unlimited undo, resume. Still to do: the user plays a whole game in the browser. `static/htmx.min.js` may be absent: **never download it**, the user drops it in.
 
 ## Commands
 
-- Build: `cargo build` (cold build ≈ 2.5 min, mostly RocksDB's C++ under PoloDB; incremental: seconds). Toolchain pinned to Rust 1.100.0 in `rust-toolchain.toml`.
-- Play in text mode (you play the first investigator, the AI the others): `cargo run -p simulator -- jouer --graine 5 --joueurs 3`; watch an all-AI game: `cargo run -p simulator -- regarder --graine 5 --joueurs 3`; bulk AI games: `cargo run --release -p simulator -- masse --parties 1000 --joueurs 3`, add `--hasard` for random answers (coverage runs) (data folder from `ARKHAM_DATA`, default `data`). Add `--graine N` for a fixed seed range and `--couverture FILE` to write the encounters, cards and abilities never played. A game that hangs shows up as a bulk run that never ends: bisect seeds with `--parties 1 --graine N`.
-- Run the server: `cargo run -p server` → http://127.0.0.1:3000. Settings via env vars `ARKHAM_ADDR`, `ARKHAM_DB` (database folder, default `arkham.db`), `ARKHAM_ASSETS`, `ARKHAM_STATIC`, `ARKHAM_DATA`; logs via `RUST_LOG`. Run it from the repo root so `assets/` and `static/` resolve.
-- Tests: `cargo test`; a single test: `cargo test -p server a_game_resumes_after_a_restart`.
-- Full local CI: `scripts/ci.sh` (rustfmt, clippy `-D warnings`, tests, cargo-audit, cargo-deny). The same steps are in `.github/workflows/ci.yml`; there is no git remote yet.
+- Build: `cargo build` (cold ≈ 2.5 min, RocksDB). Toolchain pinned to Rust 1.100.0.
+- Text play (human = seat 0): `cargo run -p simulator -- jouer --graine 5 --joueurs 3`; watch an AI game: `… regarder --graine 5 --joueurs 3`; bulk: `cargo run --release -p simulator -- masse --parties 1000 --joueurs 3` (`--hasard` random answers, `--graine N` seed range, `--couverture FILE` writes what was never played). A bulk run that never ends = a hanging game: bisect with `--parties 1 --graine N`.
+- Server: `cargo run -p server` from the repo root → http://127.0.0.1:3000. Env: `ARKHAM_ADDR`, `ARKHAM_DB` (default `arkham.db`), `ARKHAM_ASSETS`, `ARKHAM_STATIC`, `ARKHAM_DATA` (default `data`), `RUST_LOG`.
+- Tests: `cargo test`; one test: `cargo test -p server a_game_resumes_after_a_restart`.
+- Local CI: `scripts/ci.sh` (rustfmt, clippy `-D warnings`, tests, cargo-audit, cargo-deny); same in `.github/workflows/ci.yml`. No git remote.
 
-Technical facts found at J0 (details in `manques_et_questions.md` §2):
+## Architecture and constraints
 
-- Database: **PoloDB** (`polodb_core` 5.3, MongoDB-like, serde documents, RocksDB underneath). SurrealDB was tried first and dropped by the user on 2026-11-16 (too many constraints); do not bring it back.
-- PoloDB calls are synchronous and short; they run directly on the single tokio `current_thread` runtime. RocksDB adds 3 helper threads.
-- The database is flushed and unlocked when the last `Database` clone is dropped; drop it before reopening the same folder (tests do).
-- Game state is meant to be stored as a JSON **string** field (BSON has no unsigned 64-bit integers).
-- One RustSec advisory with no upstream fix is ignored, with its reason, in both `deny.toml` and `.cargo/audit.toml` (askama's build-time `basic-toml`). Re-check it on every askama upgrade.
-- Data files (`data/*.ron`): ids are English snake_case (`train_station`), player-facing values French; each file starts with `#![enable(implicit_some)]` and a `version` checked against the type's `VERSION`; structs use `deny_unknown_fields`. Locations have no arrow field: a monster in a location always goes to its own street. Board values were read from the board image and must be proofread by the user; the wiki monster table had errors, token images are authoritative.
-- Rust 1.100 cargo warns on unused crate dependencies: add inter-crate deps (`engine` → `data`, etc.) only when the code uses them.
-- Engine (J2): `engine::play(data, setup, responder)` replays a game from its `Setup` (seed included) and asks the `Responder` for each `Decision` (a list of labelled options; the answer is an index). `Replay` feeds recorded answers, `Waiting` stops at the first open decision. Rule code is `impl Game` blocks in `crates/engine/src/rules/`, one topic per file; it unwinds with `Halt` (`Waiting`, `KnockedOut`, `Awakened`, `Over`…) through `?`. All randomness goes through `Game::die` / the in-repo `Rng` (xoshiro256**; its output is pinned by a test, never change it). Use `BTreeMap`, never `HashMap`, in the state (replay order). Unit tests in `crates/engine/src/tests/` build a clean state and force dice (`run(state, answers, dice, |game| …)`).
-- AI (J4): `Responder::answer(&mut self, view: &View, decision: &Decision) -> Option<usize>`. `View` is a read-only window on the game for responders (state, data, dice for a check, maximums, monster stats, routes, closed locations…). Each `Decision` carries a `Context` (`Check`, `Monsters`, `Combat`, `Gate`, `Cards(CardAim)`) and each option its card `effects` when it has some, so the AI can weigh choices; keep them filled when adding decisions. `Outcome.tally` counts knock-outs, devourings, gates opened/closed/sealed, monsters defeated and the awakening cause. The AI's plan for a turn is `ai::intention` (target place and `Reason`). `crates/ai/tests/ai_games.rs` plays 160 AI games on the real data (≈35 s in debug).
-- Server (J5): no game state in memory. The `partie` collection holds one `GameRow` per game whose `record` is the JSON of `Progress` (setup, every answer human and AI, positions of the human's answers for undo, journal lines already seen). Each request replays the game with `Replay` + `ai::Seated` (human on seat 0); `engine::inspect` gives a `View` on a saved state for the page models in `crates/server/src/views/`. Forms carry the move number (`coup`) so a stale or repeated post is ignored; cross-site posts are refused by `same_origin.rs`. HTTP tests are in `crates/server/src/tests/` (a whole game played through the forms, resume after reopening the database).
-- Ancient One and monster texts are coded by id in `rules/ancient_one_powers.rs`, `rules/ancient_one_attacks.rs`, `rules/monster_specials.rs` and `rules/monster_movement.rs`.
+- One executable: engine, AIs, axum server, embedded DB. Tokio **`current_thread`**. Local only (`127.0.0.1`, no login; hosting out of scope).
+- **UI**: server-rendered HTML with **askama**, forms POST → redirect → GET, **htmx** and small JS served locally (never a CDN). No heavy client: no SPA, no rules or game state in the browser.
+- AI turns and the Mythos phase play **in one block** after each human answer.
+- Game data stays in versioned RON files, never in the DB or code. Card texts are transcribed by Claude from `assets/` images, proofread by the user; unknown copy counts are entered from memory and marked « à vérifier ».
+
+Technical facts (details in `manques_et_questions.md` §2):
+
+- **DB: PoloDB** (`polodb_core` 5.3, RocksDB under). SurrealDB was dropped (2026-11-16): never bring it back. Calls are synchronous, run on the runtime thread. The DB unlocks when the last `Database` clone is dropped: drop it before reopening the same folder. Store game state as a JSON **string** (BSON has no u64).
+- One RustSec advisory (askama's build-time `basic-toml`) is ignored in `deny.toml` and `.cargo/audit.toml`; re-check on each askama upgrade.
+- Cargo warns on unused deps: add inter-crate deps only when used.
+- **RON files**: ids English snake_case, player-facing values French; start with `#![enable(implicit_some)]` and a `version` checked against the type's `VERSION`; `deny_unknown_fields`. Locations have no arrow: a monster goes to its own street. Board values need user proofreading; monster token images beat the wiki table.
+- **Engine**: `engine::play(data, setup, responder)` replays from `Setup` (seed) and asks the `Responder` for each `Decision` (labelled options, answer = index); `Replay` feeds recorded answers, `Waiting` stops at the first open decision. Rules are `impl Game` blocks in `crates/engine/src/rules/`, one topic per file, unwinding with `Halt` via `?`. Ancient One and monster texts are coded by id in `rules/ancient_one_*.rs`, `rules/monster_*.rs`. All randomness via `Game::die` / in-repo `Rng` (xoshiro256**, output pinned by a test: never change it). `BTreeMap`, never `HashMap`, in the state. Unit tests in `crates/engine/src/tests/` force dice with `run(state, answers, dice, |game| …)`.
+- **AI**: `Responder::answer(&mut self, view: &View, decision: &Decision) -> Option<usize>`. `View` = read-only game window. Each `Decision` carries a `Context` and each option its card `effects`: keep them filled when adding decisions. `Outcome.tally` counts game events; `ai::intention` is the AI's turn plan. `crates/ai/tests/ai_games.rs` plays 160 games (≈35 s debug).
+- **Server**: no game state in memory. Collection `partie`, one `GameRow` per game, `record` = JSON of `Progress` (setup, all answers, human answer positions for undo, journal lines seen). Each request replays with `Replay` + `ai::Seated`; `engine::inspect` gives a `View` for page models in `crates/server/src/views/`. Forms carry the move number (`coup`) to ignore stale posts; `same_origin.rs` refuses cross-site posts. HTTP tests in `crates/server/src/tests/`.
+
+## Reference files
 
 | File | Role |
 |---|---|
-| `plan_creation_jeu.md` | **The current plan (2026-11-16). Read this first.** Architecture (axum + tokio single-thread server, embedded database — now PoloDB, server-rendered HTML, JS allowed but no heavy client), crate layout, data format, engine design (decision/response model), AI, milestones J0–J6, tests, hosting. |
-| `manques_et_questions.md` | Up-to-date list of missing data (M1–M24), technical points to verify (T1–T6), rules R1–R27 (settled, see `regles/decisions.md`) and questions for the user (Q1–Q23); §2 also records the J0 measurements. |
-| `plan_mise_en_ligne.md` | The earlier plan (WASM client, no server). Its architecture is superseded; its Parts 2–3 (missing data M1–M20, open questions) are kept for reference. |
-| `J5.md` | J5 notes: what the server does, how games are saved and replayed, what is left. |
-| `J4.md` | J4 notes: how the AI decides, calibration results and statistics per player count. |
-| `J3.md`, `J3_releve_cartes.md` | J3 progress notes, and the raw text of every card read from the images (the source of the data files). |
-| `vocabulaire_cartes.md` | How card effects are written in the data files: effect primitives, lasting effects, abilities, the « effet spécial » list, the sample and the load-time checks. Update it whenever the vocabulary changes. |
-| `regles/decisions.md` | Rules the rulebook leaves open, settled with the user (date and reason each). Authoritative for the engine. |
-| `regles/base.md` | Base-game rules, transcribed from the official French rulebook (Edge 2016 revised edition). Transcription notes are marked ⚠ in italics; §22 lists rulebook inconsistencies; §23 holds the base-game part of the official FAQ v2.0 (2017: card errata + rulings), which overrides the rulebook. |
-| `inventaire.md` | Inventory of the source material (a 2017 scrape of the French wiki `wiki.horreuraarkham.fr`): what each HTML/PDF file contains and what data is still missing (§7–§8). |
+| `plan_creation_jeu.md` | **Current plan. Read first.** |
+| `manques_et_questions.md` | Missing data (M), technical points (T), rules (R), questions for the user (Q). |
+| `plan_mise_en_ligne.md` | Old plan (WASM), superseded. |
+| `J3.md`, `J4.md`, `J5.md` | Milestone notes. |
+| `vocabulaire_cartes.md` | Card effect vocabulary. |
+| `regles/decisions.md` | Rules settled with the user (R1–R27). Authoritative. |
+| `regles/base.md` | French rulebook; §22 inconsistencies; §23 official FAQ (overrides the rulebook). |
+| `inventaire.md` | Inventory of the scraped sources and what is missing. |
 
-The scraped sources live **outside** this repo, at `~/python/perso/scraper/pages/wiki.horreuraarkham.fr/` (= `/Users/ced/python/perso/scraper/pages/wiki.horreuraarkham.fr/`). As of 2026-11-16 the folder holds 953 HTML, 66 PDF and about 3,100 wiki images, all in one flat folder (images are named `images__x__xy__<name>`). They mix three games; only Arkham Horror 2nd ed. is relevant — ignore *Mansions of Madness* (`_mom`/`_MoM` suffix) and *Elder Sign* (`_es` suffix) pages.
+**Scraped sources**: `/Users/ced/python/perso/scraper/pages/wiki.horreuraarkham.fr/` (flat folder, images named `images__x__xy__<name>`; ignore `_mom`/`_MoM` and `_es` pages).
 
-- **This local scrape is the only allowed source. Never download anything** (wiki, archive.org or elsewhere). If something is missing, tell the user; they re-run the scraper themselves.
-- Treat the scrape folder as **read-only**. Write outputs to the scratchpad or the project, never next to the sources.
-- Counts change when the user re-runs the scraper, so recount on disk before saying a file is missing.
+- **Only allowed source. Never download anything**; if something is missing, tell the user (they re-run the scraper).
+- **Read-only**: write outputs to the scratchpad or the project.
+- Recount on disk before saying a file is missing.
 
-Base-game images are sorted by theme in `assets/` (plateau, cartes, fiches, monstres, marqueurs, errata, regles, illustrations). `assets/inventaire_assets.md` lists every file with its source and has a « Manquants » section.
+## Domain rules
 
-## Planned architecture (from `plan_creation_jeu.md`)
-
-One executable holds everything: rules engine, AIs, web server and embedded database.
-
-- **Server**: axum + tokio on a **single thread** (`current_thread` runtime). No game state in memory: each request loads the game from the DB, applies the answer, lets the AIs play up to the next human decision, then saves.
-- **Database**: PoloDB embedded (collections `partie`, `action`, `evenement`). Game data (cards, board…) stays in versioned RON files under `data/`, never in the DB or the code.
-- **UI**: server-rendered HTML with **askama** (user's choice, 2026-11-16), classic forms with POST → redirect → GET, plus **htmx** (served locally, no CDN) to swap page fragments. JavaScript is allowed (user's decision, 2026-11-21): hand-written scripts or small libraries served locally (no CDN) when they improve the interface (bubbles, board zoom, partial updates…). What is refused is a **heavy client**: no in-browser application (no React/Vue/SPA), no game rules or game state in the browser; the server keeps all the logic and renders the HTML. Playing without JS is no longer required. Card and token images come from `assets/`.
-- AI turns and the Mythos phase are played **in one block** after each human answer; the human follows them in the journal.
-- **Hosting and access control are out of scope** (the user has a dedicated environment). The project only has to run locally: listen on `127.0.0.1`, no login page.
-- Cargo workspace: `data` (types + loading + consistency checks), `engine` (rules: deterministic, serializable, no I/O), `ai` (policies answering decisions), `server` (axum), `simulator` (CLI for mass AI-only games; kept out of the server because it would block the single thread).
-- **Engine model**: the engine advances until someone must choose, then exposes a *Decision* (who, what, legal options). Humans answer through forms, AIs through a policy function; the engine validates both the same way and refuses illegal answers. Dice come from the engine's seeded RNG. Seed + ordered answers replay a game exactly, which gives save/resume, undo and reproducible tests.
-- Card effects are written in the data files with a small vocabulary of effect primitives; the rare cards that do not fit are flagged « effet spécial » and coded by name.
-- Deliverable: single binary + `data/` + `assets/` + htmx file + DB file created on first run, configured by file or environment variables.
-- Card texts are transcribed by Claude from the images in `assets/` (user's decision, 2026-11-16), then proofread by the user against the physical box. Copy counts per card are pending the user's own research: enter them from memory and mark them « à vérifier ».
-
-Planned tests: unit tests per phase and rule, property tests (no impossible states, no negative resources), data consistency checks, one auto-generated test per card, thousands of AI-only games that must end without crashing, seed + answer-list replay, HTTP route tests with a temporary DB. CI: rustfmt, clippy, tests, cargo-audit, cargo-deny.
-
-Settled rules go in `regles/decisions.md` with date and reason. R1–R17 were all settled on 2026-11-16, R18–R27 on 2026-11-20 (the user accepted every recommendation except R20).
+- Before coding a rule, check `regles/decisions.md`, then `regles/base.md` §23 and §22. A new rule gap: never decide silently, ask the user, then record it in `decisions.md` with date and reason.
+- Golden rule: when in doubt, the outcome worst for the investigator.
+- **Vigueur** = the skill once called « Combat » (*Fight*).
+- Card texts are copyrighted: the repository stays **private**.
 
 ## Rust code guidelines
 
-Adopted on 2026-11-16 from the user's style guide (gist `czuger/e216e802e61c9c6d156c1a0f03b31003`). They apply to all future code. The planned CI (rustfmt, clippy with warnings forbidden) is how they are enforced.
+From the user's style guide (2026-11-16), enforced by rustfmt and clippy `-D warnings`.
 
-### Language
-
-- **Code is English, whatever language the prompt is in.** Identifiers, function names, crate and module names, comments, docstrings, commit messages and log lines are in English even when the request or the discussion is in French.
-- **User-facing text is French, and stays French.** Error messages shown to users, CLI output, labels, templates, anything a reader sees: French, UTF-8, accents kept. Do not translate it; write new user-facing text in French.
-- Project-specific precisions (user's decisions, 2026-11-16):
-  - Crate names are English (`data`, `engine`, `ai`, `server`, `simulator`).
-  - In the RON data files, keys, field names and effect-primitive names are English like the code; values read by the player (card names, card texts, location names…) are French.
-  - Project documents (`.md`) stay in French, as stated in « Project status ».
-
-### Imports
-
-- Prefer `crate::`-rooted paths across modules (the Rust equivalent of absolute imports).
-- `super::` is acceptable within tightly nested hierarchies (a `tests` submodule referencing its parent, a submodule referencing its direct parent's types).
-- No deep `super::super::` chains: restructure the module tree instead.
-- No glob imports (`use foo::*;`) except prelude modules designed for it, or `use super::*;` in test modules.
-
-### Type annotations
-
-- Annotate all `pub` function signatures explicitly (parameters and return type), even where inference would work.
-- Let inference handle local variable bindings inside function bodies.
-- Prefer concrete types over generics unless genericity provides real, used value (called with more than one concrete type, or part of a public API meant to be generic).
-- Avoid `Box<dyn Any>` and other type-erasure patterns unless strictly necessary; justify with a short comment.
-- Avoid `Box<dyn Error>` in library code; prefer a concrete, well-typed error enum. `Box<dyn Error>` is acceptable at binary/application boundaries (e.g. `main`).
-
-### Docstrings
-
-- All `pub` items (functions, methods, structs, enums, traits) require a rustdoc comment (`///`), with the standard sections (`# Arguments`, `# Returns`, `# Errors`, `# Panics`) as applicable.
-- Private items get a docstring only when the logic isn't obvious from the signature and name.
-- Keep docstrings proportionate: short for simple functions, detailed only when it adds real clarity. Do not restate what the signature already says.
-- Enforce at crate level: `#![warn(missing_docs)]` everywhere, `#![deny(missing_docs)]` for the library crates (`data`, `engine`, `ai`).
-
-### Comments
-
-- No comments for straightforward or self-evident code; never caption the obvious.
-- Comment only when the logic is genuinely complex, non-obvious, or could be misread.
-- Keep comments short: a brief note on intent or reasoning, not a narration of what the code does.
-
-### Error handling
-
-- `Result<T, E>` for recoverable errors, `Option<T>` for absence. No panics as control flow.
-- Propagate with `?` rather than manual `match`/`if let` chains, unless the error must be transformed or contextualized at that point.
-- No `unwrap()` or `expect()` in library or production code paths; reserve them for tests, examples and prototypes. If used elsewhere because failure is provably impossible, justify with a short comment (e.g. `// safe: regex is a compile-time constant`).
-- Define proper error types (plain enums, or via `thiserror`), not stringly-typed errors (`Err("something failed".to_string())`) nor blanket `Box<dyn Error>` in library code.
-- Never silently discard errors with `.ok()`, `let _ =` or similar: handle, log or propagate explicitly.
-- `panic!` (and `unreachable!`, `todo!`, `unimplemented!` left in shipped code) is reserved for genuine invariant violations (bugs), not expected failure modes.
-
-### Function size and decomposition
-
-- Soft limit of 50 lines per function.
-- Beyond that, split into smaller, well-named sub-functions, each with a single clear responsibility and its own concise docstring.
-- Prefer composition of small functions over deeply nested logic or long procedural blocks.
-- Prefer early returns and `?`-based flattening over deeply nested `match`/`if let` pyramids.
-
-### Types and modules
-
-- One primary public type (struct, enum or trait) per file, with its associated `impl` blocks. The file name (snake_case) matches the type name (`struct UserAccount` → `user_account.rs`).
-- Exceptions: small, tightly-coupled types may share the file with the primary type (an error enum returned by its methods, a config/builder struct feeding it, a result type it produces).
-- A closely-related family of small types with no independent identity (AST node variants, a state machine's states) may live together in one file organized around the concept they express. Split it out once it grows into its own topic.
-- Traits implemented by multiple unrelated types get their own file; a trait implemented by only one type may be co-located with that type.
-
-### File and module organization
-
-- No monolithic files. Split code by topic/responsibility into modules (`mod foo;`).
-- Group related modules into a directory-based module tree when a topic grows large enough.
-- Keep `mod.rs` / inline module-declaration files thin: `pub use` re-exports only, no implementation logic.
-- Keep `lib.rs` / `main.rs` as thin entry points: module declarations, top-level wiring and re-exports, no business logic.
-
-### General principles
-
-- Favor readability and small, testable units over cleverness.
-- Prefer explicit over implicit in naming, typing and structure.
-- Split files as soon as they start doing « too much » rather than waiting for a refactor pass.
-- Prefer composition over inheritance-like patterns; use traits for shared behavior, not deep hierarchies.
-- Align with idiomatic Rust and clippy/rustfmt defaults rather than fighting them; deviate only where this guide explicitly says so.
-
-## Domain notes
-
-- Terminology follows the 2016 French edition: **Vigueur** is the skill the first French edition called « Combat » (*Fight* in English).
-- Golden rule of the game: when in doubt, choose the outcome that is worst for the investigator.
-- Card texts are copyrighted. The planned repository must stay **private**.
-- Before writing engine code for a rule, check `regles/decisions.md` (settled rules, authoritative), `regles/base.md` §23 (official FAQ) and §22. Any new gap in the rules: do not decide it silently — ask the user, then record it in `decisions.md`.
+- **Language**: code, identifiers, comments, docs, commits, logs in English. User-facing text (messages, CLI output, labels, templates) in French with accents; never translate it. RON keys and effect names English, player-read values French.
+- **Imports**: `crate::` paths; `super::` only one level (e.g. tests); no globs except preludes or `use super::*;` in tests.
+- **Types**: annotate all `pub` signatures; let inference handle locals; concrete types over generics unless genericity is really used; no `Box<dyn Any>` without a justifying comment; no `Box<dyn Error>` in libraries (fine in `main`).
+- **Docs**: rustdoc on every `pub` item, with `# Arguments`/`# Returns`/`# Errors`/`# Panics` as needed, proportionate; private items only when non-obvious. `#![warn(missing_docs)]` everywhere, `#![deny(missing_docs)]` in `data`, `engine`, `ai`.
+- **Comments**: only for non-obvious logic, short, about intent.
+- **Errors**: `Result` / `Option`, propagate with `?`; real error enums (or `thiserror`), no string errors. No `unwrap`/`expect` outside tests unless provably safe with a `// safe:` comment. Never silently drop errors (`.ok()`, `let _ =`). `panic!`/`unreachable!` only for invariant violations.
+- **Size**: soft limit 50 lines per function; split into small named functions; early returns over nesting.
+- **Files**: one primary public type per file, file named after it (small tightly coupled types may share it; a family of tiny types may live together). Traits with several implementors get their own file. No monolithic files; `mod.rs`, `lib.rs`, `main.rs` thin (declarations, wiring, re-exports).
+- Readability over cleverness, explicit over implicit, composition over hierarchies, idiomatic clippy/rustfmt style.

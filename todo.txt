@@ -1,0 +1,5 @@
+Fait une page pour afficher les fiches d'investigateurs, utilise les pions coulissants pour marquer les caracteristiques. Utilise également les pions res et san pour marquer la résistance et la santé mentale.
+Un investigateurs qui a 7 en san a 7 pions. Enlève des pions quand il en perd. Utilise également les pions dollars pour affocher le montant d'argent.
+Utilise les pions indoces pour montrer le nombre d'indices. Affiche les monstres dans une zone trophée dédiée. 
+
+Fait également une page ou l'on voit la carte en taille 1:1 orienté paysage avec tous les éléments dessus. Pour l'instant, cette carte n'est pas interactive, c'est juste pour un test.

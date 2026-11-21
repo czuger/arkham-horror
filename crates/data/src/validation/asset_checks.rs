@@ -20,7 +20,9 @@ fn cited_images(data: &GameData) -> impl Iterator<Item = &str> {
     let gates = &data.gate_markers;
     std::iter::once(data.board.image.as_str())
         .chain(std::iter::once(data.board.terror_track.marker.as_str()))
+        .chain(data.board.icon_images.values().map(String::as_str))
         .chain(std::iter::once(data.ancient_ones.doom_marker.as_str()))
+        .chain(data.investigators.markers.images())
         .chain(std::iter::once(gates.back_image.as_str()))
         .chain(gates.markers.iter().map(|marker| marker.image.as_str()))
         .chain(

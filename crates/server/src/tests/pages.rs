@@ -83,6 +83,47 @@ async fn the_ancient_one_page_shows_its_sheet() {
 }
 
 #[tokio::test(flavor = "current_thread")]
+async fn the_investigators_page_shows_every_sheet_with_its_tokens() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db"));
+    let game = new_game(&app, NEW_GAME).await;
+    assert!(app.get(&game).await.body.contains("/investigateurs\""));
+    let page = app.get(&format!("{game}/investigateurs")).await;
+    assert_eq!(page.status, StatusCode::OK);
+    let body = page.body;
+    assert_eq!(body.matches("class=\"investigator-sheet\"").count(), 3);
+    assert_eq!(body.matches("class=\"slider\"").count(), 9);
+    assert!(body.contains("marqueurs/san.jpg"), "{body}");
+    assert!(body.contains("marqueurs/res.jpg"), "{body}");
+    assert!(body.contains("Trophées"), "{body}");
+    assert_eq!(
+        app.get("/partie/99/investigateurs").await.status,
+        StatusCode::NOT_FOUND
+    );
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn the_landscape_board_page_shows_the_turned_board() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db"));
+    let game = new_game(&app, NEW_GAME).await;
+    assert!(app.get(&game).await.body.contains("/plateau\""));
+    let page = app.get(&format!("{game}/plateau")).await;
+    assert_eq!(page.status, StatusCode::OK);
+    assert!(
+        page.body.contains("width: 1576px; height: 1064px"),
+        "{}",
+        page.body
+    );
+    assert!(page.body.contains("rotate(90deg)"), "{}", page.body);
+    assert!(!page.body.contains("<button"), "{}", page.body);
+    assert_eq!(
+        app.get("/partie/99/plateau").await.status,
+        StatusCode::NOT_FOUND
+    );
+}
+
+#[tokio::test(flavor = "current_thread")]
 async fn locations_show_their_text_and_icons_on_hover() {
     let dir = temp();
     let app = TestApp::open(&dir.path().join("db"));

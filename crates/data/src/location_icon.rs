@@ -2,10 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::position::Position;
-
 /// What an encounter icon announces: the rewards most often found there.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum EncounterIcon {
     /// Allies.
     Ally,
@@ -30,6 +28,20 @@ pub enum EncounterIcon {
 }
 
 impl EncounterIcon {
+    /// Every icon, in the rulebook's order.
+    pub const ALL: [Self; 10] = [
+        Self::Ally,
+        Self::Sanity,
+        Self::Blessing,
+        Self::Skill,
+        Self::Clue,
+        Self::Spell,
+        Self::CommonItem,
+        Self::Money,
+        Self::Stamina,
+        Self::UniqueItem,
+    ];
+
     /// French name of what the icon stands for.
     pub fn label(self) -> &'static str {
         match self {
@@ -56,6 +68,4 @@ pub struct LocationIcon {
     /// Printed in reversed colours: a sure way to get it here.
     #[serde(default)]
     pub sure: bool,
-    /// Centre of the icon on the board image.
-    pub position: Position,
 }
