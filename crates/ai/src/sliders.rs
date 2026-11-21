@@ -142,7 +142,9 @@ fn stop_worth(view: &View<'_, '_>, seat: usize, needs: &Needs, track: usize, sto
     match track {
         0 => {
             let points = (left + needs.speed_offset).max(0.0);
-            knob("SPEED", 1.5) * points.min(needs.speed) + knob("SPEED_EXTRA", 0.1) * points + needs.sneak * knob("SNEAK", 1.0) * right
+            knob("SPEED", 1.5) * points.min(needs.speed)
+                + knob("SPEED_EXTRA", 0.1) * points
+                + needs.sneak * knob("SNEAK", 1.0) * right
         }
         1 => needs.fight * left + needs.will * right,
         _ => needs.lore * left + needs.luck * right,

@@ -81,6 +81,30 @@ async fn a_new_game_waits_for_the_human() {
 }
 
 #[tokio::test(flavor = "current_thread")]
+async fn a_hot_seat_game_lets_the_human_play_every_investigator() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db")).await;
+    let form = "investigateur=amanda_sharpe&ia=1&ia1=bob_jenkins&graine=7&tous=1";
+    let game = new_game(&app, form).await;
+    assert!(
+        app.get("/")
+            .await
+            .body
+            .contains("Amanda Sharpe et Bob Jenkins contre"),
+    );
+    let other = app.get(&format!("{game}/investigateurs/1")).await.body;
+    assert!(other.contains("(Vous ·"), "{other}");
+    let mut page = current_page(&app, &game).await;
+    for _ in 0..40 {
+        if page.contains("Bob Jenkins : à vous") {
+            return;
+        }
+        page = answer_first(&app, &game).await;
+    }
+    panic!("Bob Jenkins never had a decision: {page}");
+}
+
+#[tokio::test(flavor = "current_thread")]
 async fn the_ancient_one_page_shows_its_sheet() {
     let dir = temp();
     let app = TestApp::open(&dir.path().join("db")).await;

@@ -6,7 +6,8 @@ use engine::{View, inspect};
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
-use crate::session::{HUMAN_SEAT, Session};
+use crate::play_mode::PlayMode;
+use crate::session::Session;
 use crate::views::{HandZones, InvestigatorMat, SheetDecision, on_sheet, sheet};
 
 #[derive(Template)]
@@ -30,7 +31,7 @@ struct Tab {
     current: bool,
 }
 
-/// The human investigator's page.
+/// The page of the investigator the human plays now.
 ///
 /// # Errors
 ///
@@ -40,7 +41,9 @@ pub async fn investigators(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
-    page(&state, id, HUMAN_SEAT).await
+    let session = Session::load(&state.db, &state.data, id).await?;
+    let seat = session.player_seat();
+    page(&state, session, seat)
 }
 
 /// One investigator's page: sheet with its sliders, tokens, trophies and
@@ -55,24 +58,26 @@ pub async fn investigator(
     State(state): State<AppState>,
     Path((id, seat)): Path<(i64, usize)>,
 ) -> Result<Html<String>, AppError> {
-    page(&state, id, seat).await
+    let session = Session::load(&state.db, &state.data, id).await?;
+    page(&state, session, seat)
 }
 
 /// Renders the page of the investigator at `seat`.
-async fn page(state: &AppState, id: i64, seat: usize) -> Result<Html<String>, AppError> {
-    let session = Session::load(&state.db, &state.data, id).await?;
+fn page(state: &AppState, session: Session, seat: usize) -> Result<Html<String>, AppError> {
+    let id = session.id;
+    let mode = session.mode();
     let decision = session
         .decision()
-        .filter(|decision| seat == HUMAN_SEAT && on_sheet(decision));
+        .filter(|decision| mode.human(seat) && decision.who == seat && on_sheet(decision));
     let page = inspect(&state.data, &session.outcome.state, |view| {
-        let mat = InvestigatorMat::new(view, seat)?;
+        let mat = InvestigatorMat::new(view, seat, mode)?;
         let inv = view.state().investigators.get(seat)?;
         let sheet = sheet(view.data(), &inv.id)?;
         Some(InvestigatorPage {
             htmx: state.htmx,
             id,
             markers: state.data.investigators.markers.clone(),
-            tabs: tabs(view, seat),
+            tabs: tabs(view, seat, mode),
             mat,
             hands: HandZones::new(view.data(), inv, decision),
             decision: decision
@@ -84,12 +89,12 @@ async fn page(state: &AppState, id: i64, seat: usize) -> Result<Html<String>, Ap
 }
 
 /// Links to every investigator's page.
-fn tabs(view: &View<'_, '_>, current: usize) -> Vec<Tab> {
+fn tabs(view: &View<'_, '_>, current: usize, mode: PlayMode) -> Vec<Tab> {
     (0..view.state().investigators.len())
         .map(|seat| Tab {
             seat,
             name: view.name(seat),
-            player: if seat == HUMAN_SEAT { "vous" } else { "IA" },
+            player: if mode.human(seat) { "vous" } else { "IA" },
             current: seat == current,
         })
         .collect()

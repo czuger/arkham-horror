@@ -33,6 +33,14 @@ impl CombatSpan {
         })
     }
 
+    /// The seat of the investigator who faced a monster last.
+    pub fn last_seat(shown: &[Shown]) -> Option<usize> {
+        shown.iter().rev().find_map(|item| match &item.what {
+            Exhibit::CombatStart { seat, .. } => Some(*seat),
+            _ => None,
+        })
+    }
+
     /// Whether the combat goes on.
     pub fn ongoing(&self) -> bool {
         self.end.is_none()

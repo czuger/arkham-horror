@@ -1,7 +1,6 @@
 use data::{CheckKind, MonsterAbility, MonsterId, Resource};
 use engine::{Choice, Context, Decision, DecisionKind, Outcome, View};
 
-use crate::session::HUMAN_SEAT;
 use crate::views::combat_span::{CombatSpan, end_label};
 use crate::views::decision_view::DecisionView;
 use crate::views::image_token::ImageToken;
@@ -69,7 +68,7 @@ pub struct HandsChoice {
 }
 
 impl CombatView {
-    /// The combat page of the human investigator.
+    /// The combat page of the investigator at `seat`.
     ///
     /// # Arguments
     ///
@@ -77,12 +76,13 @@ impl CombatView {
     /// * `seen` - journal lines the player had seen at their last answer.
     pub fn new(
         view: &View<'_, '_>,
+        seat: usize,
         outcome: &Outcome,
         span: Option<&CombatSpan>,
         seen: usize,
         decision: Option<&Decision>,
     ) -> Option<Self> {
-        let inv = view.state().investigators.get(HUMAN_SEAT)?;
+        let inv = view.state().investigators.get(seat)?;
         let bonus = decision.and_then(|decision| match &decision.context {
             Context::Combat { bonus, .. } => Some(*bonus),
             _ => None,
@@ -91,17 +91,17 @@ impl CombatView {
         let to_face = match decision.map(|decision| (&decision.kind, &decision.context)) {
             Some((DecisionKind::FaceMonster, Context::Monsters(monsters))) => monsters
                 .iter()
-                .filter_map(|id| foe(view, id, bonus))
+                .filter_map(|id| foe(view, seat, id, bonus))
                 .collect(),
             _ => Vec::new(),
         };
         Some(Self {
-            who: view.name(HUMAN_SEAT),
-            sanity: (inv.sanity, view.maximum(HUMAN_SEAT, Resource::Sanity)),
-            stamina: (inv.stamina, view.maximum(HUMAN_SEAT, Resource::Stamina)),
+            who: view.name(seat),
+            sanity: (inv.sanity, view.maximum(seat, Resource::Sanity)),
+            stamina: (inv.stamina, view.maximum(seat, Resource::Stamina)),
             clues: inv.clues,
-            success_from: view.success_face(HUMAN_SEAT),
-            foe: span.and_then(|span| foe(view, &span.foe, bonus)),
+            success_from: view.success_face(seat),
+            foe: span.and_then(|span| foe(view, seat, &span.foe, bonus)),
             lines: span.map_or_else(Vec::new, |span| {
                 let to = span.end.map_or(outcome.events.len(), |(_, line)| line);
                 journal_lines(view, &outcome.events, &outcome.shown, span.start, to)
@@ -115,22 +115,22 @@ impl CombatView {
 }
 
 /// A monster with its values and the dice rolled against it.
-fn foe(view: &View<'_, '_>, id: &MonsterId, bonus: Option<i32>) -> Option<FoeView> {
+fn foe(view: &View<'_, '_>, seat: usize, id: &MonsterId, bonus: Option<i32>) -> Option<FoeView> {
     let token = monster(view, id)?;
     let stats = view.monster_stats(id)?;
     let mut dice = vec![format!(
         "Évasion : {} dé(s)",
-        view.check_dice(HUMAN_SEAT, CheckKind::Evade, stats.awareness)
+        view.check_dice(seat, CheckKind::Evade, stats.awareness)
     )];
     if let Some(horror) = stats.horror {
         dice.push(format!(
             "Horreur : {} dé(s)",
-            view.check_dice(HUMAN_SEAT, CheckKind::Horror, i32::from(horror.modifier))
+            view.check_dice(seat, CheckKind::Horror, i32::from(horror.modifier))
         ));
     }
     if let Some(combat) = stats.combat {
         let modifier = i32::from(combat.modifier) + bonus.unwrap_or(0);
-        let dice_count = view.check_dice(HUMAN_SEAT, CheckKind::Combat, modifier);
+        let dice_count = view.check_dice(seat, CheckKind::Combat, modifier);
         dice.push(match bonus {
             Some(bonus) => format!(
                 "Combat : {dice_count} dé(s), armes en main comprises ({bonus:+}), {} succès nécessaire(s)",

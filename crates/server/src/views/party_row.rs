@@ -1,8 +1,8 @@
 use ai::Reason;
 use data::Resource;
-use engine::View;
+use engine::{Decision, View};
 
-use crate::session::HUMAN_SEAT;
+use crate::play_mode::PlayMode;
 use crate::views::names::investigator_name;
 use crate::views::tip::Tip;
 use crate::views::tips;
@@ -12,7 +12,7 @@ use crate::views::tips;
 pub struct PartyRow {
     /// Name.
     pub name: String,
-    /// Whether it is the human's investigator.
+    /// Whether it is shown as the player's own (see [`PlayMode::highlighted`]).
     pub human: bool,
     /// Whether this investigator is the first player.
     pub first: bool,
@@ -38,7 +38,7 @@ pub struct PartyRow {
 
 impl PartyRow {
     /// Every investigator, in seat order.
-    pub fn all(view: &View<'_, '_>) -> Vec<Self> {
+    pub fn all(view: &View<'_, '_>, decision: Option<&Decision>, mode: PlayMode) -> Vec<Self> {
         let state = view.state();
         state
             .investigators
@@ -46,7 +46,7 @@ impl PartyRow {
             .enumerate()
             .map(|(seat, inv)| Self {
                 name: investigator_name(view.data(), &inv.id),
-                human: seat == HUMAN_SEAT,
+                human: mode.highlighted(seat, decision),
                 first: seat == state.first_player,
                 place: view.place_name(&inv.place),
                 sanity: (inv.sanity, view.maximum(seat, Resource::Sanity)),
@@ -54,7 +54,11 @@ impl PartyRow {
                 money: inv.money,
                 clues: inv.clues,
                 cards: inv.cards.len(),
-                plan: plan(view, seat),
+                plan: if mode.human(seat) {
+                    String::new()
+                } else {
+                    plan(view, seat)
+                },
                 eliminated: inv.eliminated,
                 tip: tips::investigator(view, seat),
             })
@@ -64,9 +68,6 @@ impl PartyRow {
 
 /// « Fermer le portail de la Gare », for the AI seats in Arkham.
 fn plan(view: &View<'_, '_>, seat: usize) -> String {
-    if seat == HUMAN_SEAT {
-        return String::new();
-    }
     let Some((place, reason)) = ai::intention(view, seat) else {
         return String::new();
     };

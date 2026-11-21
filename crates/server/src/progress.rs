@@ -1,11 +1,16 @@
 use engine::Setup;
 use serde::{Deserialize, Serialize};
 
+use crate::play_mode::PlayMode;
+
 /// What is saved of a game: enough to replay it exactly.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Progress {
     /// The setup, seed included.
     pub setup: Setup,
+    /// Who plays the investigators; games saved before hot seat are solo.
+    #[serde(default)]
+    pub mode: PlayMode,
     /// Every answer given so far, the human's and the AI's, in order.
     pub answers: Vec<usize>,
     /// The human's answers, for undoing: position in `answers`, and

@@ -5,7 +5,7 @@ use engine::inspect;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
-use crate::session::{HUMAN_SEAT, Session};
+use crate::session::Session;
 use crate::views::{CombatDecision, CombatView, HandZones};
 
 #[derive(Template)]
@@ -21,7 +21,7 @@ struct CombatPage {
     can_undo: bool,
 }
 
-/// The human investigator's combat: the monster, every roll of the
+/// The combat of the investigator the human plays now: the monster, every roll of the
 /// combat, the cards in hand, and the decision when it is about the
 /// combat.
 ///
@@ -35,15 +35,17 @@ pub async fn combat(
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
     let decision = session.decision().filter(|_| session.in_combat());
+    let seat = session.combat_seat();
     let span = session.combat();
     let outcome = &session.outcome;
     let page = inspect(&state.data, &outcome.state, |view| {
-        let inv = view.state().investigators.get(HUMAN_SEAT)?;
+        let inv = view.state().investigators.get(seat)?;
         Some(CombatPage {
             htmx: state.htmx,
             id,
             combat: CombatView::new(
                 view,
+                seat,
                 outcome,
                 span.as_ref(),
                 session.progress.seen_events,

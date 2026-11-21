@@ -1,5 +1,7 @@
 use engine::View;
 
+use crate::play_mode::PlayMode;
+
 use crate::views::board_geometry::BOARD_SIZE;
 use crate::views::board_view::BoardView;
 use crate::views::spot::Spot;
@@ -28,8 +30,8 @@ pub struct LandscapeBoardView {
 
 impl LandscapeBoardView {
     /// Draws every token of a state on the turned board.
-    pub fn new(view: &View<'_, '_>) -> Self {
-        let board = BoardView::new(view, None);
+    pub fn new(view: &View<'_, '_>, mode: PlayMode) -> Self {
+        let board = BoardView::new(view, None, mode);
         Self {
             image: board.image,
             // safe: the board size constants are whole numbers well within u16.

@@ -84,7 +84,8 @@ fn should_fight(odds: &Odds) -> bool {
         }
         return odds.win > odds.evade + 0.2;
     }
-    odds.win >= crate::knob::knob("SURE_WIN", SURE_WIN) || (odds.evade < 0.4 && odds.win > odds.evade)
+    odds.win >= crate::knob::knob("SURE_WIN", SURE_WIN)
+        || (odds.evade < 0.4 && odds.win > odds.evade)
 }
 
 /// Which monster to deal with, and how: the surest move first.

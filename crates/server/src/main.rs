@@ -5,6 +5,7 @@ mod app_state;
 mod config;
 mod database;
 mod game_row;
+mod play_mode;
 mod progress;
 mod router;
 mod routes;

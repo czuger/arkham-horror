@@ -135,7 +135,11 @@ pub fn intention(view: &View<'_, '_>, seat: usize) -> Option<(Place, Reason)> {
 /// $2 for full care, a point a turn is not worth staying for unless at 1.
 fn healing(view: &View<'_, '_>, seat: usize) -> Option<Goal> {
     let can_pay = amount_of(view, seat, Resource::Money) >= HEALING_PRICE;
-    let low = if can_pay { knob("HEAL_LOW", 2.0) as u32 } else { knob("HEAL_LOW_POOR", 1.0) as u32 };
+    let low = if can_pay {
+        knob("HEAL_LOW", 2.0) as u32
+    } else {
+        knob("HEAL_LOW_POOR", 1.0) as u32
+    };
     let frac = knob("HEAL_FRAC", 3.0) as u32;
     for (resource, place) in [(Resource::Stamina, HOSPITAL), (Resource::Sanity, ASYLUM)] {
         let held = amount_of(view, seat, resource);
@@ -180,14 +184,29 @@ fn gates(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
     }
     let clues_held = amount_of(view, seat, Resource::Clues);
     let elder_sign = knob("ELDER", 0.0) > 0.0
-        && view.state().investigators.get(seat).is_some_and(|inv| inv.holds(&data::CardId::new("elder_sign")));
+        && view
+            .state()
+            .investigators
+            .get(seat)
+            .is_some_and(|inv| inv.holds(&data::CardId::new("elder_sign")));
     let can_seal = clues_held >= seal_cost(view) || elder_sign;
-    let trophies: usize = view.state().investigators.iter().map(|inv| inv.gate_trophies.len()).sum();
-    let finishing = trophies + 1 >= view.state().players() && view.state().gates.len() <= knob("FINISH_GATES", 0.0) as usize;
+    let trophies: usize = view
+        .state()
+        .investigators
+        .iter()
+        .map(|inv| inv.gate_trophies.len())
+        .sum();
+    let finishing = trophies + 1 >= view.state().players()
+        && view.state().gates.len() <= knob("FINISH_GATES", 0.0) as usize;
     let finish = if finishing { knob("FINISH", 0.0) } else { 0.0 };
     let short = f64::from(seal_cost(view).saturating_sub(clues_held));
     let open = view.state().gates.len() as f64;
-    let limit = match view.state().players() { 0..=2 => 8.0, 3..=4 => 7.0, 5..=6 => 6.0, _ => 5.0 };
+    let limit = match view.state().players() {
+        0..=2 => 8.0,
+        3..=4 => 7.0,
+        5..=6 => 6.0,
+        _ => 5.0,
+    };
     let pressure = knob("GATE_PRESSURE", 0.0) * open / limit;
     view.state()
         .gates
@@ -198,8 +217,11 @@ fn gates(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
             Candidate {
                 place: Place::Location(gate.location.clone()),
                 worth: knob("GATE", 7.0) + if sealable { knob("SEALABLE", 4.0) } else { 0.0 }
-                    - knob("SHORT", 0.0) * short * f64::from(u8::from(view.can_be_sealed(&gate.location)))
-                    + pressure + finish
+                    - knob("SHORT", 0.0)
+                        * short
+                        * f64::from(u8::from(view.can_be_sealed(&gate.location)))
+                    + pressure
+                    + finish
                     - knob("TAKEN", GATE_TAKEN) * taken,
                 reason: Reason::Gate,
             }
@@ -243,7 +265,11 @@ fn clues(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
         .map(|(id, count)| Candidate {
             place: Place::Location(id.clone()),
             worth: knob("CLUE", 1.5) * f64::from(*count)
-                + if amount_of(view, seat, Resource::Clues) + u32::from(*count) >= seal_cost(view) { knob("COMPLETE", 0.0) } else { 0.0 },
+                + if amount_of(view, seat, Resource::Clues) + u32::from(*count) >= seal_cost(view) {
+                    knob("COMPLETE", 0.0)
+                } else {
+                    0.0
+                },
             reason: Reason::Clues,
         })
         .collect()
@@ -259,7 +285,11 @@ fn hunts(view: &View<'_, '_>, seat: usize) -> Vec<Candidate> {
         .filter(|monster| monster.place.as_place().is_some())
         .count();
     let limit = state.players() + 3;
-    let pressure = if in_town + 1 >= limit { knob("HUNT_HOT", 4.0) } else { knob("HUNT", 1.0) };
+    let pressure = if in_town + 1 >= limit {
+        knob("HUNT_HOT", 4.0)
+    } else {
+        knob("HUNT", 1.0)
+    };
     state
         .monsters
         .iter()

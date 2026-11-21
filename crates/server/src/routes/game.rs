@@ -40,8 +40,8 @@ pub async fn game(
         htmx: state.htmx,
         id,
         seed: session.progress.setup.seed,
-        board: BoardView::new(view, decision),
-        party: PartyRow::all(view),
+        board: BoardView::new(view, decision, session.mode()),
+        party: PartyRow::all(view, decision, session.mode()),
         status: StatusView::new(view, &outcome.status),
         decision: decision.map(|d| {
             DecisionView::new(view, d, session.move_number()).in_combat(session.in_combat())

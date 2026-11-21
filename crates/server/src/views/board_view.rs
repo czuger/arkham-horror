@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use data::{GameData, Position, SpecialAreaKind};
 use engine::{Area, Choice, Decision, GameState, MonsterPlace, Place, View};
 
-use crate::session::HUMAN_SEAT;
+use crate::play_mode::PlayMode;
 use crate::views::board_geometry::{BOARD_SIZE, edge, percent};
 use crate::views::closed_marker::closed_marker;
 use crate::views::image_token::ImageToken;
@@ -28,11 +28,11 @@ pub struct BoardView {
 
 impl BoardView {
     /// Draws the board for a state, with the decision's place choices.
-    pub fn new(view: &View<'_, '_>, decision: Option<&Decision>) -> Self {
+    pub fn new(view: &View<'_, '_>, decision: Option<&Decision>, mode: PlayMode) -> Self {
         let data = view.data();
         let state = view.state();
         let mut spots: BTreeMap<String, Spot> = BTreeMap::new();
-        add_investigators(view, &mut spots);
+        add_investigators(view, decision, mode, &mut spots);
         add_monsters(view, &mut spots);
         add_locations(data, state, &mut spots);
         add_closed(view, &mut spots);
@@ -122,7 +122,12 @@ fn special(data: &GameData, kind: SpecialAreaKind) -> Option<(String, String, Po
 }
 
 /// Every investigator still in the game.
-fn add_investigators(view: &View<'_, '_>, spots: &mut BTreeMap<String, Spot>) {
+fn add_investigators(
+    view: &View<'_, '_>,
+    decision: Option<&Decision>,
+    mode: PlayMode,
+    spots: &mut BTreeMap<String, Spot>,
+) {
     let data = view.data();
     for (seat, inv) in view.state().investigators.iter().enumerate() {
         if inv.eliminated {
@@ -133,7 +138,7 @@ fn add_investigators(view: &View<'_, '_>, spots: &mut BTreeMap<String, Spot>) {
             spot.investigators.push(InvestigatorToken {
                 initials: initials(&name),
                 tip: tips::investigator(view, seat),
-                human: seat == HUMAN_SEAT,
+                human: mode.highlighted(seat, decision),
             });
         }
     }

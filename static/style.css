@@ -49,6 +49,7 @@ table.games tr.over { color: #7a6b58; }
 
 form.setup { display: flex; flex-direction: column; gap: 0.6rem; max-width: 34rem; }
 form.setup label { display: flex; flex-direction: column; gap: 0.2rem; }
+form.setup label.check { flex-direction: row; align-items: center; gap: 0.4rem; }
 form.setup fieldset { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
 
 main:has(.game) { max-width: none; }

@@ -33,7 +33,11 @@ impl Responder for Spy {
                         Some((target, r)) => {
                             let d = view.distance(&inv.place, &target).unwrap_or(99);
                             let mv = view.movement_points(seat);
-                            if format!("{r:?}") == "Gate" { format!("Gate d={d} mv={}", mv.min(9)) } else { format!("{r:?}") }
+                            if format!("{r:?}") == "Gate" {
+                                format!("Gate d={d} mv={}", mv.min(9))
+                            } else {
+                                format!("{r:?}")
+                            }
                         }
                         None => "None".to_owned(),
                     },
@@ -89,7 +93,9 @@ fn main() {
         if outcome.state.ending.is_some_and(|e| e.is_victory()) {
             wins += 1;
         }
-        *endings.entry(format!("{:?}", outcome.state.ending)).or_insert(0u64) += 1;
+        *endings
+            .entry(format!("{:?}", outcome.state.ending))
+            .or_insert(0u64) += 1;
         *mins.entry(spy.min_gates.min(4)).or_insert(0u64) += 1;
         closed += u64::from(outcome.tally.gates_closed);
         sealed += u64::from(outcome.tally.gates_sealed);
@@ -110,7 +116,14 @@ fn main() {
     }
     let total: u64 = reasons.values().sum();
     let g = games as f64;
-    println!("fermés {:.2} scellés {:.2} KO {:.2} | fins {:?} | min portails (t>=3) {:?}", closed as f64 / g, sealed as f64 / g, kos as f64 / g, endings, mins);
+    println!(
+        "fermés {:.2} scellés {:.2} KO {:.2} | fins {:?} | min portails (t>=3) {:?}",
+        closed as f64 / g,
+        sealed as f64 / g,
+        kos as f64 / g,
+        endings,
+        mins
+    );
     for (k, v) in reasons.iter().filter(|_| detail) {
         println!("{:>6.1} %  {k}", 100.0 * *v as f64 / total as f64);
     }

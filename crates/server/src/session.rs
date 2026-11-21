@@ -1,16 +1,17 @@
 use ai::Seated;
 use data::GameData;
-use engine::{Choice, Decision, DecisionKind, EngineError, Outcome, Replay, Setup, Status, play};
+use engine::{
+    Choice, Decision, DecisionKind, EngineError, Outcome, Replay, Responder, Setup, Status,
+    Waiting, play,
+};
 use serde::Deserialize;
 
 use crate::app_error::AppError;
 use crate::database::{Database, DatabaseError};
 use crate::game_row::GameContent;
+use crate::play_mode::{HUMAN_SEAT, PlayMode};
 use crate::progress::Progress;
 use crate::views::{CombatSpan, on_sheet};
-
-/// Seat of the human player; the AI plays every other seat.
-pub const HUMAN_SEAT: usize = 0;
 
 /// What to do once the cards in hand are kept, sent with the answer that
 /// keeps them (so fighting is one click on the combat page).
@@ -42,9 +43,15 @@ impl Session {
     /// # Errors
     ///
     /// An [`AppError`] if the setup is refused or the database fails.
-    pub async fn start(db: &Database, data: &GameData, setup: Setup) -> Result<Self, AppError> {
+    pub async fn start(
+        db: &Database,
+        data: &GameData,
+        setup: Setup,
+        mode: PlayMode,
+    ) -> Result<Self, AppError> {
         let mut progress = Progress {
             setup,
+            mode,
             answers: Vec::new(),
             human_moves: Vec::new(),
             seen_events: 0,
@@ -116,9 +123,39 @@ impl Session {
         }
     }
 
-    /// The last time the human faced a monster.
+    /// Who plays the investigators.
+    pub fn mode(&self) -> PlayMode {
+        self.progress.mode
+    }
+
+    /// The seat the human plays now: the one who decides in a hot-seat
+    /// game, else the human's seat.
+    pub fn player_seat(&self) -> usize {
+        match (self.mode(), self.decision()) {
+            (PlayMode::HotSeat, Some(decision)) => decision.who,
+            _ => HUMAN_SEAT,
+        }
+    }
+
+    /// The seat whose combat the combat page shows: the human's in a solo
+    /// game; in a hot-seat game, the one about to face a monster, else the
+    /// one who fought last.
+    pub fn combat_seat(&self) -> usize {
+        match (self.mode(), self.decision()) {
+            (PlayMode::Solo, _) => HUMAN_SEAT,
+            (PlayMode::HotSeat, Some(decision)) if decision.kind == DecisionKind::FaceMonster => {
+                decision.who
+            }
+            (PlayMode::HotSeat, _) => {
+                CombatSpan::last_seat(&self.outcome.shown).unwrap_or_else(|| self.player_seat())
+            }
+        }
+    }
+
+    /// The last time the investigator at [`Session::combat_seat`] faced a
+    /// monster.
     pub fn combat(&self) -> Option<CombatSpan> {
-        CombatSpan::last(&self.outcome.shown, HUMAN_SEAT)
+        CombatSpan::last(&self.outcome.shown, self.combat_seat())
     }
 
     /// Whether the human's decision is about a monster faced: whether to
@@ -126,7 +163,10 @@ impl Session {
     pub fn in_combat(&self) -> bool {
         match self.decision() {
             Some(decision) if decision.kind == DecisionKind::FaceMonster => true,
-            Some(_) => self.combat().is_some_and(|span| span.ongoing()),
+            Some(decision) => {
+                decision.who == self.combat_seat()
+                    && self.combat().is_some_and(|span| span.ongoing())
+            }
             None => false,
         }
     }
@@ -254,7 +294,7 @@ fn content(
     outcome: &Outcome,
 ) -> Result<GameContent, AppError> {
     Ok(GameContent {
-        title: title(data, outcome),
+        title: title(data, outcome, progress.mode),
         summary: summary(outcome),
         over: matches!(outcome.status, Status::Over(_)),
         record: serde_json::to_string(progress)?,
@@ -294,35 +334,42 @@ fn outdated(error: &AppError) -> bool {
 }
 
 /// Replays the saved answers, then lets the AI answer every seat but the
-/// human's.
+/// human's (none in a hot-seat game).
 fn advance(data: &GameData, progress: &Progress) -> Result<Outcome, AppError> {
     let mut seated = Seated::new(HUMAN_SEAT);
-    let mut replay = Replay::new(&progress.answers, &mut seated);
+    let mut waiting = Waiting;
+    let then: &mut dyn Responder = match progress.mode {
+        PlayMode::Solo => &mut seated,
+        PlayMode::HotSeat => &mut waiting,
+    };
+    let mut replay = Replay::new(&progress.answers, then);
     Ok(play(data, &progress.setup, &mut replay)?)
 }
 
-/// « Amanda Sharpe et 2 IA contre Azathoth ».
-fn title(data: &GameData, outcome: &Outcome) -> String {
+/// « Amanda Sharpe et 2 IA contre Azathoth », or in a hot-seat game
+/// « Amanda Sharpe, Bob Jenkins et Joe Diamond contre Azathoth ».
+fn title(data: &GameData, outcome: &Outcome, mode: PlayMode) -> String {
     let state = &outcome.state;
-    let human = state
-        .investigators
-        .get(HUMAN_SEAT)
-        .and_then(|inv| {
-            data.investigators
-                .investigators
-                .iter()
-                .find(|sheet| sheet.id == inv.id)
-        })
-        .map_or("?", |sheet| sheet.name.as_str());
     let ancient_one = data
         .ancient_ones
         .ancient_ones
         .iter()
         .find(|sheet| sheet.id == state.ancient_one)
         .map_or("?", |sheet| sheet.name.as_str());
-    match state.players().saturating_sub(1) {
-        0 => format!("{human}, seul contre {ancient_one}"),
-        ais => format!("{human} et {ais} IA contre {ancient_one}"),
+    let names: Vec<String> = state
+        .investigators
+        .iter()
+        .map(|inv| crate::views::investigator_name(data, &inv.id))
+        .collect();
+    let human = names.get(HUMAN_SEAT).map_or("?", String::as_str);
+    match (mode, names.split_last()) {
+        (_, None | Some((_, []))) => format!("{human}, seul contre {ancient_one}"),
+        (PlayMode::Solo, Some((_, others))) => {
+            format!("{human} et {} IA contre {ancient_one}", others.len())
+        }
+        (PlayMode::HotSeat, Some((last, others))) => {
+            format!("{} et {last} contre {ancient_one}", others.join(", "))
+        }
     }
 }
 

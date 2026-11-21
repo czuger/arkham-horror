@@ -11,6 +11,7 @@ use serde::Deserialize;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
+use crate::play_mode::PlayMode;
 use crate::session::Session;
 
 /// Most AI investigators in a game (8 investigators in all).
@@ -38,6 +39,9 @@ pub struct NewGameForm {
     grand_ancien: String,
     #[serde(default)]
     graine: String,
+    /// Ticked: the human plays every investigator (hot seat).
+    #[serde(default)]
+    tous: Option<String>,
     #[serde(default)]
     ia1: String,
     #[serde(default)]
@@ -81,7 +85,12 @@ pub async fn create_game(
             return Ok((StatusCode::BAD_REQUEST, Html(page)).into_response());
         }
     };
-    let session = Session::start(&state.db, &state.data, setup).await?;
+    let mode = if form.tous.is_some() {
+        PlayMode::HotSeat
+    } else {
+        PlayMode::Solo
+    };
+    let session = Session::start(&state.db, &state.data, setup, mode).await?;
     Ok(Redirect::to(&session.page()).into_response())
 }
 

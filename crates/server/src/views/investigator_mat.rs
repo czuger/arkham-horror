@@ -1,7 +1,7 @@
 use data::{Investigator, Resource, SheetMarkers};
 use engine::{InvestigatorState, View};
 
-use crate::session::HUMAN_SEAT;
+use crate::play_mode::PlayMode;
 use crate::views::image_token::ImageToken;
 use crate::views::names::{monster, sheet};
 use crate::views::tips;
@@ -61,14 +61,14 @@ pub struct BillRow {
 impl InvestigatorMat {
     /// The play area of the investigator at `seat`; `None` when the seat is
     /// empty or the sheet unknown.
-    pub fn new(view: &View<'_, '_>, seat: usize) -> Option<Self> {
+    pub fn new(view: &View<'_, '_>, seat: usize, mode: PlayMode) -> Option<Self> {
         let data = view.data();
         let inv = view.state().investigators.get(seat)?;
         let sheet = sheet(data, &inv.id)?;
         Some(Self {
             name: sheet.name.clone(),
             title: sheet.title.clone(),
-            player: if seat == HUMAN_SEAT { "Vous" } else { "IA" },
+            player: mode.player_label(seat),
             place: view.place_name(&inv.place),
             image: sheet.image.clone(),
             sliders: sliders(sheet, inv),

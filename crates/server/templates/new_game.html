@@ -9,15 +9,15 @@
       {% for (id, name) in investigators %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
     </select>
   </label>
-  <label>Nombre d'investigateurs IA
+  <label>Nombre d'autres investigateurs
     <select name="ia">
       {% for count in ai_counts %}<option value="{{ count }}"{% if *count == default_ais %} selected{% endif %}>{{ count }}</option>{% endfor %}
     </select>
   </label>
   <fieldset>
-    <legend>Investigateurs des IA (seuls les premiers servent, selon le nombre choisi)</legend>
+    <legend>Autres investigateurs (seuls les premiers servent, selon le nombre choisi)</legend>
     {% for slot in 1..=7 %}
-    <label>IA {{ slot }}
+    <label>N° {{ slot + 1 }}
       <select name="ia{{ slot }}">
         <option value="">Au hasard</option>
         {% for (id, name) in investigators %}<option value="{{ id }}">{{ name }}</option>{% endfor %}
@@ -25,6 +25,9 @@
     </label>
     {% endfor %}
   </fieldset>
+  <label class="check"><input type="checkbox" name="tous" value="1">
+    Jouer moi-même tous les investigateurs, chacun son tour (sans IA)
+  </label>
   <label>Grand Ancien
     <select name="grand_ancien">
       <option value="">Au hasard</option>
