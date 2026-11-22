@@ -46,9 +46,12 @@ impl CombatSpan {
         self.end.is_none()
     }
 
-    /// Whether the combat ended at or after journal line `line`.
-    pub fn ended_since(&self, line: usize) -> bool {
-        self.end.is_some_and(|(_, at)| at >= line)
+    /// Whether the combat ended after the first `seen` journal lines were
+    /// read: whether one of its lines is among the new ones. Its end is
+    /// noted at the line after its last, so a combat over before the human's
+    /// last answer may end exactly at `seen`.
+    pub fn ended_since(&self, seen: usize) -> bool {
+        self.end.is_some_and(|(_, at)| at > seen)
     }
 }
 
@@ -60,5 +63,42 @@ pub fn end_label(end: CombatEnd) -> &'static str {
         CombatEnd::Fled => "Vous avez fui le combat.",
         CombatEnd::KnockedOut => "Vous avez perdu connaissance ou la raison.",
         CombatEnd::Stopped => "Le combat s'est arrêté.",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use data::MonsterId;
+    use engine::{CombatEnd, Exhibit, Shown};
+
+    use super::CombatSpan;
+
+    /// A combat on lines 87 to 89, its end noted at line 90.
+    fn evaded() -> CombatSpan {
+        let shown = [
+            Shown {
+                line: 87,
+                what: Exhibit::CombatStart {
+                    seat: 1,
+                    foe: MonsterId::new("witch"),
+                },
+            },
+            Shown {
+                line: 90,
+                what: Exhibit::CombatEnd {
+                    seat: 1,
+                    end: CombatEnd::Evaded,
+                },
+            },
+        ];
+        CombatSpan::last(&shown, 1).expect("combat")
+    }
+
+    #[test]
+    fn a_combat_ended_before_the_last_answer_is_not_shown_again() {
+        let span = evaded();
+        assert!(span.ended_since(87));
+        assert!(span.ended_since(89));
+        assert!(!span.ended_since(90));
     }
 }
