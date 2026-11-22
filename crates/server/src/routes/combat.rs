@@ -8,7 +8,7 @@ use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::root_of;
 use crate::session::Session;
-use crate::views::{CombatDecision, CombatView, HandZones};
+use crate::views::{BoardView, CombatDecision, CombatView, HandZones, MapView};
 
 #[derive(Template)]
 #[template(path = "combat.html")]
@@ -16,6 +16,7 @@ struct CombatPage {
     htmx: bool,
     root: String,
     id: i64,
+    map: MapView,
     combat: CombatView,
     hands: HandZones,
     decision: Option<CombatDecision>,
@@ -48,6 +49,7 @@ pub async fn combat(
             htmx: state.htmx,
             root: root_of(uri.path()),
             id,
+            map: MapView::new(view, &BoardView::new(view, None, session.mode()), id),
             combat: CombatView::new(
                 view,
                 seat,

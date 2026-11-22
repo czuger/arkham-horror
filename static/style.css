@@ -1,3 +1,5 @@
+:root { --map-width: clamp(280px, 22vw, 340px); }
+
 body {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
@@ -422,4 +424,21 @@ main:has(.landscape) { max-width: none; overflow-x: auto; }
 .destination:hover, .destination:focus-visible { outline: 3px solid #ffe066; background: #fff3c4; }
 @media (prefers-reduced-motion: reduce) {
   .scene-image, .scene-fallback { animation: none; }
+}
+
+/* Combat page: the same map column, the monster's portrait as the scene. */
+main:has(.combat-page) { max-width: none; }
+.combat-page { display: grid; grid-template-columns: var(--map-width) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.combat-page > .map { position: sticky; top: 0.5rem; }
+.combat-area { min-width: 0; }
+.combat-scene { flex: 1 1 24rem; max-width: 34rem; }
+.combat-scene .scene-picture { height: min(72vh, 44rem); }
+.combat-foes .foe-face { width: 96px; height: 96px; }
+.combat-foes .facts { font-size: 0.9rem; }
+/* Journal: a fight starts, with the monster's portrait. */
+.fought { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem; }
+.fought img { width: 44px; height: 44px; object-fit: cover; object-position: top; border-radius: 50%; border: 2px solid #c0392b; }
+@media (max-width: 900px) {
+  .combat-page { grid-template-columns: 1fr; }
+  .combat-page > .map { position: static; order: 2; }
 }

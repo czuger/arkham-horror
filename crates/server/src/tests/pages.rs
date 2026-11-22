@@ -408,6 +408,11 @@ async fn drawn_cards_and_combat_dice_are_shown() {
             if reply.location.as_deref() == Some(&format!("{game}/combat")) {
                 let combat = app.get(&format!("{game}/combat")).await.body;
                 assert!(combat.contains("class=\"foe\""), "{combat}");
+                assert!(
+                    combat.contains("class=\"scene-image\" src=\"illustrations/grand/monstres/"),
+                    "the monster's portrait is the scene"
+                );
+                assert!(combat.contains("<section class=\"map\""), "the map stays");
                 combat_seen |= combat.contains("class=\"die");
             }
             cards_seen |= app

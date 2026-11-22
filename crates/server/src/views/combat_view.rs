@@ -1,6 +1,7 @@
 use data::{CheckKind, MonsterAbility, MonsterId, Resource};
 use engine::{Choice, Context, Decision, DecisionKind, Outcome, View};
 
+use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::views::combat_span::{CombatSpan, end_label};
 use crate::views::decision_view::DecisionView;
 use crate::views::image_token::ImageToken;
@@ -41,6 +42,8 @@ pub struct FoeView {
     pub stats: Vec<String>,
     /// Dice the investigator would roll against it, one check per line.
     pub dice: Vec<String>,
+    /// Link to its large illustrated portrait.
+    pub portrait: String,
 }
 
 /// The decision taken on the combat page.
@@ -68,6 +71,11 @@ pub struct HandsChoice {
 }
 
 impl CombatView {
+    /// The monster the scene shows: the one fought, else the first to face.
+    pub fn scene_foe(&self) -> Option<&FoeView> {
+        self.foe.as_ref().or_else(|| self.to_face.first())
+    }
+
     /// The combat page of the investigator at `seat`.
     ///
     /// # Arguments
@@ -142,10 +150,19 @@ fn foe(view: &View<'_, '_>, seat: usize, id: &MonsterId, bonus: Option<i32>) -> 
             ),
         });
     }
+    let portrait = view
+        .data()
+        .monsters
+        .monsters
+        .iter()
+        .find(|monster| &monster.id == id)
+        .map(|monster| illustration_url(IllustrationSize::Large, &monster.portrait))
+        .unwrap_or_default();
     Some(FoeView {
         stats: token.tip.lines.clone(),
         token,
         dice,
+        portrait,
     })
 }
 

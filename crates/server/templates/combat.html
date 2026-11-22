@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Combat — Horreur à Arkham{% endblock %}
 {% block content %}
+<div class="combat-page">
+{% include "game/map.html" %}
+<div class="combat-area">
 <nav class="seat-tabs">
   <a href="partie/{{ id }}">Retour à la partie</a>
   <a href="partie/{{ id }}/investigateurs">Votre fiche</a>
@@ -10,6 +13,14 @@
 {% if let Some(decision) = decision %}<form id="combat-form" method="post" action="partie/{{ id }}/reponse">
 <input type="hidden" name="coup" value="{{ decision.form.move_number }}">{% endif %}
 <div class="combat">
+  {% if let Some(foe) = combat.scene_foe() %}
+  <section class="scene combat-scene" aria-label="Le monstre">
+    <figure class="scene-picture">
+      <img class="scene-image" src="{{ foe.portrait }}" alt="{{ foe.token.name }}">
+      <figcaption class="scene-band"><h2>{{ foe.token.name }}<small>{{ combat.who }} lui fait face</small></h2></figcaption>
+    </figure>
+  </section>
+  {% endif %}
   <div class="combat-foes">
     {% if let Some(foe) = combat.foe %}{% include "combat/foe.html" %}{% endif %}
     {% for foe in combat.to_face %}{% include "combat/foe.html" %}{% endfor %}
@@ -78,4 +89,6 @@
   <button type="submit" class="small">Annuler le dernier coup</button>
 </form>
 {% endif %}
+</div>
+</div>
 {% endblock %}

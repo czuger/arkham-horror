@@ -1,5 +1,6 @@
 use engine::{Deck, DiceCount, Exhibit, Shown, View};
 
+use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::views::image_token::ImageToken;
 use crate::views::names::card;
 
@@ -13,6 +14,19 @@ pub struct JournalLine {
     pub cards: Vec<DrawnCard>,
     /// Dice rolled.
     pub rolls: Vec<DiceRoll>,
+    /// Monsters an investigator starts to fight.
+    pub foes: Vec<FoughtMonster>,
+}
+
+/// A monster an investigator faces, with its illustrated portrait.
+#[derive(Debug, Clone)]
+pub struct FoughtMonster {
+    /// Who faces it.
+    pub who: String,
+    /// The monster's name.
+    pub name: String,
+    /// Link to its portrait thumbnail.
+    pub portrait: String,
 }
 
 /// A Mythos, location or gate card drawn, or an investigator card received.
@@ -73,6 +87,7 @@ pub fn journal_lines(
             text: text.clone(),
             cards: Vec::new(),
             rolls: Vec::new(),
+            foes: Vec::new(),
         })
         .collect();
     let last = if to == events.len() {
@@ -85,6 +100,7 @@ pub fn journal_lines(
             text: String::new(),
             cards: Vec::new(),
             rolls: Vec::new(),
+            foes: Vec::new(),
         });
     }
     for item in shown
@@ -95,10 +111,12 @@ pub fn journal_lines(
             attach(view, line, &item.what);
         }
     }
-    if lines
-        .last()
-        .is_some_and(|line| line.text.is_empty() && line.cards.is_empty() && line.rolls.is_empty())
-    {
+    if lines.last().is_some_and(|line| {
+        line.text.is_empty()
+            && line.cards.is_empty()
+            && line.rolls.is_empty()
+            && line.foes.is_empty()
+    }) {
         lines.pop();
     }
     lines
@@ -127,7 +145,17 @@ fn attach(view: &View<'_, '_>, line: &mut JournalLine, what: &Exhibit) {
         Exhibit::Dice { seat, faces, count } => {
             line.rolls.push(dice_roll(view, *seat, faces, *count));
         }
-        Exhibit::CombatStart { .. } | Exhibit::CombatEnd { .. } => {}
+        Exhibit::CombatStart { seat, foe } => {
+            let data = view.data();
+            if let Some(monster) = data.monsters.monsters.iter().find(|m| &m.id == foe) {
+                line.foes.push(FoughtMonster {
+                    who: view.name(*seat),
+                    name: monster.name.clone(),
+                    portrait: illustration_url(IllustrationSize::Thumbnail, &monster.portrait),
+                });
+            }
+        }
+        Exhibit::CombatEnd { .. } => {}
     }
 }
 
