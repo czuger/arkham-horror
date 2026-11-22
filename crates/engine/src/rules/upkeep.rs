@@ -2,7 +2,7 @@
 
 use data::{CardId, Timing};
 
-use crate::decision::{Choice, DecisionKind, DecisionOption};
+use crate::decision::{Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
 use crate::halt::Flow;
 use crate::rules::abilities::is_mandatory;
@@ -100,8 +100,9 @@ impl Game<'_> {
             let mut options = vec![option(Choice::Done, "Terminer l'ajustement")];
             options.extend(self.slider_moves(seat));
             let prompt = format!("Ajustement des compétences (Concentration restante : {focus})");
+            let context = Context::Focus { remaining: focus };
             let Choice::Slider { track, stop } =
-                self.ask(seat, DecisionKind::AdjustSkills, prompt, options)?
+                self.ask_about(seat, DecisionKind::AdjustSkills, context, prompt, options)?
             else {
                 return Ok(());
             };

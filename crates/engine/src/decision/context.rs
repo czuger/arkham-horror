@@ -41,6 +41,11 @@ pub enum Context {
     },
     /// Investigator cards to pick, and why.
     Cards(CardAim),
+    /// Skill adjustment: the slider stops that may still be moved.
+    Focus {
+        /// Concentration left this Upkeep.
+        remaining: u8,
+    },
 }
 
 /// Why investigator cards are picked.

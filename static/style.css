@@ -227,6 +227,29 @@ main:has(.mat) { max-width: none; }
 .investigator-sheet > .stop-target:hover, .investigator-sheet > .stop-target:focus-visible {
   background: rgba(255, 215, 0, 0.6); animation: none;
 }
+/* Skill adjustment page: decision beside the sheet, whose stops are radio
+   buttons; the picked one shows the slider, the others a ring. */
+.adjustment { display: grid; grid-template-columns: minmax(16rem, 24rem) auto; gap: 1rem; align-items: start; }
+@media (max-width: 760px) { .adjustment { grid-template-columns: 1fr; } }
+.adjustment h1 { font-size: 1.3rem; margin-top: 0; }
+.track-values { padding-left: 1.2rem; }
+.track-values span { color: #7a6b58; }
+.focus-count.too-much { color: #a01010; font-weight: bold; }
+.adjust-sheet { width: min(560px, 100%); }
+.stop-choice {
+  position: absolute; width: 8%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  border: 3px solid #e0a800; border-radius: 50%; background: rgba(255, 215, 0, 0.2); cursor: pointer;
+}
+.stop-choice:hover, .stop-choice:has(input:focus-visible) { background: rgba(255, 215, 0, 0.6); }
+.stop-choice.out-of-reach { border: none; background: none; cursor: default; }
+.stop-choice:has(input:checked) { border: none; background: none; }
+.stop-choice input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: inherit; }
+.stop-choice img.slider {
+  display: none; position: absolute; left: 50%; top: 50%; width: 112%; height: auto;
+  transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(1px 2px 2px rgba(0, 0, 0, 0.5));
+}
+.stop-choice input:checked + img.slider { display: block; }
+.decision a.adjust-skills { display: block; margin-bottom: 0.4rem; }
 @keyframes stop-pulse { from { box-shadow: 0 0 2px #e0a800; } to { box-shadow: 0 0 10px #ffcc00; } }
 .mat-tokens { grid-area: tokens; display: flex; flex-direction: column; gap: 0.6rem; }
 .pile .tokens { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 2rem; }

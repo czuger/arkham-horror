@@ -15,6 +15,7 @@ mod routes;
 mod same_origin;
 mod schema;
 mod session;
+mod skill_moves;
 mod startup;
 #[cfg(test)]
 mod tests;

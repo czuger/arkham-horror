@@ -7,6 +7,7 @@ mod journal;
 mod moves;
 mod new_game;
 mod robots;
+mod skill_adjustment;
 
 pub use ancient_one::ancient_one;
 pub use combat::combat;
@@ -19,3 +20,4 @@ pub use journal::journal;
 pub use moves::{answer, delete, undo};
 pub use new_game::{create_game, new_game_form};
 pub use robots::robots;
+pub use skill_adjustment::{adjust_skills, skill_adjustment};

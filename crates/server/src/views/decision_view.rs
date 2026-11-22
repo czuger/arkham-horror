@@ -3,6 +3,7 @@ use engine::{CardAim, Choice, Context, Decision, View, of_check};
 use crate::views::image_token::ImageToken;
 use crate::views::names::{card, monster_name};
 use crate::views::sheet_decision::on_sheet;
+use crate::views::skill_adjustment::adjusts_skills;
 
 /// The decision the human must take, as a form.
 #[derive(Debug, Clone)]
@@ -24,6 +25,9 @@ pub struct DecisionView {
     pub on_sheet: bool,
     /// Answered on the combat page, not with these buttons.
     pub in_combat: bool,
+    /// The Upkeep skill adjustment: the answer that leaves the sliders as
+    /// they are, the rest being set on the adjustment page.
+    pub keep_skills: Option<usize>,
 }
 
 /// A card that can be picked: the answer index, the card and the button text.
@@ -56,6 +60,7 @@ impl DecisionView {
             move_number,
             on_sheet: on_sheet(decision),
             in_combat: false,
+            keep_skills: keep_skills(decision),
         }
     }
 
@@ -64,6 +69,17 @@ impl DecisionView {
         self.in_combat = in_combat && !self.on_sheet;
         self
     }
+}
+
+/// In a skill adjustment, the answer that ends it at once.
+fn keep_skills(decision: &Decision) -> Option<usize> {
+    if !adjusts_skills(decision) {
+        return None;
+    }
+    decision
+        .options
+        .iter()
+        .position(|option| option.choice == Choice::Done)
 }
 
 /// The cards to pick from when keeping, buying, selling or losing one; empty

@@ -5,15 +5,13 @@ use crate::views::decision_view::DecisionView;
 use crate::views::investigator_mat::slider_spot;
 
 /// Whether a decision is answered on the investigator's own page rather
-/// than on the game page: slider placement and adjustment, and the weapons
-/// and spells taken in hand against the Ancient One (against a monster,
-/// they are taken on the combat page).
+/// than on the game page: initial slider placement, and the weapons and
+/// spells taken in hand against the Ancient One (against a monster, they
+/// are taken on the combat page). The Upkeep adjustment has its own page.
 pub fn on_sheet(decision: &Decision) -> bool {
-    matches!(
-        decision.kind,
-        DecisionKind::PlaceSliders | DecisionKind::AdjustSkills
-    ) || (prepares_combat(decision)
-        && matches!(decision.context, Context::Combat { foe: None, .. }))
+    decision.kind == DecisionKind::PlaceSliders
+        || (prepares_combat(decision)
+            && matches!(decision.context, Context::Combat { foe: None, .. }))
 }
 
 /// Whether a decision picks the weapons and spells held in a combat.

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Ajustement des compétences — Horreur à Arkham{% endblock %}
+{% block content %}
+<nav class="seat-tabs">
+  <a href="partie/{{ id }}" class="back">Retour à la partie</a>
+</nav>
+<form id="adjustment" class="adjustment" method="post" action="partie/{{ id }}/ajustement" data-focus="{{ adjustment.focus }}">
+<input type="hidden" name="coup" value="{{ adjustment.move_number }}">
+<section class="decision">
+  <h1>Ajustement des compétences : {{ adjustment.name }}</h1>
+  <p class="hint">Cliquez sur les crans de la fiche pour y mettre les curseurs. Concentration : {{ adjustment.focus }} cran(s) à déplacer en tout.</p>
+  <ul class="track-values">
+    {% for track in adjustment.tracks %}
+    <li><span>{{ track.name }}</span> : {% for stop in track.stops %}{% if stop.checked %}<output data-track="{{ track.field }}">{{ stop.label }}</output>{% endif %}{% endfor %}</li>
+    {% endfor %}
+  </ul>
+  <p class="focus-count">Crans déplacés : <output id="focus-used">0</output> / {{ adjustment.focus }}</p>
+  <p>
+    <button type="submit" id="adjust-submit">Valider l'ajustement</button>
+    <button type="reset" class="small">Remettre comme avant</button>
+  </p>
+</section>
+<div class="investigator-sheet adjust-sheet">
+  <img src="assets/{{ adjustment.image }}" alt="Fiche de {{ adjustment.name }}">
+  {% for track in adjustment.tracks %}{% for stop in track.stops %}
+  <label class="stop-choice{% if !stop.reachable %} out-of-reach{% endif %}" style="left: {{ stop.left }}; top: {{ stop.top }}" title="{{ stop.label }}">
+    <input type="radio" name="{{ track.field }}" value="{{ stop.stop }}" data-current="{{ track.current }}" data-label="{{ stop.label }}" aria-label="{{ track.name }} : {{ stop.label }}"{% if stop.checked %} checked{% endif %}{% if !stop.reachable %} disabled{% endif %}>
+    <img class="slider" src="assets/{{ slider }}" alt="">
+  </label>
+  {% endfor %}{% endfor %}
+</div>
+</form>
+{% if can_undo %}
+<form method="post" action="partie/{{ id }}/annuler" class="inline undo">
+  <button type="submit" class="small">Annuler le dernier coup</button>
+</form>
+{% endif %}
+{% endblock %}

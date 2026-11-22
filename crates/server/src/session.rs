@@ -281,7 +281,7 @@ impl Session {
     }
 
     /// Replays from the saved answers and keeps the AI's new ones.
-    fn replay(&mut self, data: &GameData) -> Result<(), AppError> {
+    pub(crate) fn replay(&mut self, data: &GameData) -> Result<(), AppError> {
         self.outcome = advance(data, &self.progress)?;
         self.progress.answers.clone_from(&self.outcome.answers);
         Ok(())
