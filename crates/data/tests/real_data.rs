@@ -1,6 +1,6 @@
 //! Loads the real files under `data/` and checks them against the box contents.
 
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use std::path::PathBuf;
 
 use data::{Deck, GameData, MonsterAbility, MythosKind, Stability, StreetId};
@@ -28,6 +28,34 @@ fn every_cited_image_exists() {
     if let Err(error) = load().check_assets(&repo_dir("assets")) {
         panic!("{error}");
     }
+}
+
+#[test]
+fn every_illustration_exists_and_none_is_orphan() {
+    let data = load();
+    let dir = repo_dir("illustrations");
+    if let Err(error) = data.check_illustrations(&dir) {
+        panic!("{error}");
+    }
+    let cited: BTreeSet<String> = data.illustrations().map(str::to_owned).collect();
+    assert_eq!(
+        cited.len(),
+        26 + 9 + 2 * 8 + 29,
+        "one illustration per entry"
+    );
+    let mut on_disk = BTreeSet::new();
+    for folder in ["lieux", "quartiers", "autres mondes", "monstres"] {
+        let entries = std::fs::read_dir(dir.join(folder)).unwrap_or_else(|e| panic!("{e}"));
+        for entry in entries {
+            let name = entry.unwrap_or_else(|e| panic!("{e}")).file_name();
+            let name = name.to_string_lossy();
+            if !name.starts_with('.') {
+                on_disk.insert(format!("{folder}/{name}"));
+            }
+        }
+    }
+    let orphans: Vec<&String> = on_disk.difference(&cited).collect();
+    assert!(orphans.is_empty(), "illustrations never used: {orphans:?}");
 }
 
 #[test]

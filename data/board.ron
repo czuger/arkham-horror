@@ -15,9 +15,13 @@
 //   à vérifier sur le plateau réel.
 // - `icon_images` : l'image de chaque icône de rencontre, découpée dans la
 //   légende du livret (`marqueurs/legende_icones_rencontre.png`).
+// - Version 5 (22/11/2026) : `short_name` = nom abrégé pour la carte symbolique
+//   (à relire) ; `illustration` (lieux, rues) et `illustrations` (Autres Mondes,
+//   `first` = zone 1, `second` = zone 2) = illustration de la scène, relative au
+//   dossier `illustrations/` (voir `correspondance_illustrations.md`).
 #![enable(implicit_some)]
 Board(
-    version: 4,
+    version: 5,
     image: "plateau/arkham.jpg",
     icon_images: {
         Ally: "marqueurs/icones_rencontre/allie.png",
@@ -35,6 +39,8 @@ Board(
         (
             id: "northside",
             name: "Quartier Nord",
+            short_name: "Nord",
+            illustration: "quartiers/northside.png",
             neighbours: ["downtown", "merchant_district"],
             white_arrow: "downtown",
             black_arrow: "merchant_district",
@@ -43,6 +49,8 @@ Board(
         (
             id: "downtown",
             name: "Centre-Ville",
+            short_name: "Centre",
+            illustration: "quartiers/downtown.png",
             neighbours: ["northside", "easttown", "merchant_district"],
             white_arrow: "easttown",
             black_arrow: "northside",
@@ -51,6 +59,8 @@ Board(
         (
             id: "easttown",
             name: "Quartier Est",
+            short_name: "Est",
+            illustration: "quartiers/easttown.png",
             neighbours: ["downtown", "rivertown"],
             white_arrow: "rivertown",
             black_arrow: "downtown",
@@ -59,6 +69,8 @@ Board(
         (
             id: "merchant_district",
             name: "Quartier Marchand",
+            short_name: "Marchand",
+            illustration: "quartiers/merchant_district.png",
             neighbours: ["northside", "downtown", "rivertown", "miskatonic_u"],
             white_arrow: "northside",
             black_arrow: "miskatonic_u",
@@ -67,6 +79,8 @@ Board(
         (
             id: "rivertown",
             name: "Quartier de la Rivière",
+            short_name: "Rivière",
+            illustration: "quartiers/rivertown.png",
             neighbours: ["easttown", "merchant_district", "french_hill"],
             white_arrow: "french_hill",
             black_arrow: "easttown",
@@ -75,6 +89,8 @@ Board(
         (
             id: "miskatonic_u",
             name: "Université Miskatonic",
+            short_name: "Université",
+            illustration: "quartiers/miskatonic_u.png",
             neighbours: ["merchant_district", "french_hill", "uptown"],
             white_arrow: "merchant_district",
             black_arrow: "uptown",
@@ -83,6 +99,8 @@ Board(
         (
             id: "french_hill",
             name: "French Hill",
+            short_name: "French Hill",
+            illustration: "quartiers/french_hill.png",
             neighbours: ["rivertown", "miskatonic_u", "southside"],
             white_arrow: "southside",
             black_arrow: "rivertown",
@@ -91,6 +109,8 @@ Board(
         (
             id: "uptown",
             name: "Quartier Résidentiel",
+            short_name: "Résidentiel",
+            illustration: "quartiers/uptown.png",
             neighbours: ["miskatonic_u", "southside"],
             white_arrow: "miskatonic_u",
             black_arrow: "southside",
@@ -99,6 +119,8 @@ Board(
         (
             id: "southside",
             name: "Quartier Sud",
+            short_name: "Sud",
+            illustration: "quartiers/southside.png",
             neighbours: ["french_hill", "uptown"],
             white_arrow: "uptown",
             black_arrow: "french_hill",
@@ -110,6 +132,8 @@ Board(
         (
             id: "train_station",
             name: "Gare",
+            short_name: "Gare",
+            illustration: "lieux/train_station.png",
             street: "northside",
             stability: Stable,
             icons: [
@@ -122,6 +146,8 @@ Board(
         (
             id: "newspaper",
             name: "Journal",
+            short_name: "Journal",
+            illustration: "lieux/newspaper.png",
             street: "northside",
             stability: Stable,
             icons: [
@@ -134,6 +160,8 @@ Board(
         (
             id: "curiositie_shoppe",
             name: "Boutique de Souvenirs",
+            short_name: "Souvenirs",
+            illustration: "lieux/curiositie_shoppe.png",
             street: "northside",
             stability: Stable,
             ability: (
@@ -155,6 +183,8 @@ Board(
         (
             id: "bank_of_arkham",
             name: "Banque d'Arkham",
+            short_name: "Banque",
+            illustration: "lieux/bank_of_arkham.png",
             street: "downtown",
             stability: Stable,
             ability: (
@@ -174,6 +204,8 @@ Board(
         (
             id: "arkham_asylum",
             name: "Asile d'Arkham",
+            short_name: "Asile",
+            illustration: "lieux/arkham_asylum.png",
             street: "downtown",
             stability: Stable,
             ability: (
@@ -196,6 +228,8 @@ Board(
         (
             id: "independence_square",
             name: "Square de l'Indépendance",
+            short_name: "Square",
+            illustration: "lieux/independence_square.png",
             street: "downtown",
             stability: Unstable,
             icons: [
@@ -209,6 +243,8 @@ Board(
         (
             id: "hibbs_roadhouse",
             name: "Relais Routier de Hibb",
+            short_name: "Relais",
+            illustration: "lieux/hibbs_roadhouse.png",
             street: "easttown",
             stability: Unstable,
             icons: [
@@ -221,6 +257,8 @@ Board(
         (
             id: "velmas_diner",
             name: "Restaurant de Velma",
+            short_name: "Velma",
+            illustration: "lieux/velmas_diner.png",
             street: "easttown",
             stability: Stable,
             icons: [
@@ -233,6 +271,8 @@ Board(
         (
             id: "police_station",
             name: "Poste de Police",
+            short_name: "Police",
+            illustration: "lieux/police_station.png",
             street: "easttown",
             stability: Stable,
             ability: (
@@ -257,6 +297,8 @@ Board(
         (
             id: "unvisited_isle",
             name: "Île Inexplorée",
+            short_name: "Île",
+            illustration: "lieux/unvisited_isle.png",
             street: "merchant_district",
             stability: Unstable,
             icons: [
@@ -269,6 +311,8 @@ Board(
         (
             id: "river_docks",
             name: "Les Quais",
+            short_name: "Quais",
+            illustration: "lieux/river_docks.png",
             street: "merchant_district",
             stability: Stable,
             ability: (
@@ -291,6 +335,8 @@ Board(
         (
             id: "the_unnamable",
             name: "L'Innommable",
+            short_name: "Innommable",
+            illustration: "lieux/the_unnamable.png",
             street: "merchant_district",
             stability: Unstable,
             icons: [
@@ -304,6 +350,8 @@ Board(
         (
             id: "graveyard",
             name: "Cimetière",
+            short_name: "Cimetière",
+            illustration: "lieux/graveyard.png",
             street: "rivertown",
             stability: Unstable,
             icons: [
@@ -316,6 +364,8 @@ Board(
         (
             id: "black_cave",
             name: "Caverne Noire",
+            short_name: "Caverne",
+            illustration: "lieux/black_cave.png",
             street: "rivertown",
             stability: Unstable,
             icons: [
@@ -328,6 +378,8 @@ Board(
         (
             id: "general_store",
             name: "Magasin",
+            short_name: "Magasin",
+            illustration: "lieux/general_store.png",
             street: "rivertown",
             stability: Stable,
             ability: (
@@ -349,6 +401,8 @@ Board(
         (
             id: "science_building",
             name: "Département Scientifique",
+            short_name: "Sciences",
+            illustration: "lieux/science_building.png",
             street: "miskatonic_u",
             stability: Unstable,
             ability: (
@@ -371,6 +425,8 @@ Board(
         (
             id: "administration",
             name: "Administration",
+            short_name: "Admin.",
+            illustration: "lieux/administration.png",
             street: "miskatonic_u",
             stability: Stable,
             ability: (
@@ -391,6 +447,8 @@ Board(
         (
             id: "library",
             name: "Bibliothèque",
+            short_name: "Bibliothèque",
+            illustration: "lieux/library.png",
             street: "miskatonic_u",
             stability: Stable,
             icons: [
@@ -404,6 +462,8 @@ Board(
         (
             id: "witch_house",
             name: "La Maison de la Sorcière",
+            short_name: "Sorcière",
+            illustration: "lieux/witch_house.png",
             street: "french_hill",
             stability: Unstable,
             icons: [
@@ -416,6 +476,8 @@ Board(
         (
             id: "silver_twilight_lodge",
             name: "Loge du Crépuscule d'Argent",
+            short_name: "Loge",
+            illustration: "lieux/silver_twilight_lodge.png",
             street: "french_hill",
             stability: Unstable,
             ability: (
@@ -433,6 +495,8 @@ Board(
         (
             id: "st_marys_hospital",
             name: "Hôpital Sainte-Marie",
+            short_name: "Hôpital",
+            illustration: "lieux/st_marys_hospital.png",
             street: "uptown",
             stability: Stable,
             ability: (
@@ -455,6 +519,8 @@ Board(
         (
             id: "ye_olde_magick_shoppe",
             name: "La Vieille Échoppe de Magie",
+            short_name: "Magie",
+            illustration: "lieux/ye_olde_magick_shoppe.png",
             street: "uptown",
             stability: Stable,
             ability: (
@@ -476,6 +542,8 @@ Board(
         (
             id: "woods",
             name: "Bois",
+            short_name: "Bois",
+            illustration: "lieux/woods.png",
             street: "uptown",
             stability: Unstable,
             icons: [
@@ -489,6 +557,8 @@ Board(
         (
             id: "historical_society",
             name: "Société des Historiens",
+            short_name: "Historiens",
+            illustration: "lieux/historical_society.png",
             street: "southside",
             stability: Unstable,
             icons: [
@@ -501,6 +571,8 @@ Board(
         (
             id: "mas_boarding_house",
             name: "Pension de Ma",
+            short_name: "Pension",
+            illustration: "lieux/mas_boarding_house.png",
             street: "southside",
             stability: Stable,
             ability: (
@@ -524,6 +596,8 @@ Board(
         (
             id: "south_church",
             name: "Église Méridionale",
+            short_name: "Église",
+            illustration: "lieux/south_church.png",
             street: "southside",
             stability: Stable,
             ability: (
@@ -548,6 +622,8 @@ Board(
         (
             id: "rlyeh",
             name: "R'lyeh",
+            short_name: "R'lyeh",
+            illustrations: (first: "autres mondes/rlyeh.png", second: "autres mondes/rlyeh_2.png"),
             colors: [Red, Yellow],
             first_area: (x: 955, y: 150),
             second_area: (x: 955, y: 65),
@@ -555,6 +631,8 @@ Board(
         (
             id: "plateau_of_leng",
             name: "Plateau de Leng",
+            short_name: "Leng",
+            illustrations: (first: "autres mondes/plateau_of_leng.png", second: "autres mondes/plateau_of_leng_2.png"),
             colors: [Red, Green],
             first_area: (x: 955, y: 340),
             second_area: (x: 955, y: 255),
@@ -562,6 +640,8 @@ Board(
         (
             id: "dreamlands",
             name: "Les Contrées du Rêve",
+            short_name: "Rêve",
+            illustrations: (first: "autres mondes/dreamlands.png", second: "autres mondes/dreamlands_2.png"),
             colors: [Red, Yellow, Green, Blue],
             first_area: (x: 955, y: 520),
             second_area: (x: 955, y: 440),
@@ -569,6 +649,8 @@ Board(
         (
             id: "great_hall_of_celeano",
             name: "Grand Hall de Celeano",
+            short_name: "Celeano",
+            illustrations: (first: "autres mondes/great_hall_of_celeano.png", second: "autres mondes/great_hall_of_celeano_2.png"),
             colors: [Green, Blue],
             first_area: (x: 955, y: 720),
             second_area: (x: 955, y: 640),
@@ -576,6 +658,8 @@ Board(
         (
             id: "yuggoth",
             name: "Yuggoth",
+            short_name: "Yuggoth",
+            illustrations: (first: "autres mondes/yuggoth.png", second: "autres mondes/yuggoth_2.png"),
             colors: [Yellow, Blue],
             first_area: (x: 955, y: 910),
             second_area: (x: 955, y: 830),
@@ -583,6 +667,8 @@ Board(
         (
             id: "city_of_the_great_race",
             name: "Cité de la Grande Race",
+            short_name: "Grande Race",
+            illustrations: (first: "autres mondes/city_of_the_great_race.png", second: "autres mondes/city_of_the_great_race_2.png"),
             colors: [Green, Yellow],
             first_area: (x: 955, y: 1105),
             second_area: (x: 955, y: 1025),
@@ -590,6 +676,8 @@ Board(
         (
             id: "abyss",
             name: "Les Abysses",
+            short_name: "Abysses",
+            illustrations: (first: "autres mondes/abyss.png", second: "autres mondes/abyss_2.png"),
             colors: [Red, Blue],
             first_area: (x: 955, y: 1305),
             second_area: (x: 955, y: 1225),
@@ -597,6 +685,8 @@ Board(
         (
             id: "another_dimension",
             name: "Une Autre Dimension",
+            short_name: "Autre Dim.",
+            illustrations: (first: "autres mondes/another_dimension.png", second: "autres mondes/another_dimension_2.png"),
             colors: [Red, Yellow, Green, Blue],
             first_area: (x: 955, y: 1500),
             second_area: (x: 955, y: 1420),

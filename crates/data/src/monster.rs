@@ -119,6 +119,8 @@ pub struct Monster {
     pub special: Option<String>,
     /// Token image (both sides), relative to the `assets/` folder.
     pub image: String,
+    /// Illustrated portrait, relative to the `illustrations/` folder.
+    pub portrait: String,
 }
 
 /// Content of `data/monsters.ron`.
@@ -133,7 +135,7 @@ pub struct Monsters {
 
 impl Monsters {
     /// Format version this code reads.
-    pub const VERSION: u32 = 1;
+    pub const VERSION: u32 = 2;
 
     /// Total number of monster tokens.
     pub fn total_copies(&self) -> u32 {

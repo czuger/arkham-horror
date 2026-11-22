@@ -7,6 +7,7 @@ use tower_http::set_header::SetResponseHeaderLayer;
 
 use crate::app_state::AppState;
 use crate::embedded_files;
+use crate::illustrations;
 use crate::routes;
 use crate::same_origin::same_origin;
 
@@ -38,6 +39,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/robots.txt", get(routes::robots))
         .route("/assets/{*path}", get(embedded_files::asset))
         .route("/static/{*path}", get(embedded_files::static_file))
+        .route("/illustrations/{*path}", get(illustrations::illustration))
         .layer(SetResponseHeaderLayer::overriding(
             HeaderName::from_static("x-robots-tag"),
             HeaderValue::from_static("noindex, nofollow"),

@@ -26,6 +26,10 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 rust-embed = { version = "8.14.0", features = ["include-exclude", "mime-guess"] }
 
+[build-dependencies]
+# Shrinks the illustrations at build time (build.rs).
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg"] }
+
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
 http-body-util = "0.1"

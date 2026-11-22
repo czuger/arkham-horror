@@ -13,6 +13,10 @@ pub struct Street {
     pub id: StreetId,
     /// Name shown to the player, in French.
     pub name: String,
+    /// Name shortened for the symbolic map, in French.
+    pub short_name: String,
+    /// Scene illustration of the district, relative to the `illustrations/` folder.
+    pub illustration: String,
     /// Street areas reachable in one step. Links are symmetric.
     pub neighbours: Vec<StreetId>,
     /// Where a monster here goes when the Mythos card moves it along the white arrow.

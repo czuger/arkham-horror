@@ -28,6 +28,10 @@ pub struct Location {
     pub id: LocationId,
     /// Name shown to the player, in French.
     pub name: String,
+    /// Name shortened for the symbolic map, in French.
+    pub short_name: String,
+    /// Scene illustration, relative to the `illustrations/` folder.
+    pub illustration: String,
     /// The street area of the location's district.
     pub street: StreetId,
     /// Stable or unstable.

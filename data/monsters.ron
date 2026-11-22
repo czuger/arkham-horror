@@ -10,9 +10,11 @@
 //   le jeton n'imprime pas de test (« — »). damage: 0 quand le jeton imprime un
 //   effet spécial à la place des dégâts.
 // - awareness : modificateur aux tests de Discrétion pour l'éviter.
+// - portrait : illustration du monstre, relative au dossier `illustrations/`
+//   (version 2, 22/11/2026).
 #![enable(implicit_some)]
 Monsters(
-    version: 1,
+    version: 2,
     monsters: [
         (
             id: "byakhee",
@@ -25,6 +27,7 @@ Monsters(
             combat: (modifier: 0, damage: 2),
             toughness: 1,
             image: "monstres/byakhee.jpg",
+            portrait: "monstres/byakhee.png",
         ),
         (
             id: "hound_of_tindalos",
@@ -39,6 +42,7 @@ Monsters(
             abilities: [PhysicalImmunity],
             special: "Quand le Chien de Tindalos se déplace, il va directement sur l'investigateur le plus proche à l'intérieur d'un lieu à Arkham (à l'exception de l'Hôpital et de l'Asile).",
             image: "monstres/chien_de_tindalos.jpg",
+            portrait: "monstres/hound_of_tindalos.png",
         ),
         (
             id: "elder_thing",
@@ -52,6 +56,7 @@ Monsters(
             toughness: 2,
             special: "Quand vous ratez un test de Combat contre une Chose Très Ancienne, vous devez défausser 1 de vos Armes ou Sorts (au choix), si possible.",
             image: "monstres/chose_tres_ancienne.jpg",
+            portrait: "monstres/elder_thing.png",
         ),
         (
             id: "chthonian",
@@ -65,6 +70,7 @@ Monsters(
             toughness: 3,
             special: "Au lieu de bouger, lancez un dé. De 4 à 6, tous les investigateurs à Arkham perdent 1 Résistance.",
             image: "monstres/chthonien.jpg",
+            portrait: "monstres/chthonian.png",
         ),
         (
             id: "cultist",
@@ -76,6 +82,7 @@ Monsters(
             combat: (modifier: 1, damage: 1),
             toughness: 1,
             image: "monstres/cultiste.jpg",
+            portrait: "monstres/cultist.png",
         ),
         (
             id: "dhole",
@@ -89,6 +96,7 @@ Monsters(
             toughness: 3,
             abilities: [PhysicalResistance, MagicalResistance, Nightmarish(1), Overwhelming(1)],
             image: "monstres/dhole.jpg",
+            portrait: "monstres/dhole.png",
         ),
         (
             id: "god_of_the_bloody_tongue",
@@ -102,6 +110,7 @@ Monsters(
             toughness: 4,
             abilities: [Mask, Endless, Overwhelming(1), Nightmarish(1)],
             image: "monstres/dieu_de_la_langue_sanglante.jpg",
+            portrait: "monstres/god_of_the_bloody_tongue.png",
         ),
         (
             id: "ghost",
@@ -115,6 +124,7 @@ Monsters(
             toughness: 1,
             abilities: [PhysicalImmunity, Undead],
             image: "monstres/fantome.jpg",
+            portrait: "monstres/ghost.png",
         ),
         (
             id: "ghoul",
@@ -128,6 +138,7 @@ Monsters(
             toughness: 1,
             abilities: [Ambush],
             image: "monstres/goule.jpg",
+            portrait: "monstres/ghoul.png",
         ),
         (
             id: "high_priest",
@@ -141,6 +152,7 @@ Monsters(
             toughness: 2,
             abilities: [MagicalImmunity],
             image: "monstres/grand_pretre.jpg",
+            portrait: "monstres/high_priest.png",
         ),
         (
             id: "gug",
@@ -154,6 +166,7 @@ Monsters(
             toughness: 3,
             abilities: [Overwhelming(1)],
             image: "monstres/gug.jpg",
+            portrait: "monstres/gug.png",
         ),
         (
             id: "the_bloated_woman",
@@ -168,6 +181,7 @@ Monsters(
             abilities: [Mask, Endless],
             special: "Avant de faire un test d'Horreur, réussissez un test de Volonté (-2) ou ratez automatiquement le test d'Horreur et le test de Combat.",
             image: "monstres/la_femme_boursouflee.jpg",
+            portrait: "monstres/the_bloated_woman.png",
         ),
         (
             id: "formless_spawn",
@@ -181,6 +195,7 @@ Monsters(
             toughness: 2,
             abilities: [PhysicalImmunity],
             image: "monstres/larve_amorphe.jpg",
+            portrait: "monstres/formless_spawn.png",
         ),
         (
             id: "star_spawn",
@@ -193,6 +208,7 @@ Monsters(
             combat: (modifier: -3, damage: 3),
             toughness: 3,
             image: "monstres/larve_stellaire.jpg",
+            portrait: "monstres/star_spawn.png",
         ),
         (
             id: "the_black_man",
@@ -205,6 +221,7 @@ Monsters(
             abilities: [Mask, Endless],
             special: "Avant de faire un test d'Horreur, réussissez un test de Chance (-1) ou soyez dévoré. En cas de réussite, gagnez 2 pions Indice. Dans les deux cas, remettez l'Homme en Noir dans la tasse.",
             image: "monstres/lhomme_en_noir.jpg",
+            portrait: "monstres/the_black_man.png",
         ),
         (
             id: "nightgaunt",
@@ -218,6 +235,7 @@ Monsters(
             toughness: 2,
             special: "Quand vous ratez un test de Combat contre une Maigre Bête de la Nuit, vous êtes aspiré par le portail ouvert le plus proche. S'il y a une égalité pour les portails, vous choisissez celui où vous êtes aspiré.",
             image: "monstres/maigre_bete_de_la_nuit.jpg",
+            portrait: "monstres/nightgaunt.png",
         ),
         (
             id: "maniac",
@@ -230,6 +248,7 @@ Monsters(
             toughness: 1,
             special: "Si le niveau de terreur est au moins à 6, la valeur de combat d'un Maniaque augmente à -2, ses dégâts de combat passent à 3 Résistance et il devient Inépuisable.",
             image: "monstres/maniaque.jpg",
+            portrait: "monstres/maniac.png",
         ),
         (
             id: "mi_go",
@@ -243,6 +262,7 @@ Monsters(
             toughness: 1,
             special: "Si vous réussissez un test de Combat contre un Migo, remettez-le dans la boîte et piochez 1 Objet Unique.",
             image: "monstres/migo.jpg",
+            portrait: "monstres/mi_go.png",
         ),
         (
             id: "flying_polyp",
@@ -256,6 +276,7 @@ Monsters(
             toughness: 3,
             abilities: [PhysicalResistance, Nightmarish(1), Overwhelming(1)],
             image: "monstres/polype_volant.jpg",
+            portrait: "monstres/flying_polyp.png",
         ),
         (
             id: "shoggoth",
@@ -269,6 +290,7 @@ Monsters(
             toughness: 3,
             abilities: [PhysicalResistance, Nightmarish(1)],
             image: "monstres/shoggoth.jpg",
+            portrait: "monstres/shoggoth.png",
         ),
         (
             id: "dark_young",
@@ -282,6 +304,7 @@ Monsters(
             toughness: 3,
             abilities: [PhysicalResistance, Nightmarish(1)],
             image: "monstres/sombre_rejeton.jpg",
+            portrait: "monstres/dark_young.png",
         ),
         (
             id: "warlock",
@@ -296,6 +319,7 @@ Monsters(
             abilities: [MagicalImmunity],
             special: "Si vous réussissez un test de Combat contre un Sorcier, remettez-le dans la boîte et gagnez 2 pions Indice.",
             image: "monstres/sorcier.jpg",
+            portrait: "monstres/warlock.png",
         ),
         (
             id: "witch",
@@ -308,6 +332,7 @@ Monsters(
             toughness: 1,
             abilities: [MagicalResistance],
             image: "monstres/sorciere.jpg",
+            portrait: "monstres/witch.png",
         ),
         (
             id: "haunter_of_the_dark",
@@ -322,6 +347,7 @@ Monsters(
             abilities: [Mask, Endless],
             special: "Si la carte Nuit la plus Sombre est en jeu, la valeur de combat du Tourmenteur des Ténèbres augmente à -5.",
             image: "monstres/tourmenteur_des_tenebres.jpg",
+            portrait: "monstres/haunter_of_the_dark.png",
         ),
         (
             id: "dimensional_shambler",
@@ -335,6 +361,7 @@ Monsters(
             toughness: 1,
             special: "Si vous ratez un test de Combat contre un Vagabond Dimensionnel, vous êtes perdu dans le temps et l'espace.",
             image: "monstres/vagabond_dimensionnel.jpg",
+            portrait: "monstres/dimensional_shambler.png",
         ),
         (
             id: "fire_vampire",
@@ -347,6 +374,7 @@ Monsters(
             toughness: 1,
             abilities: [Ambush, PhysicalImmunity],
             image: "monstres/vampire_de_feu.jpg",
+            portrait: "monstres/fire_vampire.png",
         ),
         (
             id: "vampire",
@@ -360,6 +388,7 @@ Monsters(
             toughness: 2,
             abilities: [Undead, PhysicalResistance],
             image: "monstres/vampire.jpg",
+            portrait: "monstres/vampire.png",
         ),
         (
             id: "zombie",
@@ -373,6 +402,7 @@ Monsters(
             toughness: 1,
             abilities: [Undead],
             image: "monstres/zombie.jpg",
+            portrait: "monstres/zombie.png",
         ),
         (
             id: "the_black_pharaoh",
@@ -387,6 +417,7 @@ Monsters(
             abilities: [Mask, Endless],
             special: "Utilisez le Savoir en combat contre Le Pharaon Noir au lieu de la Vigueur.",
             image: "monstres/le_pharaon_noir.jpg",
+            portrait: "monstres/the_black_pharaoh.png",
         ),
     ],
 )

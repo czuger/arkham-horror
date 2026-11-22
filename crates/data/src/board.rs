@@ -38,7 +38,7 @@ pub struct Board {
 
 impl Board {
     /// Format version this code reads.
-    pub const VERSION: u32 = 4;
+    pub const VERSION: u32 = 5;
 
     /// Finds a location by id.
     pub fn location(&self, id: &LocationId) -> Option<&Location> {

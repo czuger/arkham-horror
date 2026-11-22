@@ -2,6 +2,8 @@
 
 Les originaux des lieux et des Autres Mondes se trouvent sur le [plateau d’Arkham](assets/plateau/arkham.jpg). Les coordonnées `(x, y)` sont les centres approximatifs relevés dans [board.ron](data/board.ron), en pixels depuis le coin supérieur gauche de l’image de 1064 × 1576 px.
 
+Depuis le 22/11/2026, chaque chemin est écrit dans les données : `illustration` pour les lieux et les rues et `illustrations: (first, second)` pour les Autres Mondes dans [board.ron](data/board.ron), `portrait` pour les monstres dans [monsters.ron](data/monsters.ron). Le test `every_illustration_exists_and_none_is_orphan` vérifie que chaque fichier existe et qu'aucun PNG n'est inutilisé. Le serveur en fait au build des copies JPEG réduites (`grand`, 1280 px, et `vignette`, 320 px) : 21,5 Mo au lieu de 186.
+
 ## Lieux
 
 | Lieu | Quartier | Centre sur le plateau | Nouvelle illustration |

@@ -12,8 +12,8 @@ use crate::investigator::Investigators;
 use crate::monster::Monsters;
 use crate::validation::{
     Issue, check_ancient_ones, check_board, check_card_ids, check_gate_cards, check_gate_markers,
-    check_images, check_investigator_cards, check_investigators, check_location_cards,
-    check_monsters, check_mythos_cards,
+    check_illustration_files, check_images, check_investigator_cards, check_investigators,
+    check_location_cards, check_monsters, check_mythos_cards, cited_illustrations,
 };
 
 /// Every data file of the base game, consistent with each other.
@@ -101,6 +101,28 @@ impl GameData {
         let mut issues = Vec::new();
         check_images(self, assets_dir, &mut issues);
         into_result(issues)
+    }
+
+    /// Checks that every illustration cited by the data exists under
+    /// `illustrations_dir`.
+    ///
+    /// # Errors
+    ///
+    /// [`DataError::Invalid`] listing every missing illustration.
+    pub fn check_illustrations(&self, illustrations_dir: &Path) -> Result<(), DataError> {
+        let mut issues = Vec::new();
+        check_illustration_files(self, illustrations_dir, &mut issues);
+        into_result(issues)
+    }
+
+    /// The illustrations cited by the data, relative to `illustrations/`.
+    ///
+    /// # Returns
+    ///
+    /// Locations, districts, both areas of each Other World and monster
+    /// portraits, in that order.
+    pub fn illustrations(&self) -> impl Iterator<Item = &str> {
+        cited_illustrations(self)
     }
 
     /// Collects every inconsistency.

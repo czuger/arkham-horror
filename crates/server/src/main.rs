@@ -6,6 +6,7 @@ mod config;
 mod database;
 mod embedded_files;
 mod game_row;
+mod illustrations;
 mod play_mode;
 mod progress;
 mod relative_path;

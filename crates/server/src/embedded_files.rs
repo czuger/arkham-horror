@@ -70,18 +70,30 @@ fn serve(file: Option<EmbeddedFile>, request: &HeaderMap) -> Response {
     let Some(file) = file else {
         return StatusCode::NOT_FOUND.into_response();
     };
-    let etag = format!("\"{}\"", hex(&file.metadata.sha256_hash()));
-    let mimetype = HeaderValue::from_str(file.metadata.mimetype());
+    let etag = hex(&file.metadata.sha256_hash());
+    let mimetype = file.metadata.mimetype().to_owned();
+    serve_bytes(Body::from(file.data), &mimetype, &etag, request)
+}
+
+/// A file's bytes with its type and an `ETag` made of `fingerprint`, or
+/// `304` when the browser already has this version.
+pub(crate) fn serve_bytes(
+    body: Body,
+    mimetype: &str,
+    fingerprint: &str,
+    request: &HeaderMap,
+) -> Response {
+    let etag = format!("\"{fingerprint}\"");
     let fresh = request
         .get(header::IF_NONE_MATCH)
         .is_some_and(|value| value.as_bytes() == etag.as_bytes());
     let mut response = if fresh {
         StatusCode::NOT_MODIFIED.into_response()
     } else {
-        Body::from(file.data).into_response()
+        body.into_response()
     };
     let headers = response.headers_mut();
-    if let Ok(value) = mimetype {
+    if let Ok(value) = HeaderValue::from_str(mimetype) {
         headers.insert(header::CONTENT_TYPE, value);
     }
     if let Ok(value) = HeaderValue::from_str(&etag) {

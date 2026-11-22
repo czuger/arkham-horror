@@ -175,7 +175,7 @@ mod tests {
     use super::*;
     use crate::ids::{LocationId, OtherWorldId, StreetId};
     use crate::location::{Location, Stability};
-    use crate::other_world::{EncounterColor, OtherWorld};
+    use crate::other_world::{EncounterColor, OtherWorld, WorldIllustrations};
     use crate::position::Position;
     use crate::rect::Rect;
     use crate::special_area::SpecialArea;
@@ -187,6 +187,8 @@ mod tests {
         Street {
             id: StreetId::new(id),
             name: id.to_owned(),
+            short_name: id.to_owned(),
+            illustration: String::new(),
             neighbours: vec![StreetId::new(neighbour)],
             white_arrow: StreetId::new(neighbour),
             black_arrow: StreetId::new(neighbour),
@@ -198,6 +200,8 @@ mod tests {
         Location {
             id: LocationId::new(id),
             name: id.to_owned(),
+            short_name: id.to_owned(),
+            illustration: String::new(),
             street: StreetId::new(street),
             stability: Stability::Stable,
             ability: None,
@@ -235,6 +239,11 @@ mod tests {
             other_worlds: vec![OtherWorld {
                 id: OtherWorldId::new("w"),
                 name: String::new(),
+                short_name: String::new(),
+                illustrations: WorldIllustrations {
+                    first: String::new(),
+                    second: String::new(),
+                },
                 colors: vec![EncounterColor::Red],
                 first_area: ORIGIN,
                 second_area: ORIGIN,

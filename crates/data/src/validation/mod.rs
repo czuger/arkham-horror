@@ -15,7 +15,7 @@ mod monster_checks;
 mod mythos_card_checks;
 
 pub(crate) use ancient_one_checks::check_ancient_ones;
-pub(crate) use asset_checks::check_images;
+pub(crate) use asset_checks::{check_illustration_files, check_images, cited_illustrations};
 pub(crate) use board_checks::check_board;
 pub(crate) use card_id_checks::check_card_ids;
 pub(crate) use gate_card_checks::check_gate_cards;

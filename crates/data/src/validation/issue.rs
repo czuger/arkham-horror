@@ -125,6 +125,11 @@ pub enum Issue {
         /// Expected path.
         path: PathBuf,
     },
+    /// An illustration cited by the data is not in `illustrations/`.
+    MissingIllustration {
+        /// Expected path.
+        path: PathBuf,
+    },
 }
 
 impl fmt::Display for Issue {
@@ -193,6 +198,9 @@ impl fmt::Display for Issue {
             ),
             Self::Mismatch { context, reason } => write!(f, "{context} : {reason}"),
             Self::MissingImage { path } => write!(f, "image absente : {}", path.display()),
+            Self::MissingIllustration { path } => {
+                write!(f, "illustration absente : {}", path.display())
+            }
         }
     }
 }

@@ -18,6 +18,16 @@ pub enum EncounterColor {
     Blue,
 }
 
+/// The scene illustrations of an Other World, one per area.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct WorldIllustrations {
+    /// First area, relative to the `illustrations/` folder.
+    pub first: String,
+    /// Second area, relative to the `illustrations/` folder.
+    pub second: String,
+}
+
 /// One of the 8 Other Worlds of the base game.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -26,6 +36,10 @@ pub struct OtherWorld {
     pub id: OtherWorldId,
     /// Name shown to the player, in French.
     pub name: String,
+    /// Name shortened for the symbolic map, in French.
+    pub short_name: String,
+    /// Scene illustrations of both areas.
+    pub illustrations: WorldIllustrations,
     /// Gate card colours that trigger an encounter in this world.
     pub colors: Vec<EncounterColor>,
     /// Display position of the first area on the board image.
