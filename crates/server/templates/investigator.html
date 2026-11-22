@@ -3,6 +3,7 @@
 {% block content %}
 <nav class="seat-tabs">
   {% for tab in tabs %}<a href="partie/{{ id }}/investigateurs/{{ tab.seat }}"{% if tab.current %} aria-current="page"{% endif %}>{{ tab.name }} <small>({{ tab.player }})</small></a>{% endfor %}
+  <a href="partie/{{ id }}#scene" class="back">Voir la scène</a>
   <a href="partie/{{ id }}" class="back">Retour à la partie</a>
 </nav>
 {% if let Some(decision) = decision %}

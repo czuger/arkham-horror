@@ -70,10 +70,14 @@ async fn robots_txt_and_static_files_are_served() {
 async fn built_in_images_are_served_with_their_type() {
     let dir = temp();
     let app = TestApp::open(&dir.path().join("db")).await;
-    let page = app.get("/partie/1/plateau").await;
-    assert_eq!(page.status, StatusCode::NOT_FOUND);
     let game = new_game(&app, NEW_GAME).await;
-    let body = app.get(&game).await.body;
+    let old_board = app.get(&format!("{game}/plateau")).await;
+    assert_eq!(
+        old_board.status,
+        StatusCode::NOT_FOUND,
+        "page removed in J6"
+    );
+    let body = app.get(&format!("{game}{SHEET}")).await.body;
     let start = body.find("src=\"assets/").expect("an image") + "src=\"".len();
     let image = &body[start..start + body[start..].find('"').expect("end")];
     let request = Request::get(format!("/{image}"))
@@ -106,7 +110,6 @@ async fn pages_link_relatively() {
         (format!("{game}/journal"), "../../"),
         (format!("{game}/combat"), "../../"),
         (format!("{game}/grand-ancien"), "../../"),
-        (format!("{game}/plateau"), "../../"),
         (format!("{game}{SHEET}"), "../../"),
         (format!("{game}{SHEET}/1"), "../../../"),
     ];
@@ -253,33 +256,13 @@ async fn sliders_are_placed_on_the_sheet() {
 }
 
 #[tokio::test(flavor = "current_thread")]
-async fn the_landscape_board_page_shows_the_turned_board() {
-    let dir = temp();
-    let app = TestApp::open(&dir.path().join("db")).await;
-    let game = new_game(&app, NEW_GAME).await;
-    assert!(app.get(&game).await.body.contains("/plateau\""));
-    let page = app.get(&format!("{game}/plateau")).await;
-    assert_eq!(page.status, StatusCode::OK);
-    assert!(
-        page.body.contains("width: 1576px; height: 1064px"),
-        "{}",
-        page.body
-    );
-    assert!(page.body.contains("rotate(90deg)"), "{}", page.body);
-    assert!(!page.body.contains("<button"), "{}", page.body);
-    assert_eq!(
-        app.get("/partie/99/plateau").await.status,
-        StatusCode::NOT_FOUND
-    );
-}
-
-#[tokio::test(flavor = "current_thread")]
 async fn locations_show_their_text_and_icons_on_hover() {
     let dir = temp();
     let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     let page = app.get(&game).await.body;
-    assert_eq!(page.matches("class=\"panel tip").count(), 26);
+    let map = &page[page.find("class=\"map-targets\"").expect("map")..];
+    assert!(map.matches("class=\"bubble place-bubble\"").count() >= 26);
     assert!(
         page.contains("<b>Prêt Bancaire</b> : Au lieu de faire"),
         "{page}"

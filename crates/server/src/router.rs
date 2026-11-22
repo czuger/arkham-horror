@@ -35,7 +35,6 @@ pub fn build_router(state: AppState) -> Router {
             "/partie/{id}/investigateurs/{seat}",
             get(routes::investigator),
         )
-        .route("/partie/{id}/plateau", get(routes::landscape_board))
         .route("/robots.txt", get(routes::robots))
         .route("/assets/{*path}", get(embedded_files::asset))
         .route("/static/{*path}", get(embedded_files::static_file))

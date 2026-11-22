@@ -1,19 +1,13 @@
 use crate::views::image_token::ImageToken;
 use crate::views::tip::Tip;
 
-/// One place drawn on the board, with what stands there.
+/// One place of the board, with what stands there.
 #[derive(Debug, Clone, Default)]
 pub struct Spot {
     /// The place's key: its id, `<world>_2`, or a special area's key.
     pub key: String,
     /// French name of the place.
     pub name: String,
-    /// Horizontal position, in percent of the board width.
-    pub left: String,
-    /// Vertical position, in percent of the board height.
-    pub top: String,
-    /// Position in pixels on the board image, as read from `board.ron`.
-    pub point: (u16, u16),
     /// Investigators standing there.
     pub investigators: Vec<InvestigatorToken>,
     /// Monsters standing there.
@@ -26,9 +20,6 @@ pub struct Spot {
     pub sealed: bool,
     /// The « Lieu fermé » marker, when the location is closed.
     pub closed: Option<ImageToken>,
-    /// CSS classes telling which way the bubbles open, so they stay inside
-    /// the window (« west north »…).
-    pub edge: String,
     /// Answers of the current decision that pick this place: index and label.
     pub choices: Vec<(usize, String)>,
 }

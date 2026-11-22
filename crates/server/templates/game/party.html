@@ -1,20 +1,12 @@
-<section class="party">
-  <h2>Investigateurs</h2>
-  <table>
-    <thead><tr><th>Nom</th><th>Lieu</th><th>San</th><th>Rés</th><th>$</th><th>Ind.</th><th>Cartes</th><th>Projet</th></tr></thead>
-    <tbody>
-    {% for row in party %}
-      <tr class="{% if row.human %}human{% endif %}{% if row.eliminated %} eliminated{% endif %}">
-        <td><span class="tip" tabindex="0">{{ row.name }}{{ row.tip|safe }}</span>{% if row.first %} <span title="Premier joueur">①</span>{% endif %}</td>
-        <td>{{ row.place }}</td>
-        <td>{{ row.sanity.0 }}/{{ row.sanity.1 }}</td>
-        <td>{{ row.stamina.0 }}/{{ row.stamina.1 }}</td>
-        <td>{{ row.money }}</td>
-        <td>{{ row.clues }}</td>
-        <td>{{ row.cards }}</td>
-        <td>{{ row.plan }}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
+<section class="party" aria-label="Investigateurs">
+  <ul>
+  {% for row in party %}
+    <li class="member{% if row.human %} human{% endif %}{% if row.eliminated %} eliminated{% endif %}">
+      <span class="member-name"><span class="tip" tabindex="0">{{ row.name }}{{ row.tip|safe }}</span>{% if row.first %} <span title="Premier joueur">①</span>{% endif %}</span>
+      <span class="member-place">{{ row.place }}</span>
+      <span class="member-facts">San {{ row.sanity.0 }}/{{ row.sanity.1 }} · Rés {{ row.stamina.0 }}/{{ row.stamina.1 }} · {{ row.money }} $ · {{ row.clues }} ind. · {{ row.cards }} cartes</span>
+      {% if !row.plan.is_empty() %}<span class="member-plan">{{ row.plan }}</span>{% endif %}
+    </li>
+  {% endfor %}
+  </ul>
 </section>

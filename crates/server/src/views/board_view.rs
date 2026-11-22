@@ -1,33 +1,25 @@
 use std::collections::BTreeMap;
 
-use data::{GameData, Position, SpecialAreaKind};
+use data::{GameData, SpecialAreaKind};
 use engine::{Area, Choice, Decision, GameState, MonsterPlace, Place, View};
 
 use crate::play_mode::PlayMode;
-use crate::views::board_geometry::{BOARD_SIZE, edge, percent};
 use crate::views::closed_marker::closed_marker;
 use crate::views::image_token::ImageToken;
-use crate::views::location_panel::LocationPanel;
 use crate::views::names::{initials, investigator_name, monster_on_board};
 use crate::views::spot::{InvestigatorToken, Spot};
-use crate::views::terror_pawn::TerrorPawn;
 use crate::views::tips;
 
-/// The board with every token and the places the current decision offers.
+/// Every token on the board and the places the current decision offers,
+/// place by place.
 #[derive(Debug, Clone)]
 pub struct BoardView {
-    /// Board image path under `assets/`.
-    pub image: String,
     /// The places with something to show.
     pub spots: Vec<Spot>,
-    /// The terror marker on its track.
-    pub terror: Option<TerrorPawn>,
-    /// The white area of every location, with its text and icons on hover.
-    pub panels: Vec<LocationPanel>,
 }
 
 impl BoardView {
-    /// Draws the board for a state, with the decision's place choices.
+    /// The tokens of a state, with the decision's place choices.
     pub fn new(view: &View<'_, '_>, decision: Option<&Decision>, mode: PlayMode) -> Self {
         let data = view.data();
         let state = view.state();
@@ -40,34 +32,12 @@ impl BoardView {
             add_choices(data, decision, &mut spots);
         }
         Self {
-            image: data.board.image.clone(),
             spots: spots
                 .into_values()
                 .filter(|spot| !spot.is_empty())
                 .collect(),
-            terror: terror_pawn(data, state.terror),
-            panels: data
-                .board
-                .locations
-                .iter()
-                .map(|location| LocationPanel::new(&data.board, location))
-                .collect(),
         }
     }
-}
-
-/// The terror marker at its level on the track.
-fn terror_pawn(data: &GameData, level: u8) -> Option<TerrorPawn> {
-    let track = &data.board.terror_track;
-    let position = track.space(level)?;
-    Some(TerrorPawn {
-        level,
-        image: track.marker.clone(),
-        left: percent(position.x, BOARD_SIZE.0),
-        top: percent(position.y, BOARD_SIZE.1),
-        point: (position.x, position.y),
-        tip: tips::terror(data, level),
-    })
 }
 
 /// The spot of a place, created on first use.
@@ -76,46 +46,34 @@ fn spot_of<'s>(
     spots: &'s mut BTreeMap<String, Spot>,
     place: &Place,
 ) -> Option<&'s mut Spot> {
-    let (key, name, position) = locate(data, place)?;
-    Some(
-        spots
-            .entry(key.clone())
-            .or_insert_with(|| blank(key, name, position)),
-    )
+    let (key, name) = locate(data, place)?;
+    Some(spots.entry(key.clone()).or_insert_with(|| blank(key, name)))
 }
 
-/// An empty spot at a position.
-fn blank(key: String, name: String, position: Position) -> Spot {
+/// An empty spot.
+fn blank(key: String, name: String) -> Spot {
     Spot {
         key,
         name,
-        left: percent(position.x, BOARD_SIZE.0),
-        top: percent(position.y, BOARD_SIZE.1),
-        point: (position.x, position.y),
-        edge: edge(position),
         ..Spot::default()
     }
 }
 
-/// Key, French name and position of a place on the board image. The key is
+/// Key and French name of a place. The key is
 /// the place's id (`woods`, `uptown`), `<world>` or `<world>_2` for the two
 /// areas of an Other World, or a special area's key: the preview link
 /// `?voir=<key>` uses it.
-fn locate(data: &GameData, place: &Place) -> Option<(String, String, Position)> {
+fn locate(data: &GameData, place: &Place) -> Option<(String, String)> {
     let board = &data.board;
     match place {
-        Place::Location(id) => board
-            .location(id)
-            .map(|l| (id.to_string(), l.name.clone(), l.position)),
-        Place::Street(id) => board
-            .street(id)
-            .map(|s| (id.to_string(), s.name.clone(), s.position)),
+        Place::Location(id) => board.location(id).map(|l| (id.to_string(), l.name.clone())),
+        Place::Street(id) => board.street(id).map(|s| (id.to_string(), s.name.clone())),
         Place::OtherWorld { world, area } => board.other_world(world).map(|w| {
-            let (key, position) = match area {
-                Area::First => (world.to_string(), w.first_area),
-                Area::Second => (format!("{world}_2"), w.second_area),
+            let key = match area {
+                Area::First => world.to_string(),
+                Area::Second => format!("{world}_2"),
             };
-            (key, w.name.clone(), position)
+            (key, w.name.clone())
         }),
         Place::LostInTimeAndSpace => special(data, SpecialAreaKind::LostInTimeAndSpace),
         Place::JailCell => special(data, SpecialAreaKind::JailCell),
@@ -124,7 +82,7 @@ fn locate(data: &GameData, place: &Place) -> Option<(String, String, Position)> 
 
 /// The key of a place, as written in `?voir=` (see [`locate`]).
 pub fn place_key(data: &GameData, place: &Place) -> Option<String> {
-    locate(data, place).map(|(key, _, _)| key)
+    locate(data, place).map(|(key, _)| key)
 }
 
 /// The key of a special area, as written in `?voir=`.
@@ -137,15 +95,11 @@ pub fn special_key(kind: SpecialAreaKind) -> &'static str {
     }
 }
 
-/// Key, name and position of a special area.
-fn special(data: &GameData, kind: SpecialAreaKind) -> Option<(String, String, Position)> {
-    data.board.special_area(kind).map(|area| {
-        (
-            special_key(kind).to_owned(),
-            area.name.clone(),
-            area.position,
-        )
-    })
+/// Key and name of a special area.
+fn special(data: &GameData, kind: SpecialAreaKind) -> Option<(String, String)> {
+    data.board
+        .special_area(kind)
+        .map(|area| (special_key(kind).to_owned(), area.name.clone()))
 }
 
 /// Every investigator still in the game.
@@ -194,12 +148,8 @@ fn special_spot<'s>(
     spots: &'s mut BTreeMap<String, Spot>,
     kind: SpecialAreaKind,
 ) -> Option<&'s mut Spot> {
-    let (key, name, position) = special(data, kind)?;
-    Some(
-        spots
-            .entry(key.clone())
-            .or_insert_with(|| blank(key, name, position)),
-    )
+    let (key, name) = special(data, kind)?;
+    Some(spots.entry(key.clone()).or_insert_with(|| blank(key, name)))
 }
 
 /// Gates, clue tokens and seals.

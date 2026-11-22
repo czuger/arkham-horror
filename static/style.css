@@ -54,43 +54,64 @@ form.setup label { display: flex; flex-direction: column; gap: 0.2rem; }
 form.setup label.check { flex-direction: row; align-items: center; gap: 0.4rem; }
 form.setup fieldset { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
 
-main:has(.game) { max-width: none; }
-/* Game page: board, then decision and town, then the journal in its own column. */
-.game { display: flex; gap: 1rem; align-items: flex-start; }
-.side { flex: 1 1 22rem; min-width: 20rem; display: flex; flex-direction: column; gap: 0.8rem; }
-.side section, .log section, .combat section { background: #fffaf0; border: 1px solid #d8cbb3; border-radius: 6px; padding: 0.5rem 0.8rem; }
-.log {
-  flex: 0 0 26rem; position: sticky; top: 0.5rem;
-  max-height: calc(100vh - 4.5rem); overflow-y: auto;
+main:has(.game) { max-width: none; padding: 0.5rem; }
+/* Game page: the map column on the left, the town bar, the scene with the
+   decision and the journal beside it, the investigators at the bottom. */
+.game {
+  display: grid; gap: 0.5rem;
+  grid-template-columns: var(--map-width) minmax(0, 1fr) minmax(19rem, 25rem);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "map status status"
+    "map scene decision"
+    "map scene journal"
+    "map party party";
 }
-.log .journal { max-height: none; }
-@media (max-width: 1400px) { .game { flex-wrap: wrap; } .log { position: static; max-height: none; flex: 1 1 100%; } }
+.map-fold { grid-area: map; min-height: 0; overflow-y: auto; }
+.map-fold > summary { display: none; }
+.game > .status { grid-area: status; }
+.game > .scene { grid-area: scene; }
+.game > .decision { grid-area: decision; max-height: 55vh; overflow-y: auto; }
+.game > .recent { grid-area: journal; min-height: 0; overflow-y: auto; }
+.game > .party { grid-area: party; }
+.game > section:not(.scene) { background: #fffaf0; border: 1px solid #d8cbb3; border-radius: 6px; padding: 0.4rem 0.7rem; }
+.game h2 { font-size: 1rem; margin: 0.2em 0; }
+.game .recent .journal { max-height: none; }
+.game .recent .tip > .bubble, .game .decision .tip > .bubble { left: auto; right: 0; transform: none; }
+/* The page fits the window: only the journal and the decision scroll. */
+@media (min-width: 901px) {
+  body:has(.game) { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+  main:has(.game) { flex: 1 1 auto; min-height: 0; width: 100%; box-sizing: border-box; }
+  .game { height: 100%; }
+}
+/* Narrow screens: one column, the map folds away. */
+@media (max-width: 900px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr); grid-template-rows: none;
+    grid-template-areas: "status" "scene" "decision" "map" "journal" "party";
+  }
+  .map-fold > summary { display: list-item; cursor: pointer; padding: 0.3rem 0; font-weight: bold; }
+  .game > .decision { max-height: none; }
+  .scene-picture { flex: none; }
+  .scene-image { height: auto; }
+}
+/* Town bar: turn, Ancient One, counters, Environment and Rumor. */
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1rem; }
+.town { display: flex; flex-wrap: wrap; gap: 0.2rem 0.9rem; list-style: none; margin: 0; padding: 0; font-size: 0.9rem; }
+.town-cards { display: flex; gap: 0.5rem; margin-left: auto; }
+.town-card { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; }
+.town-card img { height: 2.6rem; width: auto; border-radius: 3px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); }
+.status .tip > .bubble { top: calc(100% + 6px); bottom: auto; }
+.town-cards .tip > .bubble { left: auto; right: 0; transform: none; }
+/* Investigators: one compact card each. */
+.party ul { display: flex; flex-wrap: wrap; gap: 0.3rem 1.2rem; list-style: none; margin: 0; padding: 0; }
+.member { display: flex; flex-direction: column; font-size: 0.82rem; min-width: 11rem; }
+.member-name { font-size: 0.95rem; }
+.member.human .member-name { font-weight: bold; }
+.member.eliminated { color: #999; text-decoration: line-through; }
+.member-place, .member-plan { color: #7a6b58; }
+.party .tip > .bubble { top: auto; bottom: calc(100% + 6px); left: 0; transform: none; }
 
-/* The board fits the window height (image ratio 1064 × 1576). */
-.board {
-  position: relative;
-  flex: 0 0 auto;
-  width: max(560px, min(1064px, calc((100vh - 4rem) * 0.675)));
-}
-.board > img { width: 100%; height: auto; display: block; }
-.spot {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  pointer-events: none;
-}
-.spot .tokens { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; max-width: 110px; }
-.spot button.go {
-  pointer-events: auto;
-  font-size: 0.75rem;
-  padding: 0.1rem 0.4rem;
-  background: #ffe066;
-  border: 2px solid #b8860b;
-  box-shadow: 0 0 6px #ffd700;
-}
 .pawn {
   width: 24px; height: 24px; border-radius: 50%;
   background: #375a7f; color: #fff; font: bold 11px sans-serif;
@@ -98,22 +119,11 @@ main:has(.game) { max-width: none; }
   border: 2px solid #fff;
 }
 .pawn.human { background: #b22222; }
-/* Monsters on the board show their movement side (right half of the image). */
-.monster {
-  width: 28px; height: 28px; border-radius: 4px;
-  background-size: 200% 100%; background-position: 100% 0;
-  border: 1px solid #000;
-}
-.gate { width: 30px; height: 30px; border-radius: 50%; }
 .doom-sheet { position: relative; max-width: 451px; }
 .doom-sheet > img { width: 100%; height: auto; display: block; }
 .doom-sheet > img.doom {
   position: absolute; width: 15%; height: auto; transform: translate(-50%, -50%);
   border-radius: 50%; box-shadow: 0 0 4px #000;
-}
-.terror {
-  width: 26px; height: auto; border-radius: 50%;
-  border: 2px solid #fff; box-shadow: 0 0 4px #000; display: block;
 }
 .clue {
   min-width: 18px; height: 18px; border-radius: 50%;
@@ -147,16 +157,11 @@ main:has(.game) { max-width: none; }
 .drawn-card { position: relative; margin: 0; display: flex; flex-direction: column; align-items: center; }
 .drawn-card img { display: block; width: auto; max-width: none; height: auto; border-radius: 8px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); }
 .drawn-card figcaption { font-size: 0.9rem; color: #2b2118; margin-bottom: 0.2rem; }
-.log .tip > .bubble { left: auto; right: 0; transform: none; }
 
 .facts { margin: 0; padding-left: 1.2rem; }
 .flags { color: #8b0000; }
 .cards { margin: 0; padding-left: 1.2rem; }
 .ability { font-size: 0.85rem; }
-.party table { border-collapse: collapse; font-size: 0.85rem; width: 100%; }
-.party td, .party th { padding: 0.15rem 0.3rem; border-bottom: 1px solid #eee2cc; text-align: left; }
-.party tr.human { font-weight: bold; }
-.party tr.eliminated { color: #999; text-decoration: line-through; }
 .seed { color: #7a6b58; font-size: 0.85rem; }
 
 /* Hover bubbles, CSS only: shown on hover or keyboard focus. */
@@ -179,18 +184,6 @@ main:has(.game) { max-width: none; }
 .tip > .bubble.pictured { max-width: none; }
 .tip > .bubble > img.bubble-image { display: block; width: auto; height: auto; max-width: none; margin-top: 0.4rem; border-radius: 4px; }
 .tip:hover > .bubble, .tip:focus > .bubble, .tip:focus-within > .bubble { display: block; }
-.spot:hover, .spot:focus-within { z-index: 10; }
-.spot.west .tip > .bubble { left: 0; transform: none; }
-.spot.east .tip > .bubble { left: auto; right: 0; transform: none; }
-.spot.north .tip > .bubble { top: auto; bottom: calc(100% + 4px); }
-.side .tip > .bubble { left: 0; transform: none; }
-
-/* Location white areas: invisible hover zones over the board image. */
-.panel { position: absolute; border-radius: 3px; }
-.panel:hover, .panel:focus { z-index: 10; box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.8); outline: none; }
-.panel.west > .bubble { left: 0; transform: none; }
-.panel.east > .bubble { left: auto; right: 0; transform: none; }
-.panel.north > .bubble { top: auto; bottom: calc(100% + 4px); }
 .tip > .place-bubble { width: 20rem; }
 .place-bubble .diamond { font-size: 1rem; }
 .place-bubble .diamond.stable { color: #3cb371; }
@@ -286,11 +279,6 @@ form.undo { margin-top: 0.5rem; }
 .held-card .card-facts { color: #7a6b58; }
 .held-card .card-note { color: #a03020; }
 .held-card button { font-size: 0.75rem; }
-
-/* Landscape board at its pixel size: the portrait image is turned a quarter right. */
-main:has(.landscape) { max-width: none; overflow-x: auto; }
-.landscape { position: relative; overflow: hidden; }
-.landscape > img { position: absolute; left: 0; top: 0; transform-origin: 0 0; max-width: none; }
 
 /* Combat page: the monster (both sides of its token), the rolls, the decision. */
 .combat-title { font-size: 1.3rem; }

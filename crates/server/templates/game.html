@@ -2,17 +2,14 @@
 {% block title %}Partie {{ id }} — Horreur à Arkham{% endblock %}
 {% block content %}
 <div class="game">
-  {% include "game/map.html" %}
+  <details class="map-fold" open>
+    <summary>Carte d'Arkham</summary>
+    {% include "game/map.html" %}
+  </details>
+  {% include "game/status.html" %}
   {% include "game/scene.html" %}
-  {% include "game/board.html" %}
-  <div class="side">
-    {% include "game/decision.html" %}
-    {% include "game/status.html" %}
-    {% include "game/party.html" %}
-    {% include "game/mythos.html" %}
-  </div>
-  <aside class="log">
-    {% include "game/journal.html" %}
-  </aside>
+  {% include "game/decision.html" %}
+  {% include "game/journal.html" %}
+  {% include "game/party.html" %}
 </div>
 {% endblock %}

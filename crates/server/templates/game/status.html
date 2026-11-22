@@ -1,9 +1,16 @@
-<section class="status">
-  <h2>Arkham — tour {{ status.turn }}, {{ status.phase }}</h2>
-  <p><a href="partie/{{ id }}/investigateurs">Fiches des investigateurs</a> · <a href="partie/{{ id }}/plateau">Plateau en paysage</a></p>
-  <ul class="facts">
-    <li>Grand Ancien : <span class="tip" tabindex="0"><a href="partie/{{ id }}/grand-ancien">{{ status.ancient_one.name }}</a>{{ status.ancient_one.tip|safe }}</span></li>
-    <li>Portails ouverts : {{ status.gates }} · Sceaux : {{ status.seals }}</li>
-    <li>Monstres : {{ status.monsters.0 }} / {{ status.monsters.1 }} · Périphérie : {{ status.outskirts }}</li>
+<section class="status" aria-label="La ville">
+  <h2>Tour {{ status.turn }} · {{ status.phase }}</h2>
+  <ul class="town">
+    <li><span class="tip" tabindex="0"><a href="partie/{{ id }}/grand-ancien">{{ status.ancient_one.name }}</a>{{ status.ancient_one.tip|safe }}</span></li>
+    <li><span class="tip" tabindex="0">Terreur {{ status.terror.0 }}{{ status.terror.1|safe }}</span></li>
+    <li>Portails {{ status.gates }}</li>
+    <li>Sceaux {{ status.seals }}</li>
+    <li>Monstres {{ status.monsters.0 }} / {{ status.monsters.1 }}</li>
+    <li>Périphérie {{ status.outskirts }}</li>
   </ul>
+  <div class="town-cards">
+    {% if let Some(card) = status.environment %}<span class="town-card tip" tabindex="0">{% if card.image.is_empty() %}<span class="card-name">{{ card.name }}</span>{% else %}<img src="assets/{{ card.image }}" alt="Environnement : {{ card.name }}">{% endif %}<span class="town-card-label">Environnement</span>{{ card.tip|safe }}</span>{% endif %}
+    {% if let Some((card, tokens)) = status.rumor %}<span class="town-card tip" tabindex="0">{% if card.image.is_empty() %}<span class="card-name">{{ card.name }}</span>{% else %}<img src="assets/{{ card.image }}" alt="Rumeur : {{ card.name }}">{% endif %}<span class="town-card-label">Rumeur, {{ tokens }} marqueur(s)</span>{{ card.tip|safe }}</span>{% endif %}
+  </div>
+  <a class="button small" href="partie/{{ id }}/investigateurs">Fiches</a>
 </section>

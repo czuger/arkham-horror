@@ -1,4 +1,4 @@
-<section class="scene{% if scene.preview %} previewing{% endif %}" aria-label="Scène">
+<section class="scene{% if scene.preview %} previewing{% endif %}" id="scene" aria-label="Scène">
   <figure class="scene-picture">
     {% if let Some(image) = scene.image %}
     <img class="scene-image" src="{{ image }}" alt="{{ scene.alt }}">

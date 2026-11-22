@@ -22,6 +22,8 @@ pub struct StatusView {
     pub monsters: (usize, usize),
     /// Monsters in the Outskirts.
     pub outskirts: usize,
+    /// Terror level, and what it has done so far.
+    pub terror: (u8, Tip),
     /// Environment card in play.
     pub environment: Option<ImageToken>,
     /// Rumor in play, with its tokens.
@@ -60,6 +62,7 @@ impl StatusView {
                 .iter()
                 .filter(|monster| monster.place == MonsterPlace::Outskirts)
                 .count(),
+            terror: (state.terror, tips::terror(data, state.terror)),
             environment: state.environment.as_ref().map(|id| card(data, id)),
             rumor: state
                 .rumor

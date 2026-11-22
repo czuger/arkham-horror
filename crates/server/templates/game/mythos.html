@@ -1,9 +1,0 @@
-<section class="mythos">
-  <h2>Mythes en cours</h2>
-  {% if status.environment.is_none() && status.rumor.is_none() %}<p>Aucun Environnement ni Rumeur en jeu.</p>{% else %}
-  <div class="drawn">
-    {% if let Some(card) = status.environment %}<figure class="drawn-card tip" tabindex="0"><figcaption>Environnement</figcaption>{% if card.image.is_empty() %}<span class="card-name">{{ card.name }}</span>{% else %}<a href="assets/{{ card.image }}" target="_blank"><img src="assets/{{ card.image }}" alt="{{ card.name }}" loading="lazy"></a>{% endif %}{{ card.tip|safe }}</figure>{% endif %}
-    {% if let Some((card, tokens)) = status.rumor %}<figure class="drawn-card tip" tabindex="0"><figcaption>Rumeur — {{ tokens }} marqueur(s)</figcaption>{% if card.image.is_empty() %}<span class="card-name">{{ card.name }}</span>{% else %}<a href="assets/{{ card.image }}" target="_blank"><img src="assets/{{ card.image }}" alt="{{ card.name }}" loading="lazy"></a>{% endif %}{{ card.tip|safe }}</figure>{% endif %}
-  </div>
-  {% endif %}
-</section>
