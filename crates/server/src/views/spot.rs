@@ -4,6 +4,8 @@ use crate::views::tip::Tip;
 /// One place drawn on the board, with what stands there.
 #[derive(Debug, Clone, Default)]
 pub struct Spot {
+    /// The place's key: its id, `<world>_2`, or a special area's key.
+    pub key: String,
     /// French name of the place.
     pub name: String,
     /// Horizontal position, in percent of the board width.

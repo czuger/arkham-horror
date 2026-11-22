@@ -1,4 +1,5 @@
 <span class="bubble place-bubble" role="tooltip"><strong>{{ name }}</strong>
+{% for line in present %}<span class="present">{{ line }}</span>{% endfor %}
 {% if stable %}<span class="stability"><b class="diamond stable">◆</b> Lieu stable : ni portail ni monstre n'y apparaît.</span>{% else %}<span class="stability"><b class="diamond unstable">◆</b> Lieu instable : portails, monstres et Indices peuvent y apparaître.</span>{% endif %}
 {% if let Some(ability) = ability %}<span class="place-ability"><b>{{ ability.0 }}</b> : {{ ability.1 }}</span>{% endif %}
 {% if let Some(level) = closes_at_terror %}<span>Ferme pour de bon quand la Terreur atteint {{ level }}.</span>{% endif %}

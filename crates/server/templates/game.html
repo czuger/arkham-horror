@@ -2,6 +2,7 @@
 {% block title %}Partie {{ id }} — Horreur à Arkham{% endblock %}
 {% block content %}
 <div class="game">
+  {% include "game/map.html" %}
   {% include "game/board.html" %}
   <div class="side">
     {% include "game/decision.html" %}

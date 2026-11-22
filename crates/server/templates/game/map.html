@@ -1,0 +1,49 @@
+<section class="map" aria-label="Carte d'Arkham">
+  <input type="checkbox" id="map-zoom" class="map-zoom-toggle">
+  <label for="map-zoom" class="map-zoom-backdrop" aria-hidden="true"></label>
+  <div class="map-frame">
+    <label for="map-zoom" class="map-zoom button small"><span class="when-small">Agrandir la carte</span><span class="when-big">Réduire la carte</span></label>
+    <div class="map-board">
+      <svg class="map-drawing" viewBox="0 0 1064 1576" role="img" aria-label="Plan symbolique d'Arkham">
+        <rect class="map-ground" x="0" y="0" width="1064" height="1576" rx="24"/>
+        {% for frame in map.worlds %}
+        <g class="world-frame"><title>{{ frame.name }}</title><rect x="{{ frame.x }}" y="{{ frame.y }}" width="{{ frame.width }}" height="{{ frame.height }}" rx="14"/><text x="{{ frame.label_x }}" y="{{ frame.label_y }}">{{ frame.label }}</text></g>
+        {% endfor %}
+        {% for link in map.links %}
+        <line class="{% if link.between_streets %}road{% else %}lane{% endif %}" x1="{{ link.x1 }}" y1="{{ link.y1 }}" x2="{{ link.x2 }}" y2="{{ link.y2 }}"/>
+        {% endfor %}
+        {% for arrow in map.arrows %}
+        <polygon class="arrow {% if arrow.white %}white{% else %}black{% endif %}" points="{{ arrow.points }}"/>
+        {% endfor %}
+        {% for space in map.spaces %}
+        <g class="space {{ space.kind }}{% if space.is_offered() %} offered{% endif %}{% if space.here %} here{% endif %}{% if space.closed %} closed{% endif %}" data-key="{{ space.key }}">
+          {% if space.here %}<circle class="here-ring" cx="{{ space.x }}" cy="{{ space.y }}" r="50"/>{% endif %}
+          {% if space.kind == "location" %}<circle class="shape" cx="{{ space.x }}" cy="{{ space.y }}" r="30"/>
+          {% else if space.kind == "street" %}<polygon class="shape" points="{{ space.diamond() }}"/>
+          {% else if space.kind == "world" %}<rect class="shape" x="{{ space.x - 30 }}" y="{{ space.y - 22 }}" width="60" height="44" rx="8"/><text class="area-number" x="{{ space.x }}" y="{{ space.y + 10 }}">{{ space.short_name }}</text>
+          {% else %}<rect class="shape" x="{{ space.x - 52 }}" y="{{ space.y - 26 }}" width="104" height="52" rx="12"/>{% endif %}
+          {% if space.kind == "special" %}<text class="label" x="{{ space.x }}" y="{{ space.y - 38 }}">{{ space.short_name }}</text>{% else if space.kind != "world" %}<text class="label" x="{{ space.x }}" y="{{ space.y + 66 }}">{{ space.short_name }}</text>{% endif %}
+          {% if space.closed %}<path class="closed-cross" d="M{{ space.x - 22 }} {{ space.y - 22 }}L{{ space.x + 22 }} {{ space.y + 22 }}M{{ space.x + 22 }} {{ space.y - 22 }}L{{ space.x - 22 }} {{ space.y + 22 }}"/>{% endif %}
+          {% if space.gate %}<g class="gate-mark"><circle cx="{{ space.x - 34 }}" cy="{{ space.y - 30 }}" r="16"/><circle cx="{{ space.x - 34 }}" cy="{{ space.y - 30 }}" r="7"/></g>{% endif %}
+          {% if space.monsters > 0 %}<g class="monster-mark"><circle cx="{{ space.x + 34 }}" cy="{{ space.y - 30 }}" r="18"/><text x="{{ space.x + 34 }}" y="{{ space.y - 21 }}">{{ space.monsters }}</text></g>{% endif %}
+          {% if space.clues > 0 %}<g class="clue-mark"><circle cx="{{ space.x + 34 }}" cy="{{ space.y + 30 }}" r="16"/><text x="{{ space.x + 34 }}" y="{{ space.y + 39 }}">{{ space.clues }}</text></g>{% endif %}
+          {% if space.sealed %}<text class="seal-mark" x="{{ space.x - 34 }}" y="{{ space.y + 42 }}">✶</text>{% endif %}
+          {% for (dot_x, dot_y) in space.others %}<circle class="pawn-mark" cx="{{ dot_x }}" cy="{{ dot_y }}" r="12"/>{% endfor %}
+          {% if space.here %}<circle class="here-mark" cx="{{ space.x }}" cy="{{ space.y }}" r="13"/>{% endif %}
+        </g>
+        {% endfor %}
+      </svg>
+      <div class="map-targets">
+        {% for space in map.spaces %}
+        {% if space.is_offered() %}
+        {% for (index, label) in space.offered %}
+        <button type="submit" form="decision" name="choix" value="{{ index }}" class="map-target offered tip" style="left: {{ space.left }}; top: {{ space.top }}" aria-label="{{ label }}">{{ space.tip|safe }}</button>
+        {% endfor %}
+        {% else %}
+        <a class="map-target tip" href="partie/{{ map.game }}?voir={{ space.key }}" style="left: {{ space.left }}; top: {{ space.top }}" aria-label="Voir : {{ space.name }}">{{ space.tip|safe }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>

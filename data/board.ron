@@ -16,7 +16,7 @@
 // - `icon_images` : l'image de chaque icône de rencontre, découpée dans la
 //   légende du livret (`marqueurs/legende_icones_rencontre.png`).
 // - Version 5 (22/11/2026) : `short_name` = nom abrégé pour la carte symbolique
-//   (à relire) ; `illustration` (lieux, rues) et `illustrations` (Autres Mondes,
+//   (lieux, rues, Autres Mondes, cases spéciales ; à relire) ; `illustration` (lieux, rues) et `illustrations` (Autres Mondes,
 //   `first` = zone 1, `second` = zone 2) = illustration de la scène, relative au
 //   dossier `illustrations/` (voir `correspondance_illustrations.md`).
 #![enable(implicit_some)]
@@ -693,10 +693,10 @@ Board(
         ),
     ],
     special_areas: [
-        (kind: Outskirts, name: "Périphérie", position: (x: 520, y: 1515)),
-        (kind: Sky, name: "Ciel", position: (x: 640, y: 1515)),
-        (kind: LostInTimeAndSpace, name: "Perdu dans le Temps et l'Espace", position: (x: 760, y: 1515)),
-        (kind: JailCell, name: "Cellule de Prison", position: (x: 680, y: 425)),
+        (kind: Outskirts, name: "Périphérie", short_name: "Périphérie", position: (x: 520, y: 1515)),
+        (kind: Sky, name: "Ciel", short_name: "Ciel", position: (x: 640, y: 1515)),
+        (kind: LostInTimeAndSpace, name: "Perdu dans le Temps et l'Espace", short_name: "Perdu", position: (x: 760, y: 1515)),
+        (kind: JailCell, name: "Cellule de Prison", short_name: "Prison", position: (x: 680, y: 425)),
     ],
     // Échelle de Terreur, en bas à gauche : centre de chaque case, de 0 à 10
     // (relevé le 21/11/2026 sur l'image du plateau).

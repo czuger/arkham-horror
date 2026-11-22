@@ -313,3 +313,62 @@ main:has(.landscape) { max-width: none; overflow-x: auto; }
 .offered-card { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: 0.3rem; }
 .offered-card > img { display: block; width: auto; height: auto; max-width: none; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
 .offered-card .card-name { display: flex; align-items: center; justify-content: center; width: 110px; height: 170px; border: 1px solid #7a6b58; border-radius: 6px; background: #fff; }
+
+/* Symbolic map (SVG drawn by the server, same coordinates as board.ron). */
+.map { position: relative; }
+.map-frame { position: relative; display: flex; flex-direction: column; gap: 0.3rem; }
+.map-board { position: relative; width: 100%; aspect-ratio: 1064 / 1576; }
+.map-drawing { display: block; width: 100%; height: 100%; }
+.map-ground { fill: #1d1712; }
+.map-drawing text { font-family: Georgia, "Times New Roman", serif; text-anchor: middle; }
+.world-frame rect { fill: #2a1f33; stroke: #6d5a80; stroke-width: 3; }
+.world-frame text { fill: #d9c8ee; font-size: 26px; }
+.road { stroke: #8a7a62; stroke-width: 9; stroke-linecap: round; }
+.lane { stroke: #5e5141; stroke-width: 4; stroke-dasharray: 10 8; }
+.arrow.white { fill: #f4efe4; }
+.arrow.black { fill: #0b0806; stroke: #b9a888; stroke-width: 2; }
+.space .shape { stroke-width: 4; }
+.space.location .shape { fill: #3b2f24; stroke: #c9b48c; }
+.space.street .shape { fill: #4a3a2a; stroke: #e0c890; }
+.space.world .shape { fill: #3d2d4d; stroke: #b29cd0; }
+.space.special .shape { fill: #2b2520; stroke: #8a7a62; stroke-dasharray: 6 5; }
+.space .label { fill: #efe4cf; font-size: 32px; paint-order: stroke; stroke: #1d1712; stroke-width: 7px; }
+.space .area-number { fill: #d9c8ee; font-size: 26px; }
+.space.closed .shape { opacity: 0.45; }
+.closed-cross { stroke: #9a9a9a; stroke-width: 7; stroke-linecap: round; }
+.gate-mark circle { fill: none; stroke: #b56cff; stroke-width: 5; }
+.monster-mark circle { fill: #8b1a1a; stroke: #f4efe4; stroke-width: 3; }
+.monster-mark text, .clue-mark text { fill: #fff; font-size: 26px; font-weight: bold; }
+.clue-mark circle { fill: #2e7d32; stroke: #f4efe4; stroke-width: 3; }
+.seal-mark { fill: #f1c40f; font-size: 40px; }
+.pawn-mark { fill: #7fb2e5; stroke: #1d1712; stroke-width: 3; }
+.here-ring { fill: none; stroke: #ff3b2f; stroke-width: 9; }
+.here-mark { fill: #ff3b2f; stroke: #fff; stroke-width: 4; }
+.space.offered .shape { fill: #ffe066; stroke: #fff6c2; filter: drop-shadow(0 0 10px #ffd21f); }
+.space.offered .label { fill: #ffe066; }
+/* Targets: real links and buttons over the drawing, so it works without JS. */
+.map-targets { position: absolute; inset: 0; }
+.map-target {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 7%; aspect-ratio: 1; min-width: 18px; padding: 0; margin: 0;
+  border: 0; border-radius: 50%; background: transparent; display: block;
+}
+.map-target:hover { background: rgba(255, 224, 102, 0.25); }
+.map-target:focus-visible { outline: 3px solid #ffe066; outline-offset: 2px; }
+.map-target.offered { border: 2px solid #ffe066; animation: offered-glow 1.6s ease-in-out infinite; }
+@keyframes offered-glow { 50% { box-shadow: 0 0 0 4px rgba(255, 224, 102, 0.55); } }
+.map-target:hover, .map-target:focus-within { z-index: 10; }
+.map-target > .bubble { top: 0; left: calc(100% + 6px); transform: none; }
+/* Enlarged: the same map over the page; the checkbox works without JS. */
+.map-zoom-toggle { position: absolute; opacity: 0; pointer-events: none; }
+.map-zoom { align-self: flex-start; }
+.map-zoom-toggle:focus-visible ~ .map-frame .map-zoom { outline: 3px solid #ffe066; }
+.map-zoom .when-big, .map-zoom-backdrop { display: none; }
+.map-zoom-toggle:checked ~ .map-zoom-backdrop { display: block; position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, 0.7); }
+.map-zoom-toggle:checked ~ .map-frame { position: fixed; z-index: 41; top: 2vh; left: 50%; transform: translateX(-50%); height: 96vh; width: auto; }
+.map-zoom-toggle:checked ~ .map-frame .map-board { height: calc(96vh - 2.5rem); width: auto; }
+.map-zoom-toggle:checked ~ .map-frame .map-zoom .when-small { display: none; }
+.map-zoom-toggle:checked ~ .map-frame .map-zoom .when-big { display: inline; }
+@media (prefers-reduced-motion: reduce) {
+  .map-target.offered { animation: none; box-shadow: 0 0 0 3px rgba(255, 224, 102, 0.55); }
+}

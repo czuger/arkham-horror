@@ -77,12 +77,17 @@ fn spot_of<'s>(
     place: &Place,
 ) -> Option<&'s mut Spot> {
     let (key, name, position) = locate(data, place)?;
-    Some(spots.entry(key).or_insert_with(|| blank(name, position)))
+    Some(
+        spots
+            .entry(key.clone())
+            .or_insert_with(|| blank(key, name, position)),
+    )
 }
 
 /// An empty spot at a position.
-fn blank(name: String, position: Position) -> Spot {
+fn blank(key: String, name: String, position: Position) -> Spot {
     Spot {
+        key,
         name,
         left: percent(position.x, BOARD_SIZE.0),
         top: percent(position.y, BOARD_SIZE.1),
@@ -92,33 +97,50 @@ fn blank(name: String, position: Position) -> Spot {
     }
 }
 
-/// Key, French name and position of a place on the board image.
+/// Key, French name and position of a place on the board image. The key is
+/// the place's id (`woods`, `uptown`), `<world>` or `<world>_2` for the two
+/// areas of an Other World, or a special area's key: the preview link
+/// `?voir=<key>` uses it.
 fn locate(data: &GameData, place: &Place) -> Option<(String, String, Position)> {
     let board = &data.board;
     match place {
         Place::Location(id) => board
             .location(id)
-            .map(|l| (format!("l:{id}"), l.name.clone(), l.position)),
+            .map(|l| (id.to_string(), l.name.clone(), l.position)),
         Place::Street(id) => board
             .street(id)
-            .map(|s| (format!("s:{id}"), s.name.clone(), s.position)),
+            .map(|s| (id.to_string(), s.name.clone(), s.position)),
         Place::OtherWorld { world, area } => board.other_world(world).map(|w| {
-            let (rank, position) = match area {
-                Area::First => (1, w.first_area),
-                Area::Second => (2, w.second_area),
+            let (key, position) = match area {
+                Area::First => (world.to_string(), w.first_area),
+                Area::Second => (format!("{world}_2"), w.second_area),
             };
-            (format!("w:{world}:{rank}"), w.name.clone(), position)
+            (key, w.name.clone(), position)
         }),
         Place::LostInTimeAndSpace => special(data, SpecialAreaKind::LostInTimeAndSpace),
         Place::JailCell => special(data, SpecialAreaKind::JailCell),
     }
 }
 
+/// The key of a special area, as written in `?voir=`.
+pub fn special_key(kind: SpecialAreaKind) -> &'static str {
+    match kind {
+        SpecialAreaKind::Outskirts => "outskirts",
+        SpecialAreaKind::Sky => "sky",
+        SpecialAreaKind::LostInTimeAndSpace => "lost_in_time_and_space",
+        SpecialAreaKind::JailCell => "jail_cell",
+    }
+}
+
 /// Key, name and position of a special area.
 fn special(data: &GameData, kind: SpecialAreaKind) -> Option<(String, String, Position)> {
-    data.board
-        .special_area(kind)
-        .map(|area| (format!("x:{kind:?}"), area.name.clone(), area.position))
+    data.board.special_area(kind).map(|area| {
+        (
+            special_key(kind).to_owned(),
+            area.name.clone(),
+            area.position,
+        )
+    })
 }
 
 /// Every investigator still in the game.
@@ -168,7 +190,11 @@ fn special_spot<'s>(
     kind: SpecialAreaKind,
 ) -> Option<&'s mut Spot> {
     let (key, name, position) = special(data, kind)?;
-    Some(spots.entry(key).or_insert_with(|| blank(name, position)))
+    Some(
+        spots
+            .entry(key.clone())
+            .or_insert_with(|| blank(key, name, position)),
+    )
 }
 
 /// Gates, clue tokens and seals.

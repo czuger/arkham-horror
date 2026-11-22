@@ -221,6 +221,7 @@ mod tests {
         SpecialArea {
             kind,
             name: String::new(),
+            short_name: String::new(),
             position: ORIGIN,
         }
     }

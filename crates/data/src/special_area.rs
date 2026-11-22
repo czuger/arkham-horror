@@ -25,6 +25,8 @@ pub struct SpecialArea {
     pub kind: SpecialAreaKind,
     /// Name shown to the player, in French.
     pub name: String,
+    /// Name shortened for the symbolic map, in French.
+    pub short_name: String,
     /// Display position on the board image.
     pub position: Position,
 }

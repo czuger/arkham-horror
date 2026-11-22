@@ -16,6 +16,8 @@ pub struct LocationTip {
     pub closes_at_terror: Option<u8>,
     /// The encounter icons.
     pub icons: Vec<IconLine>,
+    /// What stands there now (investigators, monsters, gate…), one line each.
+    pub present: Vec<String>,
 }
 
 /// One encounter icon in a location's bubble.
@@ -47,6 +49,7 @@ impl LocationTip {
                 .iter()
                 .map(|icon| icon_line(board, icon))
                 .collect(),
+            present: Vec::new(),
         }
     }
 }

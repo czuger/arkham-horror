@@ -12,6 +12,8 @@ mod robots;
 pub use ancient_one::ancient_one;
 pub use combat::combat;
 pub use game::game;
+#[cfg(test)]
+pub(crate) use game::game_page;
 pub use home::home;
 pub use investigators::{investigator, investigators};
 pub use journal::journal;
