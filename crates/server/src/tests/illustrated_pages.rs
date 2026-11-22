@@ -5,8 +5,8 @@ use std::path::Path;
 
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
-use data::{GameData, InvestigatorId};
-use engine::{Choice, DecisionKind, Setup};
+use data::{GameData, InvestigatorId, LocationId, OtherWorldId, StreetId};
+use engine::{Area, Choice, DecisionKind, Place, Setup};
 use tower::ServiceExt;
 
 use crate::database::Database;
@@ -14,7 +14,7 @@ use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::play_mode::PlayMode;
 use crate::routes::game_page;
 use crate::session::Session;
-use crate::tests::test_app::TestApp;
+use crate::tests::test_app::{TestApp, move_number};
 
 fn temp() -> tempfile::TempDir {
     tempfile::tempdir().expect("temp dir")
@@ -114,7 +114,7 @@ async fn the_map_offers_every_proposed_destination() {
         .map(|(index, _)| index)
         .collect();
     assert!(!places.is_empty());
-    let page = game_page(&data, &session, "../".to_owned(), false).expect("page");
+    let page = game_page(&data, &session, "../".to_owned(), false, None).expect("page");
     let map = between(&page, "<section class=\"map\"", "</section>");
     assert!(map.contains("<svg"));
     for index in &places {
@@ -133,4 +133,75 @@ async fn the_map_offers_every_proposed_destination() {
     );
     assert!(map.contains("href=\"partie/1?voir="), "preview links");
     db.close().await;
+}
+
+/// The scene of a game page whose investigator stands at `place`.
+fn scene_at(data: &GameData, session: &mut Session, place: Place) -> String {
+    session.outcome.state.investigators[0].place = place;
+    let page = game_page(data, session, "../".to_owned(), false, None).expect("page");
+    between(&page, "<section class=\"scene", "</section>").to_owned()
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn the_scene_shows_where_the_investigator_is() {
+    let dir = temp();
+    let db = Database::open(&dir.path().join("db")).await.expect("db");
+    let data = load_data();
+    let mut session = Session::start(&db, &data, setup(7), PlayMode::Solo)
+        .await
+        .expect("start");
+    let rlyeh = |area| Place::OtherWorld {
+        world: OtherWorldId::new("rlyeh"),
+        area,
+    };
+    let cases = [
+        (
+            Place::Location(LocationId::new("woods")),
+            "lieux/woods",
+            "Bois",
+        ),
+        (
+            Place::Street(StreetId::new("uptown")),
+            "quartiers/uptown",
+            "Quartier Résidentiel",
+        ),
+        (rlyeh(Area::First), "autres%20mondes/rlyeh", "1re zone"),
+        (rlyeh(Area::Second), "autres%20mondes/rlyeh_2", "2e zone"),
+    ];
+    for (place, picture, words) in cases {
+        let scene = scene_at(&data, &mut session, place);
+        let image = format!("class=\"scene-image\" src=\"illustrations/grand/{picture}.jpg?v=");
+        assert!(scene.contains(&image), "{picture}: {scene}");
+        assert!(scene.contains(words), "{words}");
+    }
+    let lost = scene_at(&data, &mut session, Place::LostInTimeAndSpace);
+    assert!(lost.contains("class=\"scene-fallback\""));
+    assert!(lost.contains("Perdu dans le Temps"));
+    assert!(!lost.contains("scene-image"));
+    db.close().await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn a_preview_shows_another_place_without_touching_the_game() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db")).await;
+    let reply = app
+        .post(
+            "/nouvelle",
+            "investigateur=amanda_sharpe&ia=2&ia1=&ia2=&grand_ancien=&graine=7",
+        )
+        .await;
+    let game = reply.location.expect("redirect");
+    let game = game.trim_end_matches("/investigateurs");
+    let own = app.get(game).await.body;
+    let preview = app.get(&format!("{game}?voir=rlyeh_2")).await;
+    assert_eq!(preview.status, StatusCode::OK);
+    assert!(preview.body.contains("autres%20mondes/rlyeh_2.jpg?v="));
+    assert!(preview.body.contains("Revenir à ma position"));
+    assert!(!own.contains("Revenir à ma position"));
+    assert_eq!(move_number(&preview.body), move_number(&own));
+    let unknown = app.get(&format!("{game}?voir=nowhere")).await;
+    assert_eq!(unknown.status, StatusCode::OK);
+    assert!(!unknown.body.contains("Revenir à ma position"));
+    assert_eq!(app.get(game).await.body, own, "nothing changed");
 }

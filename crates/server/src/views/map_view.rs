@@ -5,9 +5,8 @@ use std::collections::BTreeMap;
 use std::fmt;
 
 use data::{Board, Position};
-use engine::{Decision, View};
+use engine::View;
 
-use crate::play_mode::PlayMode;
 use crate::views::board_geometry::{BOARD_SIZE, percent};
 use crate::views::board_view::{BoardView, special_key};
 use crate::views::location_tip::LocationTip;
@@ -111,20 +110,15 @@ impl MapView {
     ///
     /// # Arguments
     ///
-    /// * `decision` - the decision answered on this page, whose place
-    ///   choices light up; `None` when the page has no decision form.
+    /// * `board_view` - the tokens, and the place choices of the decision
+    ///   answered on this page, which light up.
     /// * `game` - the game id, for the preview links.
-    pub fn new(
-        view: &View<'_, '_>,
-        decision: Option<&Decision>,
-        mode: PlayMode,
-        game: i64,
-    ) -> Self {
+    pub fn new(view: &View<'_, '_>, board_view: &BoardView, game: i64) -> Self {
         let board = &view.data().board;
-        let mut spots: BTreeMap<String, Spot> = BoardView::new(view, decision, mode)
+        let mut spots: BTreeMap<String, Spot> = board_view
             .spots
-            .into_iter()
-            .map(|spot| (spot.key.clone(), spot))
+            .iter()
+            .map(|spot| (spot.key.clone(), spot.clone()))
             .collect();
         let spaces = places(board)
             .into_iter()

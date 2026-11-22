@@ -1,0 +1,38 @@
+<section class="scene{% if scene.preview %} previewing{% endif %}" aria-label="Scène">
+  <figure class="scene-picture">
+    {% if let Some(image) = scene.image %}
+    <img class="scene-image" src="{{ image }}" alt="{{ scene.alt }}">
+    {% else %}
+    <div class="scene-fallback">
+      {% if let Some(image) = scene.fallback_image %}<img src="assets/{{ image }}" alt="{{ scene.alt }}">{% endif %}
+      <p class="fallback-name">{{ scene.title }}</p>
+    </div>
+    {% endif %}
+    {% if scene.preview %}
+    <p class="preview-banner">Aperçu, la partie n'a pas bougé. <a class="button small" href="partie/{{ scene.game }}">Revenir à ma position</a></p>
+    {% endif %}
+    {% if !scene.drawn.is_empty() %}
+    <div class="scene-cards">
+      {% for drawn in scene.drawn %}<figure class="drawn-card tip" tabindex="0"><figcaption>Carte Lieu tirée</figcaption><img src="assets/{{ drawn.image }}" alt="{{ drawn.name }}">{{ drawn.tip|safe }}</figure>{% endfor %}
+    </div>
+    {% endif %}
+    <figcaption class="scene-band">
+      <h2>{{ scene.title }}{% if let Some(subtitle) = scene.subtitle %} <small>{{ subtitle }}</small>{% endif %}</h2>
+      <div class="scene-present">
+        {% for pawn in scene.investigators %}<span class="pawn tip{% if pawn.human %} human{% endif %}" tabindex="0">{{ pawn.initials }}{{ pawn.tip|safe }}</span>{% endfor %}
+        {% for monster in scene.monsters %}<span class="scene-monster tip" tabindex="0"><img src="{{ monster.portrait }}" alt="{{ monster.name }}">{{ monster.tip|safe }}</span>{% endfor %}
+        {% if let Some(gate) = scene.gate %}<span class="scene-gate tip" tabindex="0"><img src="assets/{{ gate.image }}" alt="{{ gate.name }}">{{ gate.tip|safe }}</span>{% endif %}
+        {% if scene.clues > 0 %}<span class="clue tip" tabindex="0">{{ scene.clues }}<span class="bubble" role="tooltip"><strong>{{ scene.clues }} Indice(s)</strong><span>À ramasser en restant ici.</span></span></span>{% endif %}
+        {% if scene.sealed %}<span class="seal tip" tabindex="0">✶<span class="bubble" role="tooltip"><strong>Scellé</strong><span>Un Signe des Anciens empêche tout portail de s'ouvrir ici.</span></span></span>{% endif %}
+        {% if let Some(closed) = scene.closed %}<span class="tip" tabindex="0"><img class="closed-marker" src="assets/{{ closed.image }}" alt="{{ closed.name }}">{{ closed.tip|safe }}</span>{% endif %}
+      </div>
+    </figcaption>
+  </figure>
+  {% if !scene.destinations.is_empty() %}
+  <div class="destinations" aria-label="Destinations proposées">
+    {% for destination in scene.destinations %}
+    <button type="submit" form="decision" name="choix" value="{{ destination.index }}" class="destination" title="{{ destination.label }}">{% if let Some(picture) = destination.picture %}<img src="{{ picture }}" alt="">{% else %}<span class="destination-blank"></span>{% endif %}<span>{{ destination.name }}</span></button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>

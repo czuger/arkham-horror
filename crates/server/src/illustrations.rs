@@ -3,10 +3,6 @@
 //!
 //! Pages link them with a fingerprint (`?v=<fingerprint>`): a link with the
 //! current fingerprint may be cached by the browser for a year.
-#![cfg_attr(
-    not(test),
-    expect(dead_code, reason = "the scene uses the links from the next step on")
-)]
 
 use axum::body::Body;
 use axum::extract::{Path, RawQuery};

@@ -122,6 +122,11 @@ fn locate(data: &GameData, place: &Place) -> Option<(String, String, Position)> 
     }
 }
 
+/// The key of a place, as written in `?voir=` (see [`locate`]).
+pub fn place_key(data: &GameData, place: &Place) -> Option<String> {
+    locate(data, place).map(|(key, _, _)| key)
+}
+
 /// The key of a special area, as written in `?voir=`.
 pub fn special_key(kind: SpecialAreaKind) -> &'static str {
     match kind {
