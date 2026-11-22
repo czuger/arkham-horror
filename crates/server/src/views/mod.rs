@@ -13,6 +13,7 @@ mod journal_view;
 mod location_tip;
 mod map_lines;
 mod map_view;
+mod monster_facts;
 mod names;
 mod party_row;
 mod scene_subject;

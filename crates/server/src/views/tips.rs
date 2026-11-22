@@ -56,7 +56,7 @@ fn printed(monster: &Monster) -> MonsterStats {
 }
 
 /// « Horreur -1 · perte 2 Santé Mentale ».
-fn check_line(name: &str, check: Option<Check>, resource: &str) -> String {
+pub fn check_line(name: &str, check: Option<Check>, resource: &str) -> String {
     match check {
         None => format!("Pas de test de {name}"),
         Some(check) if check.damage == 0 => {

@@ -279,14 +279,12 @@ main:has(.mat) { max-width: none; }
 form.undo { margin-top: 0.5rem; }
 
 /* Hands and possessions: cards are dragged from one zone to the other. */
-.hand-zones { display: grid; grid-template-columns: minmax(16rem, 1fr) 2fr; gap: 0.8rem; margin-top: 1rem; }
-@media (max-width: 700px) { .hand-zones { grid-template-columns: 1fr; } }
 .zone { border: 2px dashed #d8cbb3; border-radius: 6px; padding: 0.4rem 0.6rem; min-height: 9rem; }
 .zone h3 { margin: 0 0 0.4rem; font-size: 1rem; }
 .zone.hands { background: #f7ecd9; }
 .mat-body > .zone.hands { grid-area: hands; }
 .investigator-page > .zone.possessions { background: #fffaf0; margin-bottom: 1rem; }
-.investigator-page.active .zone, .hand-zones.active .zone { border-color: #b08850; }
+.investigator-page.active .zone, .zone.active { border-color: #b08850; }
 .zone.over { border-color: #e0a800; background: #fff3c4; }
 .cards-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: flex-start; }
 /* Possessions: every card in a 196 × 302 frame (the common card size), its
@@ -305,9 +303,28 @@ form.undo { margin-top: 0.5rem; }
 
 /* Combat page: the monster (both sides of its token), the rolls, the decision. */
 .combat-title { font-size: 1.3rem; }
-.combat { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-.combat-foes { flex: 0 1 22rem; display: flex; flex-direction: column; gap: 0.8rem; }
-.combat-main { flex: 1 1 28rem; display: flex; flex-direction: column; gap: 0.8rem; }
+/* The monster's portrait on the left, never squeezed, reaching the bottom
+   of the window and staying in view while the rest scrolls. Beside it the
+   monster, investigator, rolls and decision; then the cards in hand and the
+   possessions, in a third column when the window is wide enough, else under
+   the decision. */
+.combat {
+  display: grid; gap: 1rem; align-items: start;
+  grid-template-columns: minmax(20rem, 34rem) minmax(22rem, 1fr);
+  grid-template-areas: "scene side" "scene cards";
+}
+@media (min-width: 1600px) {
+  .combat {
+    grid-template-columns: minmax(18rem, 34rem) minmax(22rem, 1fr) minmax(26rem, 1.3fr);
+    grid-template-areas: "scene side cards";
+  }
+}
+.combat-side, .combat-cards { min-width: 0; display: flex; flex-direction: column; gap: 0.8rem; }
+.combat-side { grid-area: side; }
+.combat-cards { grid-area: cards; }
+.combat-foes { display: flex; flex-wrap: wrap; gap: 0.8rem 1.5rem; }
+.combat-cards > .zone.hands { min-height: 6rem; }
+.combat-cards > .zone.possessions { background: #fffaf0; }
 .foe-faces { display: flex; gap: 0.5rem; margin: 0.3rem 0; }
 .foe-face {
   width: 150px; height: 150px; border-radius: 8px; border: 1px solid #000;
@@ -442,14 +459,22 @@ main:has(.combat-page) { max-width: none; }
 .combat-page { display: grid; grid-template-columns: var(--map-width) minmax(0, 1fr); gap: 1rem; align-items: start; }
 .combat-page > .map { position: sticky; top: 0.5rem; }
 .combat-area { min-width: 0; }
-.combat-scene { flex: 1 1 24rem; max-width: 34rem; }
-.combat-scene .scene-picture { height: min(72vh, 44rem); }
+.combat-scene { grid-area: scene; position: sticky; top: 0.5rem; }
+.combat-scene .scene-picture { height: calc(100vh - 10rem); min-height: 20rem; }
 .combat-foes .foe-face { width: 96px; height: 96px; }
 .combat-foes .facts { font-size: 0.9rem; }
+.combat-foes .facts .tip { border-bottom: 1px dotted #b08850; }
+.combat-foes .facts .tip > .bubble { left: 0; transform: none; }
 /* Journal: a fight starts, with the monster's portrait. */
 .fought { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem; }
 .fought img { width: 44px; height: 44px; object-fit: cover; object-position: top; border-radius: 50%; border: 2px solid #c0392b; }
 @media (max-width: 900px) {
   .combat-page { grid-template-columns: 1fr; }
   .combat-page > .map { position: static; order: 2; }
+}
+/* Narrow: the column goes under the portrait, which must not cover it. */
+@media (max-width: 760px) {
+  .combat { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "side" "cards"; }
+  .combat-scene { position: static; }
+  .combat-scene .scene-picture { height: min(72vh, 44rem); }
 }

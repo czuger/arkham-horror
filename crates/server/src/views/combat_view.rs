@@ -1,11 +1,14 @@
 use data::{CheckKind, MonsterAbility, MonsterId, Resource};
-use engine::{Choice, Context, Decision, DecisionKind, Outcome, View};
+use engine::{Choice, Context, Decision, DecisionKind, MonsterStats, Outcome, View};
 
 use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::views::combat_span::{CombatSpan, end_label};
 use crate::views::decision_view::DecisionView;
 use crate::views::image_token::ImageToken;
 use crate::views::journal_line::{JournalLine, journal_lines};
+use crate::views::monster_facts::{
+    Fact, combat_dice_rule, evade_rule, horror_dice_rule, monster_facts,
+};
 use crate::views::names::monster;
 use crate::views::prepares_combat;
 
@@ -38,10 +41,10 @@ pub struct CombatView {
 pub struct FoeView {
     /// Name, token image and bubble.
     pub token: ImageToken,
-    /// Its values, one per line.
-    pub stats: Vec<String>,
+    /// Its values, one per line, each with the rule it stands for.
+    pub stats: Vec<Fact>,
     /// Dice the investigator would roll against it, one check per line.
-    pub dice: Vec<String>,
+    pub dice: Vec<Fact>,
     /// Link to its large illustrated portrait.
     pub portrait: String,
 }
@@ -126,20 +129,42 @@ impl CombatView {
 fn foe(view: &View<'_, '_>, seat: usize, id: &MonsterId, bonus: Option<i32>) -> Option<FoeView> {
     let token = monster(view, id)?;
     let stats = view.monster_stats(id)?;
-    let mut dice = vec![format!(
-        "Évasion : {} dé(s)",
-        view.check_dice(seat, CheckKind::Evade, stats.awareness)
-    )];
+    let printed = view
+        .data()
+        .monsters
+        .monsters
+        .iter()
+        .find(|monster| &monster.id == id)?;
+    Some(FoeView {
+        stats: monster_facts(printed, &stats),
+        token,
+        dice: dice(view, seat, &stats, bonus),
+        portrait: illustration_url(IllustrationSize::Large, &printed.portrait),
+    })
+}
+
+/// The dice of each check against the monster, with how they are counted.
+fn dice(view: &View<'_, '_>, seat: usize, stats: &MonsterStats, bonus: Option<i32>) -> Vec<Fact> {
+    let mut dice = vec![Fact {
+        text: format!(
+            "Évasion : {} dé(s)",
+            view.check_dice(seat, CheckKind::Evade, stats.awareness)
+        ),
+        tip: Some(evade_rule()),
+    }];
     if let Some(horror) = stats.horror {
-        dice.push(format!(
-            "Horreur : {} dé(s)",
-            view.check_dice(seat, CheckKind::Horror, i32::from(horror.modifier))
-        ));
+        dice.push(Fact {
+            text: format!(
+                "Horreur : {} dé(s)",
+                view.check_dice(seat, CheckKind::Horror, i32::from(horror.modifier))
+            ),
+            tip: Some(horror_dice_rule()),
+        });
     }
     if let Some(combat) = stats.combat {
         let modifier = i32::from(combat.modifier) + bonus.unwrap_or(0);
         let dice_count = view.check_dice(seat, CheckKind::Combat, modifier);
-        dice.push(match bonus {
+        let text = match bonus {
             Some(bonus) => format!(
                 "Combat : {dice_count} dé(s), armes en main comprises ({bonus:+}), {} succès nécessaire(s)",
                 stats.toughness
@@ -148,22 +173,13 @@ fn foe(view: &View<'_, '_>, seat: usize, id: &MonsterId, bonus: Option<i32>) -> 
                 "Combat : {dice_count} dé(s) sans les armes, {} succès nécessaire(s)",
                 stats.toughness
             ),
+        };
+        dice.push(Fact {
+            text,
+            tip: Some(combat_dice_rule()),
         });
     }
-    let portrait = view
-        .data()
-        .monsters
-        .monsters
-        .iter()
-        .find(|monster| &monster.id == id)
-        .map(|monster| illustration_url(IllustrationSize::Large, &monster.portrait))
-        .unwrap_or_default();
-    Some(FoeView {
-        stats: token.tip.lines.clone(),
-        token,
-        dice,
-        portrait,
-    })
+    dice
 }
 
 impl CombatDecision {

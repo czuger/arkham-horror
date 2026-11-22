@@ -21,12 +21,12 @@
     </figure>
   </section>
   {% endif %}
-  <div class="combat-foes">
-    {% if let Some(foe) = combat.foe %}{% include "combat/foe.html" %}{% endif %}
-    {% for foe in combat.to_face %}{% include "combat/foe.html" %}{% endfor %}
-    {% if combat.foe.is_none() && combat.to_face.is_empty() %}<p class="hint">Aucun combat en cours.</p>{% endif %}
-  </div>
-  <div class="combat-main">
+  <div class="combat-side">
+    <div class="combat-foes">
+      {% if let Some(foe) = combat.foe %}{% include "combat/foe.html" %}{% endif %}
+      {% for foe in combat.to_face %}{% include "combat/foe.html" %}{% endfor %}
+      {% if combat.foe.is_none() && combat.to_face.is_empty() %}<p class="hint">Aucun combat en cours.</p>{% endif %}
+    </div>
     <section class="fighter">
       <h2>{{ combat.who }}</h2>
       <p>Santé Mentale {{ combat.sanity.0 }} / {{ combat.sanity.1 }} · Résistance {{ combat.stamina.0 }} / {{ combat.stamina.1 }} · Indices {{ combat.clues }}</p>
@@ -61,19 +61,19 @@
     {% endif %}
     </section>
   </div>
-</div>
-<div class="hand-zones{% if hands.active %} active{% endif %}">
-  <div class="zone hands" data-zone="hand">
-    <h3>En main : {{ hands.used }} / {{ hands.total }} mains</h3>
-    {% if hands.in_hand.is_empty() %}<p class="hint">Mains libres.</p>{% endif %}
-    <div class="cards-row">
-      {% for held in hands.in_hand %}{% let target = "possessions" %}{% let action = "Lâcher" %}{% include "investigator/held_card.html" %}{% endfor %}
+  <div class="combat-cards">
+    <div class="zone hands{% if hands.active %} active{% endif %}" data-zone="hand">
+      <h3>En main : {{ hands.used }} / {{ hands.total }} mains</h3>
+      {% if hands.in_hand.is_empty() %}<p class="hint">Mains libres.</p>{% endif %}
+      <div class="cards-row">
+        {% for held in hands.in_hand %}{% let target = "possessions" %}{% let action = "Lâcher" %}{% include "investigator/held_card.html" %}{% endfor %}
+      </div>
     </div>
-  </div>
-  <div class="zone possessions" data-zone="possessions">
-    <h3>Possessions : {{ hands.possessions.len() }} carte(s)</h3>
-    <div class="cards-row">
-      {% for held in hands.possessions %}{% let target = "hand" %}{% let action = "Prendre en main" %}{% include "investigator/held_card.html" %}{% endfor %}
+    <div class="zone possessions{% if hands.active %} active{% endif %}" data-zone="possessions">
+      <h3>Possessions : {{ hands.possessions.len() }} carte(s)</h3>
+      <div class="cards-row">
+        {% for held in hands.possessions %}{% let target = "hand" %}{% let action = "Prendre en main" %}{% include "investigator/held_card.html" %}{% endfor %}
+      </div>
     </div>
   </div>
 </div>

@@ -4,6 +4,6 @@
     <span class="foe-face" style="background-image: url('assets/{{ foe.token.image }}')" role="img" aria-label="{{ foe.token.name }}, face de combat"></span>
     <span class="foe-face back" style="background-image: url('assets/{{ foe.token.image }}')" role="img" aria-label="{{ foe.token.name }}, face de mouvement"></span>
   </div>
-  <ul class="facts">{% for line in foe.stats %}<li>{{ line }}</li>{% endfor %}</ul>
-  <ul class="facts dice-odds">{% for line in foe.dice %}<li>{{ line }}</li>{% endfor %}</ul>
+  <ul class="facts">{% for fact in foe.stats %}{% include "combat/fact.html" %}{% endfor %}</ul>
+  <ul class="facts dice-odds">{% for fact in foe.dice %}{% include "combat/fact.html" %}{% endfor %}</ul>
 </section>
