@@ -6,7 +6,7 @@ Guidance for Claude Code in this repository.
 
 Browser adaptation of **Arkham Horror 2nd edition** (French edition, *Horreur à Arkham*), private use, **solo mode** (one human, the other investigators played by AIs), **base game only**. Project documents (`.md`) are in French, plain style; keep new ones so. Base-game images are in `assets/` (`assets/inventaire_assets.md` lists them, with a « Manquants » section).
 
-Milestones (plan in `plan_creation_jeu.md`, J0–J6):
+Milestones (plan in `plan_creation_jeu.md`, J0–J7):
 
 - **J0 foundation** (2026-11-16): Cargo workspace under `crates/`: `data`, `engine`, `ai` (libs), `simulator` (CLI), `server` (binary `arkham`).
 - **J1 data** (2026-11-16): `data/*.ron` (board, gate markers, monsters, investigators, Ancient Ones, cards) loaded and cross-checked by `GameData::load`, `check`, `check_assets`. Effect vocabulary: types in `crates/data/src/cards/`, described in `vocabulaire_cartes.md` (update it when the vocabulary changes).
@@ -14,6 +14,7 @@ Milestones (plan in `plan_creation_jeu.md`, J0–J6):
 - **J3 all cards** (2026-11-20): all 267 cards in `data/*_cards.ron` (raw text in `J3_releve_cartes.md`, notes in `J3.md`); location abilities in `board.ron`; 16 investigator abilities in `rules/investigator_powers.rs`; 16 cards with a coded special effect.
 - **J4 AI, first version** (2026-11-20, `J4.md`): `ai::Policy`, priority-based. AI strength tuning and trades between investigators (Q12) postponed.
 - **J5 server, first version** (2026-11-21, `J5.md`): home, new game, game page, journal, unlimited undo, resume, one page per investigator where the human sets sliders; a combat page (monster, every die, hands by drag and drop); cards drawn and dice shown in a journal column (`Outcome.shown`). Still to do: the user plays a whole game in the browser. `static/htmx.min.js` may be absent: **never download it**, the user drops it in.
+- **J6 illustrated display** (2026-11-22, `J6.md`): the game page centres on a scene (illustration of where the human stands: location, district, Other World area 1/2, the monster faced, dark fallback otherwise) with a small server-drawn SVG map on the left whose offered places are real buttons and others preview (`?voir=<key>`); fits the window. Illustration fields in `board.ron` v5 / `monsters.ron` v2, checked by `every_illustration_exists_and_none_is_orphan`; `crates/server/build.rs` shrinks `illustrations/` to JPEG (grand 1280 px, vignette 320 px) embedded and served under `illustrations/` with a fingerprint. The landscape board page is gone. The old J6 « Livraison locale » is now J7.
 
 ## Commands
 
@@ -55,7 +56,7 @@ Technical facts (details in `manques_et_questions.md` §2):
 | `plan_creation_jeu.md` | **Current plan. Read first.** |
 | `manques_et_questions.md` | Missing data (M), technical points (T), rules (R), questions for the user (Q). |
 | `plan_mise_en_ligne.md` | Old plan (WASM), superseded. |
-| `J3.md`, `J4.md`, `J5.md` | Milestone notes. |
+| `J3.md`, `J4.md`, `J5.md`, `J6.md` | Milestone notes. |
 | `vocabulaire_cartes.md` | Card effect vocabulary. |
 | `regles/decisions.md` | Rules settled with the user (R1–R27). Authoritative. |
 | `regles/base.md` | French rulebook; §22 inconsistencies; §23 official FAQ (overrides the rulebook). |

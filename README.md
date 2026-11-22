@@ -49,4 +49,4 @@ Le serveur se déploie avec `cargo deploy` (outil personnel) : il compile le pro
 - Jouer en mode texte dans le terminal : `cargo run -p simulator -- jouer --joueurs 3`.
 - Regarder une partie jouée entièrement par l'ordinateur : `cargo run -p simulator -- regarder --joueurs 3`.
 - Lancer les tests : `cargo test` ; tous les contrôles : `scripts/ci.sh`.
-- Le plan du projet est dans `plan_creation_jeu.md`, l'état du serveur dans `J5.md`.
+- Le plan du projet est dans `plan_creation_jeu.md`, l'état du serveur dans `J5.md` et `J6.md`.
