@@ -33,6 +33,22 @@ Les originaux des lieux et des Autres Mondes se trouvent sur le [plateau d’Ark
 | Pension de Ma | Quartier Sud | `(765, 1095)` | [mas_boarding_house.png](illustrations/lieux/mas_boarding_house.png) |
 | Église Méridionale | Quartier Sud | `(705, 1275)` | [south_church.png](illustrations/lieux/south_church.png) |
 
+## Quartiers
+
+Les coordonnées indiquent le centre de la case de rue de chaque quartier sur le plateau de la boîte de base.
+
+| Quartier | Centre sur le plateau | Nouvelle illustration |
+| --- | --- | --- |
+| Quartier Nord | `(245, 265)` | [northside.png](illustrations/quartiers/northside.png) |
+| Centre-Ville | `(447, 262)` | [downtown.png](illustrations/quartiers/downtown.png) |
+| Quartier Est | `(548, 410)` | [easttown.png](illustrations/quartiers/easttown.png) |
+| Quartier Marchand | `(315, 542)` | [merchant_district.png](illustrations/quartiers/merchant_district.png) |
+| Quartier de la Rivière | `(532, 538)` | [rivertown.png](illustrations/quartiers/rivertown.png) |
+| Université Miskatonic | `(318, 800)` | [miskatonic_u.png](illustrations/quartiers/miskatonic_u.png) |
+| French Hill | `(535, 828)` | [french_hill.png](illustrations/quartiers/french_hill.png) |
+| Quartier Résidentiel | `(355, 1137)` | [uptown.png](illustrations/quartiers/uptown.png) |
+| Quartier Sud | `(553, 1142)` | [southside.png](illustrations/quartiers/southside.png) |
+
 ## Autres Mondes
 
 Sur l’image du plateau, la première zone de chaque monde se trouve en bas et la seconde en haut. Le suffixe `_2` désigne la seconde étape.
