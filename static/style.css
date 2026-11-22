@@ -310,12 +310,15 @@ form.undo { margin-top: 0.5rem; }
    the decision. */
 .combat {
   display: grid; gap: 1rem; align-items: start;
-  grid-template-columns: minmax(20rem, 34rem) minmax(22rem, 1fr);
+  /* Portraits are 2 wide for 3 high: the column fits the picture at the
+     window's height, so it shows no black bands. */
+  --scene-width: calc(max(20rem, 100vh - 10rem) * 2 / 3);
+  grid-template-columns: min(var(--scene-width), 100% - 23rem) minmax(22rem, 1fr);
   grid-template-areas: "scene side" "scene cards";
 }
 @media (min-width: 1600px) {
   .combat {
-    grid-template-columns: minmax(18rem, 34rem) minmax(22rem, 1fr) minmax(26rem, 1.3fr);
+    grid-template-columns: min(var(--scene-width), 100% - 50rem) minmax(22rem, 1fr) minmax(26rem, 1.3fr);
     grid-template-areas: "scene side cards";
   }
 }
@@ -460,7 +463,7 @@ main:has(.combat-page) { max-width: none; }
 .combat-page > .map { position: sticky; top: 0.5rem; }
 .combat-area { min-width: 0; }
 .combat-scene { grid-area: scene; position: sticky; top: 0.5rem; }
-.combat-scene .scene-picture { height: calc(100vh - 10rem); min-height: 20rem; }
+.combat-scene .scene-picture { width: 100%; height: auto; aspect-ratio: 2 / 3; }
 .combat-foes .foe-face { width: 96px; height: 96px; }
 .combat-foes .facts { font-size: 0.9rem; }
 .combat-foes .facts .tip { border-bottom: 1px dotted #b08850; }
@@ -476,5 +479,5 @@ main:has(.combat-page) { max-width: none; }
 @media (max-width: 760px) {
   .combat { grid-template-columns: minmax(0, 1fr); grid-template-areas: "scene" "side" "cards"; }
   .combat-scene { position: static; }
-  .combat-scene .scene-picture { height: min(72vh, 44rem); }
+  .combat-scene .scene-picture { width: min(100%, 48vh); }
 }
