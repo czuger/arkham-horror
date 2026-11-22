@@ -8,9 +8,9 @@ use crate::views::names::ancient_one;
 pub struct DoomTrackView {
     /// French name of the Ancient One.
     pub name: String,
-    /// Sheet image path under `/assets/`.
+    /// Sheet image path under `assets/`.
     pub sheet: String,
-    /// Doom token image path under `/assets/`.
+    /// Doom token image path under `assets/`.
     pub marker: String,
     /// Where each doom token stands: left and top, in percent of the sheet.
     pub tokens: Vec<(String, String)>,

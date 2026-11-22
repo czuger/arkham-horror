@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Nouvelle partie</h1>
 {% if !error.is_empty() %}<p class="error">{{ error }}</p>{% endif %}
-<form method="post" action="/nouvelle" class="setup">
+<form method="post" action="nouvelle" class="setup">
   <label>Votre investigateur
     <select name="investigateur" required>
       {% for (id, name) in investigators %}<option value="{{ id }}">{{ name }}</option>{% endfor %}

@@ -16,7 +16,7 @@ use crate::views::tips;
 /// The board with every token and the places the current decision offers.
 #[derive(Debug, Clone)]
 pub struct BoardView {
-    /// Board image path under `/assets/`.
+    /// Board image path under `assets/`.
     pub image: String,
     /// The places with something to show.
     pub spots: Vec<Spot>,

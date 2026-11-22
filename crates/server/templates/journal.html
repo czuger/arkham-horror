@@ -3,9 +3,9 @@
 {% block content %}
 <h1>Journal de la partie {{ id }}</h1>
 <p>
-  <a href="/partie/{{ id }}">Retour à la partie</a>
+  <a href="partie/{{ id }}">Retour à la partie</a>
   {% if can_undo %}
-  <form method="post" action="/partie/{{ id }}/annuler" class="inline">
+  <form method="post" action="partie/{{ id }}/annuler" class="inline">
     <button type="submit" class="small">Annuler le dernier coup</button>
   </form>
   {% endif %}

@@ -2,23 +2,23 @@
 {% block title %}Plateau — Horreur à Arkham{% endblock %}
 {% block content %}
 <h1>Plateau (paysage, taille réelle)</h1>
-<p><a href="/partie/{{ id }}">Retour à la partie</a> · Page d'essai : rien n'est cliquable.</p>
+<p><a href="partie/{{ id }}">Retour à la partie</a> · Page d'essai : rien n'est cliquable.</p>
 <div class="landscape" style="width: {{ board.image_height }}px; height: {{ board.image_width }}px">
-  <img src="/assets/{{ board.image }}" alt="Plateau d'Arkham" width="{{ board.image_width }}" height="{{ board.image_height }}" style="transform: translate({{ board.image_height }}px, 0) rotate(90deg)">
+  <img src="assets/{{ board.image }}" alt="Plateau d'Arkham" width="{{ board.image_width }}" height="{{ board.image_height }}" style="transform: translate({{ board.image_height }}px, 0) rotate(90deg)">
   {% for spot in board.spots %}
   <div class="spot" style="left: {{ spot.left }}; top: {{ spot.top }}" title="{{ spot.name }}">
     <div class="tokens">
-      {% if let Some(gate) = spot.gate %}<img class="gate" src="/assets/{{ gate.image }}" alt="{{ gate.name }}" title="{{ gate.name }}">{% endif %}
+      {% if let Some(gate) = spot.gate %}<img class="gate" src="assets/{{ gate.image }}" alt="{{ gate.name }}" title="{{ gate.name }}">{% endif %}
       {% if spot.sealed %}<span class="seal" title="Scellé">✶</span>{% endif %}
-      {% if let Some(closed) = spot.closed %}<img class="closed-marker" src="/assets/{{ closed.image }}" alt="{{ closed.name }}" title="{{ closed.name }}">{% endif %}
+      {% if let Some(closed) = spot.closed %}<img class="closed-marker" src="assets/{{ closed.image }}" alt="{{ closed.name }}" title="{{ closed.name }}">{% endif %}
       {% if spot.clues > 0 %}<span class="clue" title="{{ spot.clues }} Indice(s)">{{ spot.clues }}</span>{% endif %}
-      {% for monster in spot.monsters %}<span class="monster" style="background-image: url('/assets/{{ monster.image }}')" title="{{ monster.name }}"></span>{% endfor %}
+      {% for monster in spot.monsters %}<span class="monster" style="background-image: url('assets/{{ monster.image }}')" title="{{ monster.name }}"></span>{% endfor %}
       {% for pawn in spot.investigators %}<span class="pawn{% if pawn.human %} human{% endif %}" title="{{ pawn.tip.title }}">{{ pawn.initials }}</span>{% endfor %}
     </div>
   </div>
   {% endfor %}
   {% if let Some(terror) = board.terror %}
-  <div class="spot" style="left: {{ terror.left }}; top: {{ terror.top }}"><img class="terror" src="/assets/{{ terror.image }}" alt="Terreur : {{ terror.level }}" title="Terreur : {{ terror.level }}"></div>
+  <div class="spot" style="left: {{ terror.left }}; top: {{ terror.top }}"><img class="terror" src="assets/{{ terror.image }}" alt="Terreur : {{ terror.level }}" title="Terreur : {{ terror.level }}"></div>
   {% endif %}
 </div>
 {% endblock %}

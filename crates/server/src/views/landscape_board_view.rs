@@ -16,7 +16,7 @@ use crate::views::terror_pawn::TerrorPawn;
 /// turned board.
 #[derive(Debug, Clone)]
 pub struct LandscapeBoardView {
-    /// Board image path under `/assets/`.
+    /// Board image path under `assets/`.
     pub image: String,
     /// Width of the image file, which is the height of the turned board.
     pub image_width: u16,

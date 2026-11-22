@@ -1,10 +1,12 @@
 use askama::Template;
 use axum::extract::{Path, State};
+use axum::http::Uri;
 use axum::response::Html;
 use engine::inspect;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
+use crate::relative_path::root_of;
 use crate::session::Session;
 use crate::views::LandscapeBoardView;
 
@@ -12,6 +14,7 @@ use crate::views::LandscapeBoardView;
 #[template(path = "landscape_board.html")]
 struct LandscapeBoardPage {
     htmx: bool,
+    root: String,
     id: i64,
     board: LandscapeBoardView,
 }
@@ -25,6 +28,7 @@ struct LandscapeBoardPage {
 /// template fails.
 pub async fn landscape_board(
     State(state): State<AppState>,
+    uri: Uri,
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
@@ -34,6 +38,7 @@ pub async fn landscape_board(
     Ok(Html(
         LandscapeBoardPage {
             htmx: state.htmx,
+            root: root_of(uri.path()),
             id,
             board,
         }

@@ -1,5 +1,5 @@
 <div class="held-card tip{% if held.exhausted %} exhausted{% endif %}{% if held.choice.is_some() %} movable{% endif %}" tabindex="0"{% if held.choice.is_some() %} draggable="true" data-move="{{ target }}"{% endif %}>
-  {% if held.token.image.is_empty() %}<span class="card-name">{{ held.token.name }}</span>{% else %}<img src="/assets/{{ held.token.image }}" alt="{{ held.token.name }}" draggable="false"><span class="card-title">{{ held.token.name }}</span>{% endif %}
+  {% if held.token.image.is_empty() %}<span class="card-name">{{ held.token.name }}</span>{% else %}<img src="assets/{{ held.token.image }}" alt="{{ held.token.name }}" draggable="false"><span class="card-title">{{ held.token.name }}</span>{% endif %}
   <span class="card-facts">{% if held.hands > 0 %}{{ held.hands }} main{% if held.hands > 1 %}s{% endif %}{% endif %}{% if held.exhausted %} · épuisée{% endif %}{% if held.tokens > 0 %} · {{ held.tokens }} pion(s){% endif %}</span>
   {% if !held.note.is_empty() %}<span class="card-note">{{ held.note }}</span>{% endif %}
   {% if let Some(index) = held.choice %}<button type="submit" name="choix" value="{{ index }}" class="small">{{ action }}</button>{% endif %}

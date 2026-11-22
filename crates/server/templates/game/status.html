@@ -1,8 +1,8 @@
 <section class="status">
   <h2>Arkham — tour {{ status.turn }}, {{ status.phase }}</h2>
-  <p><a href="/partie/{{ id }}/investigateurs">Fiches des investigateurs</a> · <a href="/partie/{{ id }}/plateau">Plateau en paysage</a></p>
+  <p><a href="partie/{{ id }}/investigateurs">Fiches des investigateurs</a> · <a href="partie/{{ id }}/plateau">Plateau en paysage</a></p>
   <ul class="facts">
-    <li>Grand Ancien : <span class="tip" tabindex="0"><a href="/partie/{{ id }}/grand-ancien">{{ status.ancient_one.name }}</a>{{ status.ancient_one.tip|safe }}</span></li>
+    <li>Grand Ancien : <span class="tip" tabindex="0"><a href="partie/{{ id }}/grand-ancien">{{ status.ancient_one.name }}</a>{{ status.ancient_one.tip|safe }}</span></li>
     <li>Portails ouverts : {{ status.gates }} · Sceaux : {{ status.seals }}</li>
     <li>Monstres : {{ status.monsters.0 }} / {{ status.monsters.1 }} · Périphérie : {{ status.outskirts }}</li>
   </ul>

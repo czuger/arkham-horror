@@ -2,12 +2,12 @@
 {% block title %}Combat — Horreur à Arkham{% endblock %}
 {% block content %}
 <nav class="seat-tabs">
-  <a href="/partie/{{ id }}">Retour à la partie</a>
-  <a href="/partie/{{ id }}/investigateurs">Votre fiche</a>
-  <a href="/partie/{{ id }}/journal">Journal complet</a>
+  <a href="partie/{{ id }}">Retour à la partie</a>
+  <a href="partie/{{ id }}/investigateurs">Votre fiche</a>
+  <a href="partie/{{ id }}/journal">Journal complet</a>
 </nav>
 <h1 class="combat-title">Combat — {{ combat.who }}{% if let Some(foe) = combat.foe %} contre {{ foe.token.name }}{% endif %}</h1>
-{% if let Some(decision) = decision %}<form id="combat-form" method="post" action="/partie/{{ id }}/reponse">
+{% if let Some(decision) = decision %}<form id="combat-form" method="post" action="partie/{{ id }}/reponse">
 <input type="hidden" name="coup" value="{{ decision.form.move_number }}">{% endif %}
 <div class="combat">
   <div class="combat-foes">
@@ -68,13 +68,13 @@
 </div>
 {% if let Some(decision) = decision %}</form>
 {% if let Some(choice) = decision.hands %}
-<form id="change-hands" method="post" action="/partie/{{ id }}/reponse" class="inline">
+<form id="change-hands" method="post" action="partie/{{ id }}/reponse" class="inline">
   <input type="hidden" name="coup" value="{{ decision.form.move_number }}">
   <input type="hidden" name="choix" value="{{ choice.change }}">
 </form>
 {% endif %}{% endif %}
 {% if can_undo %}
-<form method="post" action="/partie/{{ id }}/annuler" class="inline undo">
+<form method="post" action="partie/{{ id }}/annuler" class="inline undo">
   <button type="submit" class="small">Annuler le dernier coup</button>
 </form>
 {% endif %}

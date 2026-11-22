@@ -5,7 +5,7 @@ use crate::views::tip::Tip;
 pub struct TerrorPawn {
     /// Terror level.
     pub level: u8,
-    /// Marker image path under `/assets/`.
+    /// Marker image path under `assets/`.
     pub image: String,
     /// Horizontal position, in percent of the board width.
     pub left: String,

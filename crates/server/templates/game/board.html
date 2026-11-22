@@ -1,5 +1,5 @@
 <section class="board" aria-label="Plateau">
-  <img src="/assets/{{ board.image }}" alt="Plateau d'Arkham" width="1064" height="1576">
+  <img src="assets/{{ board.image }}" alt="Plateau d'Arkham" width="1064" height="1576">
   {% for panel in board.panels %}
   <span class="panel tip {{ panel.edge }}" tabindex="0" aria-label="{{ panel.name }}" style="left: {{ panel.left }}; top: {{ panel.top }}; width: {{ panel.width }}; height: {{ panel.height }}">{{ panel.tip|safe }}</span>
   {% endfor %}
@@ -9,18 +9,18 @@
     <button type="submit" form="decision" name="choix" value="{{ index }}" class="go" title="{{ label }}">{{ spot.name }}</button>
     {% endfor %}
     <div class="tokens">
-      {% if let Some(gate) = spot.gate %}<span class="tip" tabindex="0"><img class="gate" src="/assets/{{ gate.image }}" alt="{{ gate.name }}">{{ gate.tip|safe }}</span>{% endif %}
+      {% if let Some(gate) = spot.gate %}<span class="tip" tabindex="0"><img class="gate" src="assets/{{ gate.image }}" alt="{{ gate.name }}">{{ gate.tip|safe }}</span>{% endif %}
       {% if spot.sealed %}<span class="seal tip" tabindex="0">✶<span class="bubble" role="tooltip"><strong>Scellé</strong><span>{{ spot.name }} : un Signe des Anciens empêche tout portail de s'ouvrir ici.</span></span></span>{% endif %}
-      {% if let Some(closed) = spot.closed %}<span class="tip" tabindex="0"><img class="closed-marker" src="/assets/{{ closed.image }}" alt="{{ closed.name }}">{{ closed.tip|safe }}</span>{% endif %}
+      {% if let Some(closed) = spot.closed %}<span class="tip" tabindex="0"><img class="closed-marker" src="assets/{{ closed.image }}" alt="{{ closed.name }}">{{ closed.tip|safe }}</span>{% endif %}
       {% if spot.clues > 0 %}<span class="clue tip" tabindex="0">{{ spot.clues }}<span class="bubble" role="tooltip"><strong>{{ spot.clues }} Indice(s)</strong><span>{{ spot.name }}</span></span></span>{% endif %}
-      {% for monster in spot.monsters %}<span class="monster tip" tabindex="0" style="background-image: url('/assets/{{ monster.image }}')" aria-label="{{ monster.name }}">{{ monster.tip|safe }}</span>{% endfor %}
+      {% for monster in spot.monsters %}<span class="monster tip" tabindex="0" style="background-image: url('assets/{{ monster.image }}')" aria-label="{{ monster.name }}">{{ monster.tip|safe }}</span>{% endfor %}
       {% for pawn in spot.investigators %}<span class="pawn tip{% if pawn.human %} human{% endif %}" tabindex="0">{{ pawn.initials }}{{ pawn.tip|safe }}</span>{% endfor %}
     </div>
   </div>
   {% endfor %}
   {% if let Some(terror) = board.terror %}
   <div class="spot terror-track west north" style="left: {{ terror.left }}; top: {{ terror.top }}">
-    <span class="tip" tabindex="0"><img class="terror" src="/assets/{{ terror.image }}" alt="Terreur : {{ terror.level }}">{{ terror.tip|safe }}</span>
+    <span class="tip" tabindex="0"><img class="terror" src="assets/{{ terror.image }}" alt="Terreur : {{ terror.level }}">{{ terror.tip|safe }}</span>
   </div>
   {% endif %}
 </section>

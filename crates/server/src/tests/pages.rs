@@ -1,6 +1,8 @@
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
 
+use tower::ServiceExt;
+
 use crate::tests::test_app::{TestApp, move_number};
 
 const NEW_GAME: &str = "investigateur=amanda_sharpe&ia=2&ia1=&ia2=&grand_ancien=&graine=7";
@@ -62,6 +64,59 @@ async fn robots_txt_and_static_files_are_served() {
     assert!(robots.body.contains("Disallow: /"));
     assert_eq!(app.get("/static/style.css").await.status, StatusCode::OK);
     assert_eq!(app.get("/nouvelle").await.status, StatusCode::OK);
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn built_in_images_are_served_with_their_type() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db")).await;
+    let page = app.get("/partie/1/plateau").await;
+    assert_eq!(page.status, StatusCode::NOT_FOUND);
+    let game = new_game(&app, NEW_GAME).await;
+    let body = app.get(&game).await.body;
+    let start = body.find("src=\"assets/").expect("an image") + "src=\"".len();
+    let image = &body[start..start + body[start..].find('"').expect("end")];
+    let request = Request::get(format!("/{image}"))
+        .body(Body::empty())
+        .expect("request");
+    let response = app.router.clone().oneshot(request).await.expect("response");
+    assert_eq!(response.status(), StatusCode::OK, "{image}");
+    let kind = response.headers().get(header::CONTENT_TYPE).expect("type");
+    assert!(
+        kind.to_str().expect("text").starts_with("image/"),
+        "{kind:?}"
+    );
+    assert_eq!(
+        app.get("/assets/nothing.png").await.status,
+        StatusCode::NOT_FOUND
+    );
+}
+
+/// Every page links relatively, from the root its `<base>` gives back: the
+/// application may be served under a sub-path.
+#[tokio::test(flavor = "current_thread")]
+async fn pages_link_relatively() {
+    let dir = temp();
+    let app = TestApp::open(&dir.path().join("db")).await;
+    let game = new_game(&app, NEW_GAME).await;
+    let pages = [
+        ("/".to_owned(), "./"),
+        ("/nouvelle".to_owned(), "./"),
+        (game.clone(), "../"),
+        (format!("{game}/journal"), "../../"),
+        (format!("{game}/combat"), "../../"),
+        (format!("{game}/grand-ancien"), "../../"),
+        (format!("{game}/plateau"), "../../"),
+        (format!("{game}{SHEET}"), "../../"),
+        (format!("{game}{SHEET}/1"), "../../../"),
+    ];
+    for (path, root) in pages {
+        let body = app.get(&path).await.body;
+        assert!(body.contains(&format!("<base href=\"{root}\">")), "{path}");
+        for absolute in ["href=\"/", "src=\"/", "action=\"/", "url('/"] {
+            assert!(!body.contains(absolute), "{path} contains {absolute}");
+        }
+    }
 }
 
 #[tokio::test(flavor = "current_thread")]

@@ -1,10 +1,12 @@
 use askama::Template;
 use axum::extract::{Path, State};
+use axum::http::Uri;
 use axum::response::Html;
 use engine::inspect;
 
 use crate::app_error::AppError;
 use crate::app_state::AppState;
+use crate::relative_path::root_of;
 use crate::session::Session;
 use crate::views::{BoardView, DecisionView, JournalView, PartyRow, StatusView};
 
@@ -12,6 +14,7 @@ use crate::views::{BoardView, DecisionView, JournalView, PartyRow, StatusView};
 #[template(path = "game.html")]
 struct GamePage {
     htmx: bool,
+    root: String,
     id: i64,
     seed: u64,
     board: BoardView,
@@ -31,6 +34,7 @@ struct GamePage {
 /// template fails.
 pub async fn game(
     State(state): State<AppState>,
+    uri: Uri,
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
@@ -38,6 +42,7 @@ pub async fn game(
     let outcome = &session.outcome;
     let page = inspect(&state.data, &outcome.state, |view| GamePage {
         htmx: state.htmx,
+        root: root_of(uri.path()),
         id,
         seed: session.progress.setup.seed,
         board: BoardView::new(view, decision, session.mode()),

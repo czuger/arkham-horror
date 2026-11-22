@@ -1,29 +1,29 @@
 # Prompts d’illustration de 15 monstres d’Arkham
 
-Chaque bloc peut être copié seul. Les quinze entrées sont choisies parmi les [monstres du jeu de base](data/monsters.ron). Les scènes reprennent le rendu gouache des illustrations d’Arkham. Le cadrage est indiqué dans chaque prompt.
+Chaque bloc peut être copié seul. Les quinze entrées sont choisies parmi les [monstres du jeu de base](data/monsters.ron). Les scènes reprennent le rendu gouache des illustrations d’Arkham. Tous les prompts sont au format portrait 2:3 (1024 × 1536 px).
 
 ## Byakhee
 
 ```text
-Illustre un Byakhee en plein vol au-dessus des toits d’Arkham dans les années 1920. Son corps noueux mêle une cage thoracique d’insecte, un cou d’oiseau et des pattes griffues repliées. Deux grandes ailes en membrane terreuse se détachent devant la lune, avec une aile inclinée vers le spectateur. En contrebas, les cheminées et les fenêtres ambrées donnent l’échelle. Peinture numérique réaliste à la texture de gouache, bleu ardoise et brun fauve. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre un Byakhee en plein vol au-dessus des toits d’Arkham dans les années 1920. Son corps noueux mêle une cage thoracique d’insecte, un cou d’oiseau et des pattes griffues repliées. Deux grandes ailes en membrane terreuse se détachent devant la lune, avec une aile inclinée vers le spectateur. En contrebas, les cheminées et les fenêtres ambrées donnent l’échelle. Peinture numérique réaliste à la texture de gouache, bleu ardoise et brun fauve. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Chien de Tindalos
 
 ```text
-Illustre un Chien de Tindalos en train de sortir de l’angle d’un couloir d’Arkham dans les années 1920. L’angle vif formé par les murs et le plancher se creuse en une fente noire. Une patte aux articulations trop nombreuses prend appui sur le parquet. La tête au museau mince et deux yeux pâles émergent d’un filet de vapeur bleue. Une lampe suspendue éclaire à peine la silhouette basse du corps et le papier peint décollé. Peinture numérique réaliste à la texture de gouache, gris bleuté, bois sombre et ambre éteint. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre un Chien de Tindalos en train de sortir de l’angle d’un couloir d’Arkham dans les années 1920. L’angle vif formé par les murs et le plancher se creuse en une fente noire. Une patte aux articulations trop nombreuses prend appui sur le parquet. La tête au museau mince et deux yeux pâles émergent d’un filet de vapeur bleue. Une lampe suspendue éclaire à peine la silhouette basse du corps et le papier peint décollé. Peinture numérique réaliste à la texture de gouache, gris bleuté, bois sombre et ambre éteint. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Chose Très Ancienne
 
 ```text
-Illustre une Chose Très Ancienne qui traverse les ruines d’une salle prise dans les glaces. Son corps haut, nervuré comme un tonneau, porte une tête étoilée à cinq branches et des membres qui se divisent en fines vrilles. Des ailes plissées se déploient à moitié derrière elle. Une lumière de surface traverse la glace et révèle les reliefs de sa peau, entre les dalles gravées de simples motifs géométriques. Peinture numérique réaliste à la texture de gouache, bleu glacier, gris pierre et reflets de cuivre terne. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre une Chose Très Ancienne qui traverse les ruines d’une salle prise dans les glaces. Son corps haut, nervuré comme un tonneau, porte une tête étoilée à cinq branches et des membres qui se divisent en fines vrilles. Des ailes plissées se déploient à moitié derrière elle. Une lumière de surface traverse la glace et révèle les reliefs de sa peau, entre les dalles gravées de simples motifs géométriques. Peinture numérique réaliste à la texture de gouache, bleu glacier, gris pierre et reflets de cuivre terne. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Chthonien
 
 ```text
-Illustre un Chthonien qui soulève les rails d’une galerie souterraine sous Arkham dans les années 1920. Son corps énorme, segmenté et couvert de poussière, jaillit de biais à travers la roche. Une couronne de tentacules tactiles s’étend autour de son extrémité aveugle. Les madriers du plafond vibrent et une lanterne renversée éclaire les pierres suspendues dans la poussière. Peinture numérique réaliste à la texture de gouache, ocre de terre, gris de schiste et orange de lampe. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre un Chthonien qui soulève les rails d’une galerie souterraine sous Arkham dans les années 1920. Son corps énorme, segmenté et couvert de poussière, jaillit de biais à travers la roche. Une couronne de tentacules tactiles s’étend autour de son extrémité aveugle. Les madriers du plafond vibrent et une lanterne renversée éclaire les pierres suspendues dans la poussière. Peinture numérique réaliste à la texture de gouache, ocre de terre, gris de schiste et orange de lampe. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Cultiste
@@ -35,19 +35,19 @@ Illustre un Cultiste qui officie lors d’une messe noire clandestine dans une c
 ## Goule
 
 ```text
-Illustre une Goule accroupie sur la margelle d’un caveau du cimetière d’Arkham. Son dos voûté, ses bras démesurés et sa mâchoire canine restent lisibles dans le contre-jour. Un morceau de manteau de laine détrempé pend à une épaule. Une main aux ongles terreux agrippe la pierre et le visage se tourne vers une petite lampe abandonnée dans l’herbe. Peinture numérique réaliste à la texture de gouache, verts froids, gris de granit et touche d’ambre. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre une Goule accroupie sur la margelle d’un caveau du cimetière d’Arkham. Son dos voûté, ses bras démesurés et sa mâchoire canine restent lisibles dans le contre-jour. Un morceau de manteau de laine détrempé pend à une épaule. Une main aux ongles terreux agrippe la pierre et le visage se tourne vers une petite lampe abandonnée dans l’herbe. Peinture numérique réaliste à la texture de gouache, verts froids, gris de granit et touche d’ambre. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Larve Stellaire
 
 ```text
-Illustre une Larve Stellaire qui se redresse à mi-corps au pied des murailles inondées de R’lyeh. Une tête à franges de tentacules s’incline au-dessus d’un torse massif, et une paire d’ailes membraneuses encore repliées encadre les épaules. Le monstre s’appuie sur une arche effondrée. L’eau ruisselle de sa peau bleu-vert et les vagues couvrent la base des blocs autour de lui. Peinture numérique réaliste à la texture de gouache, verts marins, gris d’orage et lueur d’or terne. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre une Larve Stellaire qui se redresse à mi-corps au pied des murailles inondées de R’lyeh. Une tête à franges de tentacules s’incline au-dessus d’un torse massif, et une paire d’ailes membraneuses encore repliées encadre les épaules. Le monstre s’appuie sur une arche effondrée. L’eau ruisselle de sa peau bleu-vert et les vagues couvrent la base des blocs autour de lui. Peinture numérique réaliste à la texture de gouache, verts marins, gris d’orage et lueur d’or terne. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Maigre Bête de la Nuit
 
 ```text
-Illustre une Maigre Bête de la Nuit qui se pose sur le rebord d’une falaise dans les Contrées du Rêve. Sa silhouette est filiforme, avec deux cornes lisses, un visage sans traits, des ailes noires à demi repliées et une longue queue qui s’incurve au-dessus du vide. Vue de profil à hauteur du rebord. La lumière de la lune longe son corps, au-dessus d’un gouffre empli de brume mauve. Peinture numérique réaliste à la texture de gouache, encre bleue, mauve froid et argent. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre une Maigre Bête de la Nuit qui se pose sur le rebord d’une falaise dans les Contrées du Rêve. Sa silhouette est filiforme, avec deux cornes lisses, un visage sans traits, des ailes noires à demi repliées et une longue queue qui s’incurve au-dessus du vide. Vue de profil à hauteur du rebord. La lumière de la lune longe son corps, au-dessus d’un gouffre empli de brume mauve. Peinture numérique réaliste à la texture de gouache, encre bleue, mauve froid et argent. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Maniaque
@@ -59,19 +59,19 @@ Illustre le Maniaque, un rôdeur qui vient de s’immobiliser dans une ruelle d�
 ## Migo
 
 ```text
-Illustre un Migo suspendu sous une passerelle des mines de Yuggoth. Cette créature évoque un crustacé à la carapace rose cendré, avec de fines pattes articulées, des ailes translucides repliées dans le dos et une tête couverte de filaments fongiques. Deux pattes s’accrochent à la poutre tandis que les autres entourent un cylindre métallique vierge. Les lampes soufre de la mine découpent son profil sur le basalte bleu pétrole. Peinture numérique réaliste à la texture de gouache, bleu pétrole, rose gris et jaune soufre. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre un Migo suspendu sous une passerelle des mines de Yuggoth. Cette créature évoque un crustacé à la carapace rose cendré, avec de fines pattes articulées, des ailes translucides repliées dans le dos et une tête couverte de filaments fongiques. Deux pattes s’accrochent à la poutre tandis que les autres entourent un cylindre métallique vierge. Les lampes soufre de la mine découpent son profil sur le basalte bleu pétrole. Peinture numérique réaliste à la texture de gouache, bleu pétrole, rose gris et jaune soufre. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Shoggoth
 
 ```text
-Illustre un Shoggoth qui déferle dans une vaste salle de pierre. Sa masse noire, luisante et sans forme fixe monte sur les marches comme une vague épaisse. Quelques yeux vert pâle émergent à différentes profondeurs dans la masse, tandis que des pseudopodes s’étirent vers les colonnes. Vue au ras du sol, avec des dalles renversées au premier plan et une lumière froide qui dessine la crête de la vague. Peinture numérique réaliste à la texture de gouache, noir bleuté, gris calcaire et vert pâle. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre un Shoggoth qui déferle dans une vaste salle de pierre. Sa masse noire, luisante et sans forme fixe monte sur les marches comme une vague épaisse. Quelques yeux vert pâle émergent à différentes profondeurs dans la masse, tandis que des pseudopodes s’étirent vers les colonnes. Vue au ras du sol, avec des dalles renversées au premier plan et une lumière froide qui dessine la crête de la vague. Peinture numérique réaliste à la texture de gouache, noir bleuté, gris calcaire et vert pâle. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Sombre Rejeton
 
 ```text
-Illustre un Sombre Rejeton immobile au milieu d’une clairière humide près d’Arkham. Son corps massif évoque une souche vivante faite de fibres noires et de membranes brunies. Plusieurs pattes terminées par des sabots s’enfoncent dans la terre, tandis que de longs appendices noueux se mêlent visuellement aux branches des pins. Une trouée de lumière grise détache la créature du sous-bois. Peinture numérique réaliste à la texture de gouache, vert mousse, brun de tourbe et noir humide. Paysage 16:9, 1536 × 864 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
+Illustre un Sombre Rejeton immobile au milieu d’une clairière humide près d’Arkham. Son corps massif évoque une souche vivante faite de fibres noires et de membranes brunies. Plusieurs pattes terminées par des sabots s’enfoncent dans la terre, tandis que de longs appendices noueux se mêlent visuellement aux branches des pins. Une trouée de lumière grise détache la créature du sous-bois. Peinture numérique réaliste à la texture de gouache, vert mousse, brun de tourbe et noir humide. Portrait 2:3, 1024 × 1536 px, scène unique plein cadre, sans texte, bordure, signature ni filigrane.
 ```
 
 ## Sorcière

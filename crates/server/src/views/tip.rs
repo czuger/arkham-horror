@@ -10,7 +10,7 @@ pub struct Tip {
     pub title: String,
     /// The other lines.
     pub lines: Vec<String>,
-    /// Image path under `/assets/`, shown at its own size; empty for none.
+    /// Image path under `assets/`, shown at its own size; empty for none.
     pub image: String,
 }
 

@@ -4,9 +4,11 @@ mod app_error;
 mod app_state;
 mod config;
 mod database;
+mod embedded_files;
 mod game_row;
 mod play_mode;
 mod progress;
+mod relative_path;
 mod router;
 mod routes;
 mod same_origin;
@@ -18,6 +20,7 @@ mod tests;
 mod views;
 
 use std::error::Error;
+use std::io::IsTerminal;
 use std::process::ExitCode;
 
 use tracing_subscriber::EnvFilter;
@@ -25,7 +28,10 @@ use tracing_subscriber::EnvFilter;
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    tracing_subscriber::fmt().with_env_filter(filter).init();
+    tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_ansi(colors_wanted())
+        .init();
     match serve().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
@@ -33,6 +39,11 @@ async fn main() -> ExitCode {
             ExitCode::FAILURE
         }
     }
+}
+
+/// Colours only on a terminal, and never when `NO_COLOR` is set.
+fn colors_wanted() -> bool {
+    std::env::var_os("NO_COLOR").is_none() && std::io::stdout().is_terminal()
 }
 
 async fn serve() -> Result<(), Box<dyn Error>> {

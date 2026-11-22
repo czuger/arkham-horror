@@ -201,7 +201,7 @@ Consigne de l'utilisateur (21/11/2026) : JavaScript est permis (scripts maison o
 
 ### 6.5 Accès et sécurité
 
-L'hébergement et la protection de l'accès sont **hors périmètre** : l'utilisateur dispose d'un environnement dédié. Le serveur :
+La protection de l'accès est **hors périmètre**. L'hébergement passe par `cargo deploy`, l'outil de l'utilisateur (21/11/2026) : socket Unix, nginx, sous-chemin `/arkham/`, réglages dans `crates/server/Cargo.toml`. Le serveur :
 
 - écoute par défaut sur l'adresse locale uniquement (`127.0.0.1`), port configurable ;
 - lit sa configuration (port, chemin de la base, chemin des données) dans un fichier ou des variables d'environnement, pour s'installer ailleurs sans changement de code ;

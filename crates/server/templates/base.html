@@ -4,15 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
+  <base href="{{ root }}">
   <title>{% block title %}Horreur à Arkham{% endblock %}</title>
-  <link rel="stylesheet" href="/static/style.css">
-  {% if htmx %}<script src="/static/htmx.min.js" defer></script>{% endif %}
-  <script src="/static/drag_drop.js" defer></script>
+  <link rel="stylesheet" href="static/style.css">
+  {% if htmx %}<script src="static/htmx.min.js" defer></script>{% endif %}
+  <script src="static/drag_drop.js" defer></script>
 </head>
 <body{% if htmx %} hx-boost="true"{% endif %}>
   <header class="top">
-    <a href="/" class="brand">Horreur à Arkham</a>
-    <a href="/nouvelle">Nouvelle partie</a>
+    <a href="./" class="brand">Horreur à Arkham</a>
+    <a href="nouvelle">Nouvelle partie</a>
   </header>
   <main>
     {% block content %}{% endblock %}

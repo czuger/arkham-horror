@@ -1,18 +1,17 @@
 //! A server on a temporary database, driven without a network.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::Arc;
 
 use axum::Router;
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
-use data::GameData;
 use http_body_util::BodyExt;
 use tower::ServiceExt;
 
 use crate::app_state::AppState;
-use crate::config::Config;
 use crate::database::Database;
+use crate::embedded_files::load_game_data;
 use crate::router::build_router;
 
 /// A response: status, `Location` header and body.
@@ -31,23 +30,15 @@ pub struct TestApp {
 impl TestApp {
     /// Opens (or reopens) the application on a database file.
     pub async fn open(db_path: &Path) -> Self {
-        let root = PathBuf::from("../..");
-        let config = Config {
-            addr: "127.0.0.1:0".parse().expect("addr"),
-            db_path: db_path.to_owned(),
-            assets_dir: root.join("assets"),
-            static_dir: root.join("static"),
-            data_dir: root.join("data"),
-        };
-        let data = Arc::new(GameData::load(&config.data_dir).expect("data"));
-        let db = Database::open(&config.db_path).await.expect("open");
+        let data = Arc::new(load_game_data().expect("data"));
+        let db = Database::open(db_path).await.expect("open");
         let state = AppState {
             db,
             data,
             htmx: false,
         };
         Self {
-            router: build_router(&config, state),
+            router: build_router(state),
         }
     }
 
@@ -65,6 +56,7 @@ impl TestApp {
     }
 
     pub async fn send(&self, request: Request<Body>) -> Reply {
+        let from = request.uri().path().to_owned();
         let response = self
             .router
             .clone()
@@ -79,7 +71,10 @@ impl TestApp {
                 .map(str::to_owned)
         };
         let status = response.status();
-        let location = text(header::LOCATION.as_str());
+        let location = text(header::LOCATION.as_str()).map(|location| {
+            assert!(!location.starts_with('/'), "absolute redirect: {location}");
+            resolve(&from, &location)
+        });
         let robots = text("x-robots-tag");
         let bytes = response
             .into_body()
@@ -93,6 +88,30 @@ impl TestApp {
             robots,
             body: String::from_utf8_lossy(&bytes).into_owned(),
         }
+    }
+}
+
+/// The absolute path a browser reaches when following the relative
+/// `location` from the request path `from`.
+pub fn resolve(from: &str, location: &str) -> String {
+    let mut segments: Vec<&str> = from.split('/').collect();
+    segments.pop();
+    for segment in location.split('/') {
+        match segment {
+            "." => {}
+            ".." => {
+                if segments.len() > 1 {
+                    segments.pop();
+                }
+            }
+            _ => segments.push(segment),
+        }
+    }
+    let path = segments.join("/");
+    if path.is_empty() {
+        "/".to_owned()
+    } else {
+        path
     }
 }
 

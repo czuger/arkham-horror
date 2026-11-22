@@ -100,14 +100,15 @@ impl Session {
         }
     }
 
-    /// Where the human goes after a move: the combat page when a combat of
+    /// Where the human goes after a move, as a path from the application
+    /// root without a leading `/`: the combat page when a combat of
     /// theirs ended since their last answer, else [`Session::decision_page`].
     pub fn page(&self) -> String {
         let ended = self
             .combat()
             .is_some_and(|span| span.ended_since(self.progress.seen_events));
         if ended && !self.in_combat() {
-            return format!("/partie/{}/combat", self.id);
+            return format!("partie/{}/combat", self.id);
         }
         self.decision_page()
     }
@@ -117,9 +118,9 @@ impl Session {
     /// otherwise.
     pub fn decision_page(&self) -> String {
         match self.decision() {
-            Some(decision) if on_sheet(decision) => format!("/partie/{}/investigateurs", self.id),
-            Some(_) if self.in_combat() => format!("/partie/{}/combat", self.id),
-            _ => format!("/partie/{}", self.id),
+            Some(decision) if on_sheet(decision) => format!("partie/{}/investigateurs", self.id),
+            Some(_) if self.in_combat() => format!("partie/{}/combat", self.id),
+            _ => format!("partie/{}", self.id),
         }
     }
 

@@ -9,7 +9,7 @@
 
 ## Lancer le serveur
 
-Depuis le dossier du projet (c'est important : le serveur y cherche les images et les données) :
+Depuis le dossier du projet :
 
 ```
 cargo run --release -p server
@@ -28,11 +28,21 @@ Par variables d'environnement, à mettre devant la commande, par exemple `ARKHAM
 | Variable | Rôle | Par défaut |
 |---|---|---|
 | `ARKHAM_ADDR` | adresse et port d'écoute | `127.0.0.1:3000` |
-| `ARKHAM_DB` | fichier de la base des parties | `arkham.db` |
-| `ARKHAM_DATA` | dossier des données du jeu (cartes, plateau…) | `data` |
-| `ARKHAM_ASSETS` | dossier des images | `assets` |
-| `ARKHAM_STATIC` | dossier de la feuille de style (et de `htmx.min.js` s'il y est) | `static` |
+| `ARKHAM_SOCKET` | si elle est définie, le serveur écoute sur ce socket Unix au lieu de l'adresse ci-dessus | — |
+| `ARKHAM_DATA_DIR` | dossier des données qui doivent durer (la base des parties) | dossier courant |
+| `ARKHAM_DB` | fichier de la base des parties | `$ARKHAM_DATA_DIR/arkham.db`, sinon `arkham.db` |
 | `RUST_LOG` | niveau de détail des messages (`info`, `debug`…) | — |
+
+Les données du jeu (`data/`), les images (`assets/`) et `static/` sont intégrées au programme : il fonctionne seul, sans ces dossiers à côté. En développement (`cargo run` sans `--release`), il les relit sur le disque à chaque page : une modification se voit sans recompiler.
+
+## Déploiement
+
+Le serveur se déploie avec `cargo deploy` (outil personnel) : il compile le programme, l'envoie sur le serveur et le lance comme service, derrière un nginx qui le sert sous `/arkham/`. Les réglages propres à l'application sont dans la section `[package.metadata.deploy]` de `crates/server/Cargo.toml` ; ceux du serveur viennent des variables d'environnement `DEPLOY_*` de la machine, jamais d'un fichier du dépôt.
+
+- `cargo deploy setup` : prépare le serveur (une seule fois).
+- `cargo deploy` : déploie la version actuelle.
+- `cargo deploy rollback` : revient à la version précédente.
+- `cargo deploy status`, `cargo deploy logs` : état du service, journaux.
 
 ## Pour aller plus loin
 

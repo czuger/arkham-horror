@@ -19,14 +19,15 @@ Milestones (plan in `plan_creation_jeu.md`, J0–J6):
 
 - Build: `cargo build`. Toolchain pinned to Rust 1.100.0.
 - Text play (human = seat 0): `cargo run -p simulator -- jouer --graine 5 --joueurs 3`; watch an AI game: `… regarder --graine 5 --joueurs 3`; bulk: `cargo run --release -p simulator -- masse --parties 1000 --joueurs 3` (`--hasard` random answers, `--graine N` seed range, `--couverture FILE` writes what was never played). A bulk run that never ends = a hanging game: bisect with `--parties 1 --graine N`.
-- Server: `cargo run -p server` from the repo root → http://127.0.0.1:3000. Env: `ARKHAM_ADDR`, `ARKHAM_DB` (default `arkham.db`), `ARKHAM_ASSETS`, `ARKHAM_STATIC`, `ARKHAM_DATA` (default `data`), `RUST_LOG`.
+- Server: `cargo run -p server` → http://127.0.0.1:3000. Env: `ARKHAM_ADDR`, `ARKHAM_SOCKET` (Unix socket instead of TCP), `ARKHAM_DATA_DIR` (persistent folder), `ARKHAM_DB` (default `$ARKHAM_DATA_DIR/arkham.db`, else `arkham.db`), `RUST_LOG`. `data/`, `assets/`, `static/` are built into the binary with rust-embed (`embedded_files.rs`; read from disk in debug builds).
+- Deploy: `cargo deploy` (settings in `[package.metadata.deploy]` of `crates/server/Cargo.toml`, served under `/arkham/`). The user runs it; Claude only runs `cargo deploy init`/`render` (local), never the commands that touch the server.
 - Tests: `cargo test`; one test: `cargo test -p server a_game_resumes_after_a_restart`.
 - **For now (user's request, 2026-11-21): do not run the AI tests.** No `simulator masse` bulk runs, no `crates/ai/tests/ai_games.rs`; test with `cargo test --workspace --exclude ai` until the user says otherwise.
 - Local CI: `scripts/ci.sh` (rustfmt, clippy `-D warnings`, tests, cargo-audit, cargo-deny); same in `.github/workflows/ci.yml`. No git remote.
 
 ## Architecture and constraints
 
-- One executable: engine, AIs, axum server, embedded DB. Tokio **`current_thread`**. Local only (`127.0.0.1`, no login; hosting out of scope).
+- One executable: engine, AIs, axum server, embedded DB. Tokio **`current_thread`**. No login. Locally on `127.0.0.1`; deployed on a Unix socket behind nginx under a sub-path, so **every link is relative** (no leading `/`): pages carry `<base href>` from `relative_path::root_of`, redirects use `relative_path::redirect_from`, `Session::page` paths have no leading `/`. SIGTERM stops cleanly.
 - **UI**: server-rendered HTML with **askama**, forms POST → redirect → GET, **htmx** and small JS served locally (never a CDN). No heavy client: no SPA, no rules or game state in the browser.
 - AI turns and the Mythos phase play **in one block** after each human answer.
 - Game data stays in versioned RON files, never in the DB or code. Card texts are transcribed by Claude from `assets/` images, proofread by the user; unknown copy counts are entered from memory and marked « à vérifier ».

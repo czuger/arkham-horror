@@ -21,7 +21,7 @@ pub struct InvestigatorMat {
     pub player: &'static str,
     /// Where the investigator stands.
     pub place: String,
-    /// Sheet image path under `/assets/`.
+    /// Sheet image path under `assets/`.
     pub image: String,
     /// The three sliders: left and top of each, in percent of the sheet.
     pub sliders: Vec<(String, String)>,
@@ -52,7 +52,7 @@ pub struct InvestigatorMat {
 pub struct BillRow {
     /// Value of one bill, in dollars.
     pub value: u16,
-    /// Bill image path under `/assets/`.
+    /// Bill image path under `assets/`.
     pub image: String,
     /// How many bills of that value.
     pub count: u16,

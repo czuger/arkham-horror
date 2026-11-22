@@ -3,32 +3,35 @@ use std::net::{AddrParseError, SocketAddr};
 use std::path::PathBuf;
 
 const DEFAULT_ADDR: &str = "127.0.0.1:3000";
-const DEFAULT_DB: &str = "arkham.db";
-const DEFAULT_ASSETS: &str = "assets";
-const DEFAULT_STATIC: &str = "static";
-const DEFAULT_DATA: &str = "data";
+const DB_FILE: &str = "arkham.db";
 
 /// Server settings, read from environment variables.
 ///
 /// | Variable | Default |
 /// |---|---|
-/// | `ARKHAM_ADDR` | `127.0.0.1:3000` |
-/// | `ARKHAM_DB` | `arkham.db` |
-/// | `ARKHAM_ASSETS` | `assets` |
-/// | `ARKHAM_STATIC` | `static` |
-/// | `ARKHAM_DATA` | `data` |
+/// | `ARKHAM_ADDR` | `127.0.0.1:3000` (TCP, used when `ARKHAM_SOCKET` is unset) |
+/// | `ARKHAM_SOCKET` | unset: listen on TCP; set: listen on this Unix socket instead |
+/// | `ARKHAM_DATA_DIR` | unset: the current folder; persistent folder for the saved games |
+/// | `ARKHAM_DB` | `$ARKHAM_DATA_DIR/arkham.db`, or `arkham.db` without `ARKHAM_DATA_DIR` |
+///
+/// The game data files (`data/`), the images (`assets/`) and the CSS and
+/// JavaScript files (`static/`) are built into the program; they are not
+/// settings. `ARKHAM_DATA_DIR` only holds what the server writes.
 #[derive(Debug, Clone)]
 pub struct Config {
-    /// Address and port the server listens on.
-    pub addr: SocketAddr,
+    /// Where the server listens.
+    pub listen: Listen,
     /// SQLite database file, created on first run.
     pub db_path: PathBuf,
-    /// Folder of the game images (`assets/` in the repository).
-    pub assets_dir: PathBuf,
-    /// Folder of the CSS and JavaScript files.
-    pub static_dir: PathBuf,
-    /// Folder of the game data files (`data/` in the repository).
-    pub data_dir: PathBuf,
+}
+
+/// Where the server accepts connections.
+#[derive(Debug, Clone)]
+pub enum Listen {
+    /// A TCP address and port (local use).
+    Tcp(SocketAddr),
+    /// A Unix socket path (deployed behind a proxy).
+    Unix(PathBuf),
 }
 
 /// Invalid configuration value.
@@ -51,23 +54,35 @@ impl Config {
     ///
     /// Returns [`ConfigError::InvalidAddr`] if `ARKHAM_ADDR` cannot be parsed.
     pub fn from_env() -> Result<Self, ConfigError> {
-        let addr_value = env_or("ARKHAM_ADDR", DEFAULT_ADDR);
-        let addr = addr_value
-            .parse()
-            .map_err(|source| ConfigError::InvalidAddr {
-                value: addr_value.clone(),
-                source,
-            })?;
         Ok(Self {
-            addr,
-            db_path: env_or("ARKHAM_DB", DEFAULT_DB).into(),
-            assets_dir: env_or("ARKHAM_ASSETS", DEFAULT_ASSETS).into(),
-            static_dir: env_or("ARKHAM_STATIC", DEFAULT_STATIC).into(),
-            data_dir: env_or("ARKHAM_DATA", DEFAULT_DATA).into(),
+            listen: listen_from_env()?,
+            db_path: db_path_from_env(),
         })
     }
 }
 
-fn env_or(name: &str, default: &str) -> String {
-    env::var(name).unwrap_or_else(|_| default.to_owned())
+fn listen_from_env() -> Result<Listen, ConfigError> {
+    if let Some(socket) = env_value("ARKHAM_SOCKET") {
+        return Ok(Listen::Unix(socket.into()));
+    }
+    let value = env_value("ARKHAM_ADDR").unwrap_or_else(|| DEFAULT_ADDR.to_owned());
+    value
+        .parse()
+        .map(Listen::Tcp)
+        .map_err(|source| ConfigError::InvalidAddr { value, source })
+}
+
+fn db_path_from_env() -> PathBuf {
+    if let Some(db) = env_value("ARKHAM_DB") {
+        return db.into();
+    }
+    match env_value("ARKHAM_DATA_DIR") {
+        Some(dir) => PathBuf::from(dir).join(DB_FILE),
+        None => PathBuf::from(DB_FILE),
+    }
+}
+
+/// The variable's value, `None` when unset or empty.
+fn env_value(name: &str) -> Option<String> {
+    env::var(name).ok().filter(|value| !value.is_empty())
 }

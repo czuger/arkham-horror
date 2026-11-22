@@ -3,20 +3,19 @@ use axum::http::HeaderValue;
 use axum::http::header::HeaderName;
 use axum::middleware;
 use axum::routing::{get, post};
-use tower_http::services::ServeDir;
 use tower_http::set_header::SetResponseHeaderLayer;
 
 use crate::app_state::AppState;
-use crate::config::Config;
+use crate::embedded_files;
 use crate::routes;
 use crate::same_origin::same_origin;
 
-/// Builds the application router: pages, forms, `robots.txt`, images and
-/// static files.
+/// Builds the application router: pages, forms, `robots.txt`, and the
+/// built-in images and static files.
 ///
 /// Every response carries `X-Robots-Tag: noindex, nofollow`; forms posted
 /// from another site are refused.
-pub fn build_router(config: &Config, state: AppState) -> Router {
+pub fn build_router(state: AppState) -> Router {
     Router::new()
         .route("/", get(routes::home))
         .route(
@@ -37,8 +36,8 @@ pub fn build_router(config: &Config, state: AppState) -> Router {
         )
         .route("/partie/{id}/plateau", get(routes::landscape_board))
         .route("/robots.txt", get(routes::robots))
-        .nest_service("/assets", ServeDir::new(&config.assets_dir))
-        .nest_service("/static", ServeDir::new(&config.static_dir))
+        .route("/assets/{*path}", get(embedded_files::asset))
+        .route("/static/{*path}", get(embedded_files::static_file))
         .layer(SetResponseHeaderLayer::overriding(
             HeaderName::from_static("x-robots-tag"),
             HeaderValue::from_static("noindex, nofollow"),

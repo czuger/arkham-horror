@@ -27,7 +27,7 @@ pub struct IconLine {
     pub meaning: &'static str,
     /// Printed in reversed colours: a sure way to get it here.
     pub sure: bool,
-    /// Icon image path under `/assets/` (empty when there is none).
+    /// Icon image path under `assets/` (empty when there is none).
     pub image: String,
 }
 

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Parties</h1>
-<p><a class="button" href="/nouvelle">Nouvelle partie</a></p>
+<p><a class="button" href="nouvelle">Nouvelle partie</a></p>
 {% if games.is_empty() %}
 <p>Aucune partie pour l'instant.</p>
 {% else %}
@@ -11,10 +11,10 @@
   {% for game in games %}
     <tr{% if game.over %} class="over"{% endif %}>
       <td>{{ game.id }}</td>
-      <td><a href="/partie/{{ game.id }}">{{ game.title }}</a></td>
+      <td><a href="partie/{{ game.id }}">{{ game.title }}</a></td>
       <td>{{ game.summary }}</td>
       <td>
-        <form method="post" action="/partie/{{ game.id }}/supprimer" class="inline">
+        <form method="post" action="partie/{{ game.id }}/supprimer" class="inline">
           <button type="submit" class="small">Supprimer</button>
         </form>
       </td>

@@ -4,7 +4,8 @@ use askama::Template;
 use axum::Form;
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::response::{Html, IntoResponse, Redirect, Response};
+use axum::http::Uri;
+use axum::response::{Html, IntoResponse, Response};
 use data::{AncientOneId, GameData, InvestigatorId};
 use engine::Setup;
 use serde::Deserialize;
@@ -12,6 +13,7 @@ use serde::Deserialize;
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::play_mode::PlayMode;
+use crate::relative_path::{redirect_from, root_of};
 use crate::session::Session;
 
 /// Most AI investigators in a game (8 investigators in all).
@@ -23,6 +25,7 @@ const DEFAULT_AIS: usize = 2;
 #[template(path = "new_game.html")]
 struct NewGamePage {
     htmx: bool,
+    root: String,
     investigators: Vec<(String, String)>,
     ancient_ones: Vec<(String, String)>,
     ai_counts: Vec<usize>,
@@ -63,8 +66,11 @@ pub struct NewGameForm {
 /// # Errors
 ///
 /// Fails if the template fails.
-pub async fn new_game_form(State(state): State<AppState>) -> Result<Html<String>, AppError> {
-    Ok(Html(form_page(&state, String::new())?))
+pub async fn new_game_form(
+    State(state): State<AppState>,
+    uri: Uri,
+) -> Result<Html<String>, AppError> {
+    Ok(Html(form_page(&state, &uri, String::new())?))
 }
 
 /// Creates a game from the form, lets the AI play up to the human's first
@@ -76,12 +82,13 @@ pub async fn new_game_form(State(state): State<AppState>) -> Result<Html<String>
 /// makes no sense is shown again with the reason.
 pub async fn create_game(
     State(state): State<AppState>,
+    uri: Uri,
     Form(form): Form<NewGameForm>,
 ) -> Result<Response, AppError> {
     let setup = match setup_from(&state.data, &form) {
         Ok(setup) => setup,
         Err(reason) => {
-            let page = form_page(&state, reason)?;
+            let page = form_page(&state, &uri, reason)?;
             return Ok((StatusCode::BAD_REQUEST, Html(page)).into_response());
         }
     };
@@ -91,14 +98,15 @@ pub async fn create_game(
         PlayMode::Solo
     };
     let session = Session::start(&state.db, &state.data, setup, mode).await?;
-    Ok(Redirect::to(&session.page()).into_response())
+    Ok(redirect_from(&uri, &session.page()).into_response())
 }
 
 /// Renders the form, with an error line when not empty.
-fn form_page(state: &AppState, error: String) -> Result<String, AppError> {
+fn form_page(state: &AppState, uri: &Uri, error: String) -> Result<String, AppError> {
     let data = &state.data;
     Ok(NewGamePage {
         htmx: state.htmx,
+        root: root_of(uri.path()),
         investigators: data
             .investigators
             .investigators

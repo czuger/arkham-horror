@@ -112,17 +112,41 @@ impl DataFile for InvestigatorCards {
 /// not valid RON for `T`, [`DataError::Version`] if its version is not `T::VERSION`.
 pub fn read_data_file<T: DataFile>(data_dir: &Path) -> Result<T, DataError> {
     let path = data_dir.join(T::FILE_NAME);
-    let text = std::fs::read_to_string(&path).map_err(|source| DataError::Io {
-        path: path.clone(),
+    let text = read_text(&path)?;
+    parse_data_file(&path, &text)
+}
+
+/// Reads a whole text file, the error naming the file.
+///
+/// # Errors
+///
+/// [`DataError::Io`] if the file cannot be read.
+pub fn read_text(path: &Path) -> Result<String, DataError> {
+    std::fs::read_to_string(path).map_err(|source| DataError::Io {
+        path: path.to_owned(),
         source,
-    })?;
-    let file: T = ron::from_str(&text).map_err(|source| DataError::Parse {
-        path: path.clone(),
+    })
+}
+
+/// Parses and version-checks the text of one data file.
+///
+/// # Arguments
+///
+/// * `path` - where the text comes from, only used in error messages.
+/// * `text` - the RON text.
+///
+/// # Errors
+///
+/// [`DataError::Parse`] if `text` is not valid RON for `T`,
+/// [`DataError::Version`] if its version is not `T::VERSION`.
+pub fn parse_data_file<T: DataFile>(path: &Path, text: &str) -> Result<T, DataError> {
+    let file: T = ron::from_str(text).map_err(|source| DataError::Parse {
+        path: path.to_owned(),
         source: Box::new(source),
     })?;
     if file.version() != T::VERSION {
         return Err(DataError::Version {
-            path,
+            path: path.to_owned(),
             found: file.version(),
             expected: T::VERSION,
         });

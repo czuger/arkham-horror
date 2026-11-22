@@ -38,7 +38,7 @@ pub use cards::{
     RumorEnd, Scope, TableRow, Timing, Weapon, WeaponKind,
 };
 pub use data_error::DataError;
-pub use data_file::{DataFile, read_data_file};
+pub use data_file::{DataFile, parse_data_file, read_data_file, read_text};
 pub use deck::Deck;
 pub use dimension_symbol::DimensionSymbol;
 pub use game_data::GameData;

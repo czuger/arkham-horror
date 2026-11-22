@@ -6,7 +6,7 @@ use crate::ancient_one::AncientOnes;
 use crate::board::Board;
 use crate::cards::{GateCards, InvestigatorCards, LocationCards, MythosCards};
 use crate::data_error::DataError;
-use crate::data_file::read_data_file;
+use crate::data_file::{DataFile, parse_data_file, read_text};
 use crate::gate_marker::GateMarkers;
 use crate::investigator::Investigators;
 use crate::monster::Monsters;
@@ -51,16 +51,33 @@ impl GameData {
     /// Any [`DataError`]: unreadable or malformed file, unsupported version,
     /// or [`DataError::Invalid`] with every inconsistency found.
     pub fn load(data_dir: &Path) -> Result<Self, DataError> {
+        Self::load_with(|file_name| read_text(&data_dir.join(file_name)))
+    }
+
+    /// Loads every file through `read` and runs the consistency checks.
+    ///
+    /// # Arguments
+    ///
+    /// * `read` - gives the text of a data file from its name (`board.ron`…),
+    ///   for data that does not sit in a folder (files built into a program).
+    ///
+    /// # Errors
+    ///
+    /// Any error from `read`, a malformed file, an unsupported version, or
+    /// [`DataError::Invalid`] with every inconsistency found.
+    pub fn load_with(
+        mut read: impl FnMut(&str) -> Result<String, DataError>,
+    ) -> Result<Self, DataError> {
         let data = Self {
-            board: read_data_file(data_dir)?,
-            gate_markers: read_data_file(data_dir)?,
-            monsters: read_data_file(data_dir)?,
-            investigators: read_data_file(data_dir)?,
-            ancient_ones: read_data_file(data_dir)?,
-            location_cards: read_data_file(data_dir)?,
-            gate_cards: read_data_file(data_dir)?,
-            mythos_cards: read_data_file(data_dir)?,
-            investigator_cards: read_data_file(data_dir)?,
+            board: load_file(&mut read)?,
+            gate_markers: load_file(&mut read)?,
+            monsters: load_file(&mut read)?,
+            investigators: load_file(&mut read)?,
+            ancient_ones: load_file(&mut read)?,
+            location_cards: load_file(&mut read)?,
+            gate_cards: load_file(&mut read)?,
+            mythos_cards: load_file(&mut read)?,
+            investigator_cards: load_file(&mut read)?,
         };
         data.check()?;
         Ok(data)
@@ -101,6 +118,14 @@ impl GameData {
         check_investigator_cards(self, &mut issues);
         issues
     }
+}
+
+/// Reads and parses the data file `T` through `read`.
+fn load_file<T: DataFile>(
+    read: &mut impl FnMut(&str) -> Result<String, DataError>,
+) -> Result<T, DataError> {
+    let text = read(T::FILE_NAME)?;
+    parse_data_file(Path::new(T::FILE_NAME), &text)
 }
 
 /// Turns a list of issues into `Ok` when empty, [`DataError::Invalid`] otherwise.

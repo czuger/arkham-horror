@@ -5,5 +5,5 @@
     {% for line in journal.older.iter().rev() %}{% let class = "old" %}{% include "journal/line.html" %}{% endfor %}
     {% if journal.truncated %}<li class="old">…</li>{% endif %}
   </ol>
-  <p class="tools"><a href="/partie/{{ id }}/journal">Journal complet</a></p>
+  <p class="tools"><a href="partie/{{ id }}/journal">Journal complet</a></p>
 </section>

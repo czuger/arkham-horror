@@ -1,5 +1,6 @@
 use askama::Template;
 use axum::extract::{Path, State};
+use axum::http::Uri;
 use axum::response::Html;
 use data::SheetMarkers;
 use engine::{View, inspect};
@@ -7,6 +8,7 @@ use engine::{View, inspect};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::play_mode::PlayMode;
+use crate::relative_path::root_of;
 use crate::session::Session;
 use crate::views::{HandZones, InvestigatorMat, SheetDecision, on_sheet, sheet};
 
@@ -14,6 +16,7 @@ use crate::views::{HandZones, InvestigatorMat, SheetDecision, on_sheet, sheet};
 #[template(path = "investigator.html")]
 struct InvestigatorPage {
     htmx: bool,
+    root: String,
     id: i64,
     markers: SheetMarkers,
     tabs: Vec<Tab>,
@@ -39,11 +42,12 @@ struct Tab {
 /// template fails.
 pub async fn investigators(
     State(state): State<AppState>,
+    uri: Uri,
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
     let seat = session.player_seat();
-    page(&state, session, seat)
+    page(&state, &uri, session, seat)
 }
 
 /// One investigator's page: sheet with its sliders, tokens, trophies and
@@ -56,14 +60,20 @@ pub async fn investigators(
 /// or the template fails.
 pub async fn investigator(
     State(state): State<AppState>,
+    uri: Uri,
     Path((id, seat)): Path<(i64, usize)>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
-    page(&state, session, seat)
+    page(&state, &uri, session, seat)
 }
 
 /// Renders the page of the investigator at `seat`.
-fn page(state: &AppState, session: Session, seat: usize) -> Result<Html<String>, AppError> {
+fn page(
+    state: &AppState,
+    uri: &Uri,
+    session: Session,
+    seat: usize,
+) -> Result<Html<String>, AppError> {
     let id = session.id;
     let mode = session.mode();
     let decision = session
@@ -75,6 +85,7 @@ fn page(state: &AppState, session: Session, seat: usize) -> Result<Html<String>,
         let sheet = sheet(view.data(), &inv.id)?;
         Some(InvestigatorPage {
             htmx: state.htmx,
+            root: root_of(uri.path()),
             id,
             markers: state.data.investigators.markers.clone(),
             tabs: tabs(view, seat, mode),

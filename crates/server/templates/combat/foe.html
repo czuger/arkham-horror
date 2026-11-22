@@ -1,8 +1,8 @@
 <section class="foe">
   <h2><span class="tip" tabindex="0">{{ foe.token.name }}{{ foe.token.tip|safe }}</span></h2>
   <div class="foe-faces">
-    <span class="foe-face" style="background-image: url('/assets/{{ foe.token.image }}')" role="img" aria-label="{{ foe.token.name }}, face de combat"></span>
-    <span class="foe-face back" style="background-image: url('/assets/{{ foe.token.image }}')" role="img" aria-label="{{ foe.token.name }}, face de mouvement"></span>
+    <span class="foe-face" style="background-image: url('assets/{{ foe.token.image }}')" role="img" aria-label="{{ foe.token.name }}, face de combat"></span>
+    <span class="foe-face back" style="background-image: url('assets/{{ foe.token.image }}')" role="img" aria-label="{{ foe.token.name }}, face de mouvement"></span>
   </div>
   <ul class="facts">{% for line in foe.stats %}<li>{{ line }}</li>{% endfor %}</ul>
   <ul class="facts dice-odds">{% for line in foe.dice %}<li>{{ line }}</li>{% endfor %}</ul>

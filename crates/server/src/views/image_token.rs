@@ -6,7 +6,7 @@ use crate::views::tip::Tip;
 pub struct ImageToken {
     /// French name.
     pub name: String,
-    /// Image path under `/assets/` (empty when there is none).
+    /// Image path under `assets/` (empty when there is none).
     pub image: String,
     /// Bubble shown on hover.
     pub tip: Tip,

@@ -2,9 +2,9 @@
 {% block title %}{{ track.name }} — Horreur à Arkham{% endblock %}
 {% block content %}
 <h1>{{ track.name }}</h1>
-<p><a href="/partie/{{ id }}">Retour à la partie</a></p>
+<p><a href="partie/{{ id }}">Retour à la partie</a></p>
 <div class="doom-sheet">
-  <img src="/assets/{{ track.sheet }}" alt="Fiche de {{ track.name }}">
-  {% for (left, top) in track.tokens %}<img class="doom" src="/assets/{{ track.marker }}" alt="Destin" style="left: {{ left }}; top: {{ top }}">{% endfor %}
+  <img src="assets/{{ track.sheet }}" alt="Fiche de {{ track.name }}">
+  {% for (left, top) in track.tokens %}<img class="doom" src="assets/{{ track.marker }}" alt="Destin" style="left: {{ left }}; top: {{ top }}">{% endfor %}
 </div>
 {% endblock %}

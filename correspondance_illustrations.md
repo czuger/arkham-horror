@@ -66,36 +66,36 @@ Sur l’image du plateau, la première zone de chaque monde se trouve en bas et 
 
 ## Monstres
 
-Les liens vers les jetons d’origine suivent [monsters.ron](data/monsters.ron). Le suffixe `-v2` désigne un portrait issu d’un prompt révisé.
+Les jetons d’origine sont référencés dans [monsters.ron](data/monsters.ron). Chaque portrait PNG porte l’identifiant du monstre.
 
-| Monstre | Jeton original | Nouveau portrait | Portrait révisé |
-| --- | --- | --- | --- |
-| Byakhee | [byakhee.jpg](assets/monstres/byakhee.jpg) | [byakhee.png](illustrations/monstres/byakhee.png) | — |
-| Chien de Tindalos | [chien_de_tindalos.jpg](assets/monstres/chien_de_tindalos.jpg) | [hound_of_tindalos.png](illustrations/monstres/hound_of_tindalos.png) | — |
-| Chose Très Ancienne | [chose_tres_ancienne.jpg](assets/monstres/chose_tres_ancienne.jpg) | [elder_thing.png](illustrations/monstres/elder_thing.png) | — |
-| Chthonien | [chthonien.jpg](assets/monstres/chthonien.jpg) | [chthonian.png](illustrations/monstres/chthonian.png) | — |
-| Cultiste | [cultiste.jpg](assets/monstres/cultiste.jpg) | [cultist.png](illustrations/monstres/cultist.png) | [cultist-v2.png](illustrations/monstres/cultist-v2.png) |
-| Dhole | [dhole.jpg](assets/monstres/dhole.jpg) | [dhole.png](illustrations/monstres/dhole.png) | — |
-| Dieu de la Langue Sanglante | [dieu_de_la_langue_sanglante.jpg](assets/monstres/dieu_de_la_langue_sanglante.jpg) | [god_of_the_bloody_tongue.png](illustrations/monstres/god_of_the_bloody_tongue.png) | — |
-| Fantôme | [fantome.jpg](assets/monstres/fantome.jpg) | [ghost.png](illustrations/monstres/ghost.png) | — |
-| Goule | [goule.jpg](assets/monstres/goule.jpg) | [ghoul.png](illustrations/monstres/ghoul.png) | — |
-| Grand Prêtre | [grand_pretre.jpg](assets/monstres/grand_pretre.jpg) | [high_priest.png](illustrations/monstres/high_priest.png) | — |
-| Gug | [gug.jpg](assets/monstres/gug.jpg) | [gug.png](illustrations/monstres/gug.png) | — |
-| La Femme Boursouflée | [la_femme_boursouflee.jpg](assets/monstres/la_femme_boursouflee.jpg) | [the_bloated_woman.png](illustrations/monstres/the_bloated_woman.png) | — |
-| Larve Amorphe | [larve_amorphe.jpg](assets/monstres/larve_amorphe.jpg) | [formless_spawn.png](illustrations/monstres/formless_spawn.png) | — |
-| Larve Stellaire | [larve_stellaire.jpg](assets/monstres/larve_stellaire.jpg) | [star_spawn.png](illustrations/monstres/star_spawn.png) | — |
-| Le Pharaon Noir | [le_pharaon_noir.jpg](assets/monstres/le_pharaon_noir.jpg) | [the_black_pharaoh.png](illustrations/monstres/the_black_pharaoh.png) | — |
-| L’Homme en Noir | [lhomme_en_noir.jpg](assets/monstres/lhomme_en_noir.jpg) | [the_black_man.png](illustrations/monstres/the_black_man.png) | — |
-| Maigre Bête de la Nuit | [maigre_bete_de_la_nuit.jpg](assets/monstres/maigre_bete_de_la_nuit.jpg) | [nightgaunt.png](illustrations/monstres/nightgaunt.png) | — |
-| Maniaque | [maniaque.jpg](assets/monstres/maniaque.jpg) | [maniac.png](illustrations/monstres/maniac.png) | [maniac-v2.png](illustrations/monstres/maniac-v2.png) |
-| Migo | [migo.jpg](assets/monstres/migo.jpg) | [mi_go.png](illustrations/monstres/mi_go.png) | — |
-| Polype Volant | [polype_volant.jpg](assets/monstres/polype_volant.jpg) | [flying_polyp.png](illustrations/monstres/flying_polyp.png) | — |
-| Shoggoth | [shoggoth.jpg](assets/monstres/shoggoth.jpg) | [shoggoth.png](illustrations/monstres/shoggoth.png) | — |
-| Sombre Rejeton | [sombre_rejeton.jpg](assets/monstres/sombre_rejeton.jpg) | [dark_young.png](illustrations/monstres/dark_young.png) | — |
-| Sorcier | [sorcier.jpg](assets/monstres/sorcier.jpg) | [warlock.png](illustrations/monstres/warlock.png) | — |
-| Sorcière | [sorciere.jpg](assets/monstres/sorciere.jpg) | [witch.webp](illustrations/monstres/witch.webp) | — |
-| Tourmenteur des Ténèbres | [tourmenteur_des_tenebres.jpg](assets/monstres/tourmenteur_des_tenebres.jpg) | [haunter_of_the_dark.png](illustrations/monstres/haunter_of_the_dark.png) | — |
-| Vagabond Dimensionnel | [vagabond_dimensionnel.jpg](assets/monstres/vagabond_dimensionnel.jpg) | [dimensional_shambler.png](illustrations/monstres/dimensional_shambler.png) | — |
-| Vampire | [vampire.jpg](assets/monstres/vampire.jpg) | [vampire.png](illustrations/monstres/vampire.png) | — |
-| Vampire de Feu | [vampire_de_feu.jpg](assets/monstres/vampire_de_feu.jpg) | [fire_vampire.png](illustrations/monstres/fire_vampire.png) | — |
-| Zombie | [zombie.jpg](assets/monstres/zombie.jpg) | [zombie.png](illustrations/monstres/zombie.png) | [zombie-v2.png](illustrations/monstres/zombie-v2.png) |
+| Monstre | Jeton original | Portrait retenu |
+| --- | --- | --- |
+| Byakhee | [byakhee.jpg](assets/monstres/byakhee.jpg) | [byakhee.png](illustrations/monstres/byakhee.png) |
+| Chien de Tindalos | [chien_de_tindalos.jpg](assets/monstres/chien_de_tindalos.jpg) | [hound_of_tindalos.png](illustrations/monstres/hound_of_tindalos.png) |
+| Chose Très Ancienne | [chose_tres_ancienne.jpg](assets/monstres/chose_tres_ancienne.jpg) | [elder_thing.png](illustrations/monstres/elder_thing.png) |
+| Chthonien | [chthonien.jpg](assets/monstres/chthonien.jpg) | [chthonian.png](illustrations/monstres/chthonian.png) |
+| Cultiste | [cultiste.jpg](assets/monstres/cultiste.jpg) | [cultist.png](illustrations/monstres/cultist.png) |
+| Dhole | [dhole.jpg](assets/monstres/dhole.jpg) | [dhole.png](illustrations/monstres/dhole.png) |
+| Dieu de la Langue Sanglante | [dieu_de_la_langue_sanglante.jpg](assets/monstres/dieu_de_la_langue_sanglante.jpg) | [god_of_the_bloody_tongue.png](illustrations/monstres/god_of_the_bloody_tongue.png) |
+| Fantôme | [fantome.jpg](assets/monstres/fantome.jpg) | [ghost.png](illustrations/monstres/ghost.png) |
+| Goule | [goule.jpg](assets/monstres/goule.jpg) | [ghoul.png](illustrations/monstres/ghoul.png) |
+| Grand Prêtre | [grand_pretre.jpg](assets/monstres/grand_pretre.jpg) | [high_priest.png](illustrations/monstres/high_priest.png) |
+| Gug | [gug.jpg](assets/monstres/gug.jpg) | [gug.png](illustrations/monstres/gug.png) |
+| La Femme Boursouflée | [la_femme_boursouflee.jpg](assets/monstres/la_femme_boursouflee.jpg) | [the_bloated_woman.png](illustrations/monstres/the_bloated_woman.png) |
+| Larve Amorphe | [larve_amorphe.jpg](assets/monstres/larve_amorphe.jpg) | [formless_spawn.png](illustrations/monstres/formless_spawn.png) |
+| Larve Stellaire | [larve_stellaire.jpg](assets/monstres/larve_stellaire.jpg) | [star_spawn.png](illustrations/monstres/star_spawn.png) |
+| Le Pharaon Noir | [le_pharaon_noir.jpg](assets/monstres/le_pharaon_noir.jpg) | [the_black_pharaoh.png](illustrations/monstres/the_black_pharaoh.png) |
+| L’Homme en Noir | [lhomme_en_noir.jpg](assets/monstres/lhomme_en_noir.jpg) | [the_black_man.png](illustrations/monstres/the_black_man.png) |
+| Maigre Bête de la Nuit | [maigre_bete_de_la_nuit.jpg](assets/monstres/maigre_bete_de_la_nuit.jpg) | [nightgaunt.png](illustrations/monstres/nightgaunt.png) |
+| Maniaque | [maniaque.jpg](assets/monstres/maniaque.jpg) | [maniac.png](illustrations/monstres/maniac.png) |
+| Migo | [migo.jpg](assets/monstres/migo.jpg) | [mi_go.png](illustrations/monstres/mi_go.png) |
+| Polype Volant | [polype_volant.jpg](assets/monstres/polype_volant.jpg) | [flying_polyp.png](illustrations/monstres/flying_polyp.png) |
+| Shoggoth | [shoggoth.jpg](assets/monstres/shoggoth.jpg) | [shoggoth.png](illustrations/monstres/shoggoth.png) |
+| Sombre Rejeton | [sombre_rejeton.jpg](assets/monstres/sombre_rejeton.jpg) | [dark_young.png](illustrations/monstres/dark_young.png) |
+| Sorcier | [sorcier.jpg](assets/monstres/sorcier.jpg) | [warlock.png](illustrations/monstres/warlock.png) |
+| Sorcière | [sorciere.jpg](assets/monstres/sorciere.jpg) | [witch.png](illustrations/monstres/witch.png) |
+| Tourmenteur des Ténèbres | [tourmenteur_des_tenebres.jpg](assets/monstres/tourmenteur_des_tenebres.jpg) | [haunter_of_the_dark.png](illustrations/monstres/haunter_of_the_dark.png) |
+| Vagabond Dimensionnel | [vagabond_dimensionnel.jpg](assets/monstres/vagabond_dimensionnel.jpg) | [dimensional_shambler.png](illustrations/monstres/dimensional_shambler.png) |
+| Vampire | [vampire.jpg](assets/monstres/vampire.jpg) | [vampire.png](illustrations/monstres/vampire.png) |
+| Vampire de Feu | [vampire_de_feu.jpg](assets/monstres/vampire_de_feu.jpg) | [fire_vampire.png](illustrations/monstres/fire_vampire.png) |
+| Zombie | [zombie.jpg](assets/monstres/zombie.jpg) | [zombie.png](illustrations/monstres/zombie.png) |
