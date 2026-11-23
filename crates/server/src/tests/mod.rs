@@ -4,3 +4,4 @@ mod old_games;
 mod pages;
 mod skill_adjustment;
 mod test_app;
+mod trading;

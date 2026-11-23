@@ -3,6 +3,8 @@
 use data::{CheckKind, MonsterId};
 use serde::{Deserialize, Serialize};
 
+use crate::decision::trade_offer::TradeOffer;
+
 /// Facts about a decision that the prompt only gives in words.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Context {
@@ -46,6 +48,9 @@ pub enum Context {
         /// Concentration left this Upkeep.
         remaining: u8,
     },
+    /// A trade between two investigators, as put together so far (boxed:
+    /// the largest context, carried by every decision).
+    Trade(Box<TradeOffer>),
 }
 
 /// Why investigator cards are picked.

@@ -24,7 +24,7 @@ mod view;
 pub use coverage::coverage_keys;
 pub use decision::{
     CardAim, Choice, Context, Decision, DecisionKind, DecisionOption, FirstOption, Replay,
-    Responder, Waiting,
+    Responder, TradeOffer, Waiting,
 };
 pub use engine_error::EngineError;
 pub use play::{Outcome, Status, play};

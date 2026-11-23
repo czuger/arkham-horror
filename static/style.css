@@ -250,6 +250,21 @@ main:has(.mat) { max-width: none; }
 }
 .stop-choice input:checked + img.slider { display: block; }
 .decision a.adjust-skills { display: block; margin-bottom: 0.4rem; }
+/* Trade page: both sides' items, ticked to change hands. */
+.trade { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+.trade-head, .trade-actions { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 760px) { .trade { grid-template-columns: 1fr; } }
+.trade h1 { font-size: 1.3rem; margin-top: 0; }
+.trade-side { background: #fffaf0; border: 1px solid #d8c9ad; border-radius: 8px; padding: 0.6rem 1rem 1rem; }
+.trade-side h2 { font-size: 1.1rem; margin: 0.2rem 0 0.5rem; }
+.trade-side input[type="number"] { width: 4.5rem; }
+.trade-card { position: relative; width: 140px; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; text-align: center; font-size: 0.8rem; cursor: pointer; padding: 4px; border: 3px solid transparent; border-radius: 9px; }
+.trade-card > img { width: 128px; height: 197px; object-fit: contain; border-radius: 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+.trade-card .card-name { display: flex; align-items: center; justify-content: center; width: 128px; height: 197px; box-sizing: border-box; border: 1px solid #7a6b58; border-radius: 6px; background: #fff; padding: 0.3rem; }
+.trade-card .card-title { font-weight: bold; }
+.trade-card > input { position: absolute; top: 8px; left: 8px; width: 1.2rem; height: 1.2rem; }
+.trade-card:has(input:checked) { border-color: #b08850; background: #f3e4c4; }
+.decision a.trading { display: inline-block; }
 @keyframes stop-pulse { from { box-shadow: 0 0 2px #e0a800; } to { box-shadow: 0 0 10px #ffcc00; } }
 .mat-tokens { grid-area: tokens; display: flex; flex-direction: column; gap: 0.6rem; }
 .pile .tokens { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 2rem; }

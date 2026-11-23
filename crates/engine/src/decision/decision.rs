@@ -46,6 +46,10 @@ pub enum DecisionKind {
     CloseGate,
     /// Arbitration by the first player.
     Arbitration,
+    /// Put together a trade with another investigator.
+    Trade,
+    /// Accept or refuse the trade another investigator proposes.
+    AcceptTrade,
 }
 
 /// A choice someone must make before the game can go on.

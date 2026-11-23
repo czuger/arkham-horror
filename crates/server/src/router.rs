@@ -34,6 +34,10 @@ pub fn build_router(state: AppState) -> Router {
             "/partie/{id}/ajustement",
             get(routes::skill_adjustment).post(routes::adjust_skills),
         )
+        .route(
+            "/partie/{id}/echange",
+            get(routes::trade).post(routes::propose_trade),
+        )
         .route("/partie/{id}/investigateurs", get(routes::investigators))
         .route(
             "/partie/{id}/investigateurs/{seat}",

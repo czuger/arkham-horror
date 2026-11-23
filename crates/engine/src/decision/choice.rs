@@ -51,4 +51,12 @@ pub enum Choice {
     Gate(LocationId),
     /// Pick a number.
     Number(u32),
+    /// In a trade: give this item.
+    Give(CardId),
+    /// In a trade: take this item from the other investigator.
+    Take(CardId),
+    /// In a trade: give this many dollars in all.
+    GiveMoney(u16),
+    /// In a trade: take this many dollars in all.
+    TakeMoney(u16),
 }

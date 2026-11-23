@@ -11,6 +11,8 @@
     <a class="adjust-skills button" href="partie/{{ id }}/ajustement">Ajuster les compétences</a>
     <button type="submit" name="choix" value="{{ keep }}">Passer : ne rien changer</button>
   </form>
+  {% else if decision.trading %}
+  <p><a class="trading button" href="partie/{{ id }}/echange">Aller à la page de l'échange</a></p>
   {% else if decision.in_combat %}
   <p><a class="in-combat button" href="partie/{{ id }}/combat">Aller à la page du combat</a></p>
   {% else %}

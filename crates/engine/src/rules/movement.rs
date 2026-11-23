@@ -70,7 +70,9 @@ impl Game<'_> {
             let place = self.inv(seat).place.clone();
             let points = self.scratch.movement_points;
             let usable = self.usable_abilities(seat, &movement_timing)?;
-            let options = self.movement_options(seat, &place, points, &usable);
+            let mut options = self.movement_options(seat, &place, points, &usable);
+            // Last, so that the answers of older games keep their meaning.
+            options.extend(self.trade_options(seat)?);
             let prompt = format!(
                 "Mouvement depuis {} ({points} point(s))",
                 self.place_name(&place)
@@ -94,6 +96,7 @@ impl Game<'_> {
                         self.use_ability(seat, &entry.card, entry.ability)?;
                     }
                 }
+                Choice::Investigator(partner) => self.trade(seat, partner)?,
                 _ => {
                     self.face_monsters_here(seat, &mut evaded)?;
                     break;

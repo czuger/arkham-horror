@@ -7,6 +7,7 @@ mod gates;
 mod investigator_powers;
 mod monsters;
 mod status;
+mod trading;
 mod turn;
 
 use std::collections::VecDeque;

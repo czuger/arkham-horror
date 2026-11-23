@@ -1,0 +1,5 @@
+<label class="trade-card tip" tabindex="0">
+  <input type="checkbox" name="{{ item.field }}" value="{{ item.id }}">
+  {% if item.token.image.is_empty() %}<span class="card-name">{{ item.token.name }}</span>{% else %}<img src="assets/{{ item.token.image }}" alt="{{ item.token.name }}"><span class="card-title">{{ item.token.name }}</span>{% endif %}
+  {{ item.token.tip|safe }}
+</label>

@@ -26,6 +26,7 @@ mod spot;
 mod status_view;
 mod tip;
 mod tips;
+mod trade_view;
 
 pub use board_view::BoardView;
 pub use combat_span::CombatSpan;
@@ -44,3 +45,4 @@ pub use scene_view::{SceneRequest, SceneView};
 pub use sheet_decision::{SheetDecision, on_sheet, prepares_combat};
 pub use skill_adjustment::{SkillAdjustment, adjusts_skills};
 pub use status_view::StatusView;
+pub use trade_view::{TradeView, is_trade};

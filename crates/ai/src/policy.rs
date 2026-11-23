@@ -60,6 +60,9 @@ impl Policy {
             (DecisionKind::UseAbility, _) => self.ability(view, seat, decision),
             (DecisionKind::ReturnThroughGate, _) => choices::return_gate(view, seat, decision),
             (DecisionKind::Arbitration, _) => choices::arbitration(view, decision),
+            // The AI never proposes a trade, and accepts every one proposed.
+            (DecisionKind::Trade, _) => decision.find(&engine::Choice::Done).unwrap_or(0),
+            (DecisionKind::AcceptTrade, _) => decision.find(&engine::Choice::Yes).unwrap_or(0),
             _ => choices::best_effects(view, seat, decision)
                 .or_else(|| decision.find(&engine::Choice::Yes))
                 .unwrap_or(0),

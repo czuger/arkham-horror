@@ -19,6 +19,7 @@ mod skill_moves;
 mod startup;
 #[cfg(test)]
 mod tests;
+mod trade_moves;
 mod views;
 
 use std::error::Error;

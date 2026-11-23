@@ -11,7 +11,7 @@ use crate::database::{Database, DatabaseError};
 use crate::game_row::GameContent;
 use crate::play_mode::{HUMAN_SEAT, PlayMode};
 use crate::progress::Progress;
-use crate::views::{CombatSpan, on_sheet};
+use crate::views::{CombatSpan, is_trade, on_sheet};
 
 /// What to do once the cards in hand are kept, sent with the answer that
 /// keeps them (so fighting is one click on the combat page).
@@ -114,11 +114,12 @@ impl Session {
     }
 
     /// Where the human answers the decision: the investigator's page for
-    /// the sliders, the combat page while facing a monster, the game page
-    /// otherwise.
+    /// the sliders, the trade page for a trade, the combat page while
+    /// facing a monster, the game page otherwise.
     pub fn decision_page(&self) -> String {
         match self.decision() {
             Some(decision) if on_sheet(decision) => format!("partie/{}/investigateurs", self.id),
+            Some(decision) if is_trade(decision) => format!("partie/{}/echange", self.id),
             Some(_) if self.in_combat() => format!("partie/{}/combat", self.id),
             _ => format!("partie/{}", self.id),
         }

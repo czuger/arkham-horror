@@ -4,6 +4,7 @@ use crate::views::image_token::ImageToken;
 use crate::views::names::{card, monster_name};
 use crate::views::sheet_decision::on_sheet;
 use crate::views::skill_adjustment::adjusts_skills;
+use crate::views::trade_view::is_trade;
 
 /// The decision the human must take, as a form.
 #[derive(Debug, Clone)]
@@ -28,6 +29,8 @@ pub struct DecisionView {
     /// The Upkeep skill adjustment: the answer that leaves the sliders as
     /// they are, the rest being set on the adjustment page.
     pub keep_skills: Option<usize>,
+    /// A trade being put together, on the trade page.
+    pub trading: bool,
 }
 
 /// A card that can be picked: the answer index, the card and the button text.
@@ -61,6 +64,7 @@ impl DecisionView {
             on_sheet: on_sheet(decision),
             in_combat: false,
             keep_skills: keep_skills(decision),
+            trading: is_trade(decision),
         }
     }
 

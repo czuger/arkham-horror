@@ -71,17 +71,21 @@ impl InvestigatorState {
 
     /// Removes one copy of a card. Returns whether one was found.
     pub fn remove_card(&mut self, card: &CardId) -> bool {
-        let Some(index) = self.cards.iter().position(|held| &held.card == card) else {
-            return false;
-        };
-        self.cards.remove(index);
+        self.take_card(card).is_some()
+    }
+
+    /// Takes one copy of a card away, as it stands (exhausted, tokens…), and
+    /// out of the hands if no copy is left for them.
+    pub fn take_card(&mut self, card: &CardId) -> Option<HeldCard> {
+        let index = self.cards.iter().position(|held| &held.card == card)?;
+        let held = self.cards.remove(index);
         let left = self.copies(card);
         if self.in_hand.iter().filter(|kept| *kept == card).count() > left
             && let Some(at) = self.in_hand.iter().position(|kept| kept == card)
         {
             self.in_hand.remove(at);
         }
-        true
+        Some(held)
     }
 
     /// Copies of a card held.

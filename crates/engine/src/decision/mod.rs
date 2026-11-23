@@ -8,8 +8,10 @@ mod context;
 )]
 mod decision;
 mod responder;
+mod trade_offer;
 
 pub use choice::Choice;
 pub use context::{CardAim, Context};
 pub use decision::{Decision, DecisionKind, DecisionOption};
 pub use responder::{FirstOption, Replay, Responder, Waiting};
+pub use trade_offer::TradeOffer;

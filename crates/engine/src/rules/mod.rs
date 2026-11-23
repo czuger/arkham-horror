@@ -39,6 +39,7 @@ pub(crate) mod rumors;
 pub(crate) mod special_effects;
 pub(crate) mod stats;
 pub(crate) mod status;
+pub(crate) mod trading;
 pub(crate) mod triggers;
 pub(crate) mod trophies;
 pub(crate) mod turn;

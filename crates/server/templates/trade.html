@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Échange — Horreur à Arkham{% endblock %}
+{% block content %}
+<nav class="seat-tabs">
+  <a href="partie/{{ id }}" class="back">Retour à la partie</a>
+</nav>
+<form class="trade" method="post" action="partie/{{ id }}/echange">
+<input type="hidden" name="coup" value="{{ trade.move_number }}">
+<section class="decision trade-head">
+  <h1>Échange entre {{ trade.trader }} et {{ trade.partner }}</h1>
+  <p class="hint">Cochez ce que vous donnez et ce que vous prenez, puis proposez l'échange.{% if partner_ai %} {{ trade.partner }} est joué par l'IA, qui accepte toujours.{% endif %} Seuls l'argent, les Objets Communs et Uniques et les Sorts s'échangent.</p>
+</section>
+<section class="trade-side">
+  <h2>{{ trade.trader }} donne</h2>
+  <p><label>Argent : <input type="number" name="argent_donne" min="0" max="{{ trade.money }}" value="0"> $ sur {{ trade.money }} $</label></p>
+  {% if trade.give.is_empty() %}<p class="hint">Aucun objet à échanger.</p>{% endif %}
+  <div class="cards-row">
+    {% for item in trade.give %}{% include "trade/card.html" %}{% endfor %}
+  </div>
+</section>
+<section class="trade-side">
+  <h2>{{ trade.trader }} reçoit de {{ trade.partner }}</h2>
+  <p><label>Argent : <input type="number" name="argent_pris" min="0" max="{{ trade.partner_money }}" value="0"> $ sur {{ trade.partner_money }} $</label></p>
+  {% if trade.take.is_empty() %}<p class="hint">Aucun objet à échanger.</p>{% endif %}
+  <div class="cards-row">
+    {% for item in trade.take %}{% include "trade/card.html" %}{% endfor %}
+  </div>
+</section>
+<p class="trade-actions">
+  <button type="submit" name="action" value="proposer">Proposer l'échange</button>
+  <button type="submit" name="action" value="annuler" class="small">Annuler l'échange</button>
+</p>
+</form>
+{% if can_undo %}
+<form method="post" action="partie/{{ id }}/annuler" class="inline undo">
+  <button type="submit" class="small">Annuler le dernier coup</button>
+</form>
+{% endif %}
+{% endblock %}
