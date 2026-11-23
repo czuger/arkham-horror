@@ -11,7 +11,7 @@ use crate::database::{Database, DatabaseError};
 use crate::game_row::GameContent;
 use crate::play_mode::{HUMAN_SEAT, PlayMode};
 use crate::progress::Progress;
-use crate::views::{CombatSpan, is_trade, on_sheet};
+use crate::views::{CombatSpan, OtherWorldSpan, is_trade, on_sheet};
 
 /// What to do once the cards in hand are kept, sent with the answer that
 /// keeps them (so fighting is one click on the combat page).
@@ -102,13 +102,27 @@ impl Session {
 
     /// Where the human goes after a move, as a path from the application
     /// root without a leading `/`: the combat page when a combat of
-    /// theirs ended since their last answer, else [`Session::decision_page`].
+    /// theirs ended since their last answer, the Other World page when an
+    /// Other World encounter of theirs did, else [`Session::decision_page`].
     pub fn page(&self) -> String {
         let ended = self
             .combat()
             .is_some_and(|span| span.ended_since(self.progress.seen_events));
         if ended && !self.in_combat() {
             return format!("partie/{}/combat", self.id);
+        }
+        self.after_combat()
+    }
+
+    /// Where the human goes once a combat is over: the Other World page
+    /// when an Other World encounter of theirs ended since their last
+    /// answer, else [`Session::decision_page`].
+    pub fn after_combat(&self) -> String {
+        let encountered = self
+            .other_world()
+            .is_some_and(|span| span.ended_since(self.progress.seen_events));
+        if encountered {
+            return format!("partie/{}/autre-monde", self.id);
         }
         self.decision_page()
     }
@@ -152,6 +166,22 @@ impl Session {
                 CombatSpan::last_seat(&self.outcome.shown).unwrap_or_else(|| self.player_seat())
             }
         }
+    }
+
+    /// The seat whose Other World encounter is shown: the human's in a solo
+    /// game; in a hot-seat game, the one who had an encounter last.
+    pub fn other_world_seat(&self) -> usize {
+        match self.mode() {
+            PlayMode::Solo => HUMAN_SEAT,
+            PlayMode::HotSeat => {
+                OtherWorldSpan::last_seat(&self.outcome.shown).unwrap_or_else(|| self.player_seat())
+            }
+        }
+    }
+
+    /// The last Other World encounter of [`Session::other_world_seat`].
+    pub fn other_world(&self) -> Option<OtherWorldSpan> {
+        OtherWorldSpan::last(&self.outcome.shown, self.other_world_seat())
     }
 
     /// The last time the investigator at [`Session::combat_seat`] faced a

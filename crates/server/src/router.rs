@@ -30,6 +30,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/partie/{id}/journal", get(routes::journal))
         .route("/partie/{id}/combat", get(routes::combat))
         .route("/partie/{id}/grand-ancien", get(routes::ancient_one))
+        .route("/partie/{id}/autre-monde", get(routes::other_world))
         .route(
             "/partie/{id}/ajustement",
             get(routes::skill_adjustment).post(routes::adjust_skills),

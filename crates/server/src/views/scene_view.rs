@@ -228,7 +228,8 @@ fn place_picture(view: &View<'_, '_>, place: &Place) -> Picture {
     }
 }
 
-fn area_label(area: Area) -> &'static str {
+/// « Autre Monde, 1re zone » or « …, 2e zone ».
+pub fn area_label(area: Area) -> &'static str {
     match area {
         Area::First => "Autre Monde, 1re zone",
         Area::Second => "Autre Monde, 2e zone",
@@ -236,7 +237,11 @@ fn area_label(area: Area) -> &'static str {
 }
 
 /// The illustration of one area of an Other World.
-fn world_illustration(data: &GameData, world: &data::OtherWorldId, area: Area) -> Option<String> {
+pub fn world_illustration(
+    data: &GameData,
+    world: &data::OtherWorldId,
+    area: Area,
+) -> Option<String> {
     let world = data.board.other_world(world)?;
     Some(match area {
         Area::First => world.illustrations.first.clone(),

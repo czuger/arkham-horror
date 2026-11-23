@@ -481,6 +481,13 @@ main:has(.combat-page) { max-width: none; }
 .combat-page > .map { position: sticky; top: 0.5rem; }
 .combat-area { min-width: 0; }
 .combat-scene { grid-area: scene; position: sticky; top: 0.5rem; }
+/* Pause after an Other World encounter: the area's picture, then what happened. */
+.other-world { display: grid; grid-template-columns: minmax(0, 3fr) minmax(20rem, 2fr); gap: 1rem; align-items: start; }
+.other-world-scene .scene-picture { aspect-ratio: 16 / 9; }
+.other-world-side h1 { font-size: 1.3rem; margin-top: 0; }
+.other-world-side .journal { font-size: 1rem; }
+.other-world-side .drawn-card img { max-height: 22rem; width: auto; }
+@media (max-width: 900px) { .other-world { grid-template-columns: 1fr; } }
 .combat-scene .scene-picture { width: 100%; height: auto; aspect-ratio: 2 / 3; }
 .combat-foes .foe-face { width: 96px; height: 96px; }
 .combat-foes .facts { font-size: 0.9rem; }

@@ -155,7 +155,9 @@ fn attach(view: &View<'_, '_>, line: &mut JournalLine, what: &Exhibit) {
                 });
             }
         }
-        Exhibit::CombatEnd { .. } => {}
+        Exhibit::CombatEnd { .. }
+        | Exhibit::OtherWorldStart { .. }
+        | Exhibit::OtherWorldEnd { .. } => {}
     }
 }
 

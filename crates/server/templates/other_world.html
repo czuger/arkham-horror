@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ encounter.world }} — Horreur à Arkham{% endblock %}
+{% block content %}
+<nav class="seat-tabs">
+  <a href="partie/{{ id }}/journal">Journal complet</a>
+</nav>
+<div class="other-world">
+  <section class="scene other-world-scene" aria-label="L'Autre Monde">
+    <figure class="scene-picture">
+      {% if let Some(image) = encounter.image %}<img class="scene-image" src="{{ image }}" alt="{{ encounter.world }}">{% else %}<div class="scene-fallback"><p class="fallback-name">{{ encounter.world }}</p></div>{% endif %}
+      <figcaption class="scene-band"><h2>{{ encounter.world }}<small>{{ encounter.area }}</small></h2></figcaption>
+    </figure>
+  </section>
+  <section class="decision other-world-side">
+    <h1>{{ encounter.who }} — rencontre dans {{ encounter.world }}</h1>
+    <p>{{ encounter.who }} est maintenant à : {{ encounter.now_at }}.</p>
+    <p><a class="button primary" href="{{ next }}">Continuer la partie</a></p>
+    <ol class="journal">
+      {% for line in encounter.lines %}{% let class = "new" %}{% include "journal/line.html" %}{% endfor %}
+    </ol>
+  </section>
+</div>
+{% endblock %}

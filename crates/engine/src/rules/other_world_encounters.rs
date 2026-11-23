@@ -19,8 +19,14 @@ impl<'a> Game<'a> {
             if self.inv(seat).skipping_turn {
                 continue;
             }
-            if let Place::OtherWorld { world, .. } = self.inv(seat).place.clone() {
+            if let Place::OtherWorld { world, area } = self.inv(seat).place.clone() {
+                self.show(Exhibit::OtherWorldStart {
+                    seat,
+                    world: world.clone(),
+                    area,
+                });
                 self.catch_knock_out(seat, |game| game.other_world_encounter(seat, &world))?;
+                self.show(Exhibit::OtherWorldEnd { seat });
             }
         }
         Ok(())

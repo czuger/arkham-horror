@@ -61,7 +61,7 @@ pub async fn combat(
             hands: HandZones::new(view.data(), inv, decision),
             decision: decision
                 .map(|decision| CombatDecision::new(view, decision, session.move_number())),
-            next: session.decision_page(),
+            next: session.after_combat(),
             can_undo: !session.progress.human_moves.is_empty(),
         })
     });

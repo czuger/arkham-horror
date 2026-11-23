@@ -1,7 +1,9 @@
 //! What the journal shows beside its lines: cards drawn, dice rolled,
-//! combats begun and ended.
+//! combats and Other World encounters begun and ended.
 
-use data::{CardId, MonsterId};
+use data::{CardId, MonsterId, OtherWorldId};
+
+use crate::state::Area;
 
 /// Something worth showing next to a journal line.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -48,6 +50,20 @@ pub enum Exhibit {
         seat: usize,
         /// How it ended.
         end: CombatEnd,
+    },
+    /// An investigator's Other World encounter begins.
+    OtherWorldStart {
+        /// The investigator.
+        seat: usize,
+        /// The world.
+        world: OtherWorldId,
+        /// The area the investigator stands in.
+        area: Area,
+    },
+    /// That encounter is over, whatever came of it.
+    OtherWorldEnd {
+        /// The investigator.
+        seat: usize,
     },
 }
 

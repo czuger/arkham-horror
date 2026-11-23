@@ -1,6 +1,7 @@
 mod hand_zones;
 mod illustrated_pages;
 mod old_games;
+mod other_world_pause;
 mod pages;
 mod skill_adjustment;
 mod test_app;
