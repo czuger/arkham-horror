@@ -19,9 +19,11 @@
 //   (lieux, rues, Autres Mondes, cases spéciales ; à relire) ; `illustration` (lieux, rues) et `illustrations` (Autres Mondes,
 //   `first` = zone 1, `second` = zone 2) = illustration de la scène, relative au
 //   dossier `illustrations/` (voir `correspondance_illustrations.md`).
+// - Version 6 (22/11/2026) : `illustrations` sur les cases spéciales = visuels
+//   de la scène, l'un tiré au hasard (facultatif).
 #![enable(implicit_some)]
 Board(
-    version: 5,
+    version: 6,
     image: "plateau/arkham.jpg",
     icon_images: {
         Ally: "marqueurs/icones_rencontre/allie.png",
@@ -695,8 +697,11 @@ Board(
     special_areas: [
         (kind: Outskirts, name: "Périphérie", short_name: "Périphérie", position: (x: 520, y: 1515)),
         (kind: Sky, name: "Ciel", short_name: "Ciel", position: (x: 640, y: 1515)),
-        (kind: LostInTimeAndSpace, name: "Perdu dans le Temps et l'Espace", short_name: "Perdu", position: (x: 760, y: 1515)),
-        (kind: JailCell, name: "Cellule de Prison", short_name: "Prison", position: (x: 680, y: 425)),
+        (kind: LostInTimeAndSpace, name: "Perdu dans le Temps et l'Espace", short_name: "Perdu", position: (x: 760, y: 1515), illustrations: [
+            "zones_speciales/lost_in_time_and_space.png",
+            "zones_speciales/lost_in_time_and_space_house.png",
+        ]),
+        (kind: JailCell, name: "Cellule de Prison", short_name: "Prison", position: (x: 680, y: 425), illustrations: ["lieux/jail_cell.png"]),
     ],
     // Échelle de Terreur, en bas à gauche : centre de chaque case, de 0 à 10
     // (relevé le 21/11/2026 sur l'image du plateau).

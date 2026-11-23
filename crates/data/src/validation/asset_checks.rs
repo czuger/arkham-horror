@@ -56,6 +56,12 @@ pub(crate) fn cited_illustrations(data: &GameData) -> impl Iterator<Item = &str>
                 .iter()
                 .map(|monster| monster.portrait.as_str()),
         )
+        .chain(
+            board
+                .special_areas
+                .iter()
+                .flat_map(|area| area.illustrations.iter().map(String::as_str)),
+        )
 }
 
 /// Lists the image paths cited by the data files, relative to `assets/`.

@@ -40,16 +40,22 @@ fn every_illustration_exists_and_none_is_orphan() {
     let cited: BTreeSet<String> = data.illustrations().map(str::to_owned).collect();
     assert_eq!(
         cited.len(),
-        26 + 9 + 2 * 8 + 29,
+        26 + 9 + 2 * 8 + 29 + 2 + 1,
         "one illustration per entry"
     );
     let mut on_disk = BTreeSet::new();
-    for folder in ["lieux", "quartiers", "autres mondes", "monstres"] {
+    for folder in [
+        "lieux",
+        "quartiers",
+        "autres mondes",
+        "monstres",
+        "zones_speciales",
+    ] {
         let entries = std::fs::read_dir(dir.join(folder)).unwrap_or_else(|e| panic!("{e}"));
         for entry in entries {
             let name = entry.unwrap_or_else(|e| panic!("{e}")).file_name();
             let name = name.to_string_lossy();
-            if !name.starts_with('.') {
+            if name.ends_with(".png") {
                 on_disk.insert(format!("{folder}/{name}"));
             }
         }

@@ -1,4 +1,5 @@
 use crate::views::image_token::ImageToken;
+use crate::views::monster_danger::Danger;
 use crate::views::tip::Tip;
 
 /// One place of the board, with what stands there.
@@ -11,7 +12,7 @@ pub struct Spot {
     /// Investigators standing there.
     pub investigators: Vec<InvestigatorToken>,
     /// Monsters standing there.
-    pub monsters: Vec<ImageToken>,
+    pub monsters: Vec<SpotMonster>,
     /// The open gate, if any.
     pub gate: Option<ImageToken>,
     /// Clue tokens.
@@ -46,4 +47,13 @@ pub struct InvestigatorToken {
     pub initials: String,
     /// Whether it is the human's investigator.
     pub human: bool,
+}
+
+/// A monster on a spot: its name and how dangerous it is.
+#[derive(Debug, Clone)]
+pub struct SpotMonster {
+    /// French name.
+    pub name: String,
+    /// Its danger, from its current values.
+    pub danger: Danger,
 }

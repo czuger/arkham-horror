@@ -223,6 +223,7 @@ mod tests {
             name: String::new(),
             short_name: String::new(),
             position: ORIGIN,
+            illustrations: Vec::new(),
         }
     }
 

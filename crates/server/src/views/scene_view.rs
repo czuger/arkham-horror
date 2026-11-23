@@ -2,7 +2,7 @@
 //! with what stands there, the destinations offered, and the location cards
 //! just drawn.
 
-use data::{CardId, GameData, MonsterId};
+use data::{CardId, GameData, MonsterId, SpecialAreaKind};
 use engine::{Area, Choice, Decision, MonsterPlace, Place, View};
 
 use crate::illustrations::{IllustrationSize, illustration_url};
@@ -10,6 +10,7 @@ use crate::views::board_view::{BoardView, place_key, special_key};
 use crate::views::image_token::ImageToken;
 use crate::views::names::{ancient_one, card};
 use crate::views::scene_subject::SceneSubject;
+use crate::views::special_illustration::special_illustration;
 use crate::views::spot::{InvestigatorToken, Spot};
 use crate::views::tip::Tip;
 use crate::views::tips;
@@ -209,7 +210,15 @@ fn place_picture(view: &View<'_, '_>, place: &Place) -> Picture {
             Some(area_label(*area).to_owned()),
             world_illustration(data, world, *area).and_then(|path| large(&path)),
         ),
-        Place::LostInTimeAndSpace | Place::JailCell => (None, None),
+        Place::LostInTimeAndSpace => (
+            None,
+            special_illustration(view, SpecialAreaKind::LostInTimeAndSpace)
+                .and_then(|path| large(&path)),
+        ),
+        Place::JailCell => (
+            None,
+            special_illustration(view, SpecialAreaKind::JailCell).and_then(|path| large(&path)),
+        ),
     };
     Picture {
         title: view.place_name(place),
@@ -321,20 +330,24 @@ fn destinations(view: &View<'_, '_>, decision: &Decision) -> Vec<Destination> {
                 index,
                 label: option.label.clone(),
                 name: view.place_name(&place),
-                picture: thumbnail(view.data(), &place),
+                picture: thumbnail(view, &place),
             })
         })
         .collect()
 }
 
 /// The thumbnail of a place, if it has an illustration.
-fn thumbnail(data: &GameData, place: &Place) -> Option<String> {
+fn thumbnail(view: &View<'_, '_>, place: &Place) -> Option<String> {
+    let data = view.data();
     let board = &data.board;
     let path = match place {
         Place::Location(id) => board.location(id)?.illustration.clone(),
         Place::Street(id) => board.street(id)?.illustration.clone(),
         Place::OtherWorld { world, area } => world_illustration(data, world, *area)?,
-        Place::LostInTimeAndSpace | Place::JailCell => return None,
+        Place::LostInTimeAndSpace => {
+            special_illustration(view, SpecialAreaKind::LostInTimeAndSpace)?
+        }
+        Place::JailCell => special_illustration(view, SpecialAreaKind::JailCell)?,
     };
     Some(illustration_url(IllustrationSize::Thumbnail, &path))
 }

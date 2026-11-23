@@ -2,7 +2,7 @@
 
 Les originaux des lieux et des Autres Mondes se trouvent sur le [plateau d’Arkham](assets/plateau/arkham.jpg). Les coordonnées `(x, y)` sont les centres approximatifs relevés dans [board.ron](data/board.ron), en pixels depuis le coin supérieur gauche de l’image de 1064 × 1576 px.
 
-Depuis le 22/11/2026, chaque chemin est écrit dans les données : `illustration` pour les lieux et les rues et `illustrations: (first, second)` pour les Autres Mondes dans [board.ron](data/board.ron), `portrait` pour les monstres dans [monsters.ron](data/monsters.ron). Le test `every_illustration_exists_and_none_is_orphan` vérifie que chaque fichier existe et qu'aucun PNG n'est inutilisé. Le serveur en fait au build des copies JPEG réduites (`grand`, 1280 px, et `vignette`, 320 px) : 21,5 Mo au lieu de 186.
+Depuis le 22/11/2026, chaque chemin est écrit dans les données : `illustration` pour les lieux et les rues et `illustrations: (first, second)` pour les Autres Mondes dans [board.ron](data/board.ron), `portrait` pour les monstres dans [monsters.ron](data/monsters.ron). Le test `every_illustration_exists_and_none_is_orphan` vérifie que chaque fichier existe et qu'aucun PNG n'est inutilisé. Les textes de commande des images sont dans [illustrations/prompts](illustrations/prompts), un fichier par image, nommé comme elle. Le serveur en fait au build des copies JPEG réduites (`grand`, 1280 px, et `vignette`, 320 px) : 21,5 Mo au lieu de 186.
 
 ## Lieux
 
@@ -65,6 +65,15 @@ Sur l’image du plateau, la première zone de chaque monde se trouve en bas et 
 | Cité de la Grande Race | `(955, 1105)` | [city_of_the_great_race.png](illustrations/autres%20mondes/city_of_the_great_race.png) | `(955, 1025)` | [city_of_the_great_race_2.png](illustrations/autres%20mondes/city_of_the_great_race_2.png) |
 | Les Abysses | `(955, 1305)` | [abyss.png](illustrations/autres%20mondes/abyss.png) | `(955, 1225)` | [abyss_2.png](illustrations/autres%20mondes/abyss_2.png) |
 | Une Autre Dimension | `(955, 1500)` | [another_dimension.png](illustrations/autres%20mondes/another_dimension.png) | `(955, 1420)` | [another_dimension_2.png](illustrations/autres%20mondes/another_dimension_2.png) |
+
+## Cases spéciales
+
+Depuis le 22/11/2026 (`board.ron` version 6), une case spéciale peut avoir plusieurs visuels (`illustrations: [...]`). La scène en tire un au hasard, qui reste le même pendant tout le tour.
+
+| Case | Centre sur le plateau | Illustrations |
+| --- | --- | --- |
+| Cellule de Prison | `(680, 425)` | [jail_cell.png](illustrations/lieux/jail_cell.png) |
+| Perdu dans le Temps et l’Espace | `(760, 1515)` | [lost_in_time_and_space.png](illustrations/zones_speciales/lost_in_time_and_space.png), [lost_in_time_and_space_house.png](illustrations/zones_speciales/lost_in_time_and_space_house.png) |
 
 ## Monstres
 

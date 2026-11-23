@@ -37,10 +37,10 @@
         {% for space in map.spaces %}
         {% if space.is_offered() %}
         {% for (index, label) in space.offered %}
-        <button type="submit" form="decision" name="choix" value="{{ index }}" class="map-target offered tip" style="left: {{ space.left }}; top: {{ space.top }}" aria-label="{{ label }}">{{ space.tip|safe }}</button>
+        <button type="submit" form="decision" name="choix" value="{{ index }}" class="map-target offered tip{% if space.east() %} east{% endif %}" style="left: {{ space.left }}; top: {{ space.top }}; --room: {{ space.bubble_room() }}" aria-label="{{ label }}">{{ space.tip|safe }}</button>
         {% endfor %}
         {% else %}
-        <a class="map-target tip" href="partie/{{ map.game }}?voir={{ space.key }}" style="left: {{ space.left }}; top: {{ space.top }}" aria-label="Voir : {{ space.name }}">{{ space.tip|safe }}</a>
+        <a class="map-target tip{% if space.east() %} east{% endif %}" href="partie/{{ map.game }}?voir={{ space.key }}" style="left: {{ space.left }}; top: {{ space.top }}; --room: {{ space.bubble_room() }}" aria-label="Voir : {{ space.name }}">{{ space.tip|safe }}</a>
         {% endif %}
         {% endfor %}
       </div>

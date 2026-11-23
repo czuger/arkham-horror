@@ -4,6 +4,8 @@ use data::{AncientOne, CardId, GameData, Investigator, InvestigatorId, MonsterId
 use engine::View;
 
 use crate::views::image_token::ImageToken;
+use crate::views::monster_danger::Danger;
+use crate::views::spot::SpotMonster;
 use crate::views::tip::Tip;
 use crate::views::tips;
 
@@ -43,18 +45,16 @@ pub fn monster(view: &View<'_, '_>, id: &MonsterId) -> Option<ImageToken> {
         })
 }
 
-/// A monster on the board: name, token image, and a bubble with its
-/// movement values and both sides of its token.
-pub fn monster_on_board(view: &View<'_, '_>, id: &MonsterId) -> Option<ImageToken> {
+/// A monster on the board: its name and how dangerous it is now.
+pub fn monster_on_board(view: &View<'_, '_>, id: &MonsterId) -> Option<SpotMonster> {
     view.data()
         .monsters
         .monsters
         .iter()
         .find(|monster| &monster.id == id)
-        .map(|monster| ImageToken {
+        .map(|monster| SpotMonster {
             name: monster.name.clone(),
-            image: monster.image.clone(),
-            tip: tips::monster_movement_side(view, monster),
+            danger: Danger::of(&tips::current_stats(view, monster)),
         })
 }
 

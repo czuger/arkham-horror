@@ -350,7 +350,7 @@ form.undo { margin-top: 0.5rem; }
 /* Symbolic map (SVG drawn by the server, same coordinates as board.ron). */
 .map { position: relative; }
 .map-frame { position: relative; display: flex; flex-direction: column; gap: 0.3rem; }
-.map-board { position: relative; width: 100%; aspect-ratio: 1064 / 1576; }
+.map-board { position: relative; width: 100%; aspect-ratio: 1064 / 1576; container-type: inline-size; }
 .map-drawing { display: block; width: 100%; height: 100%; }
 .map-ground { fill: #1d1712; }
 .map-drawing text { font-family: Georgia, "Times New Roman", serif; text-anchor: middle; }
@@ -391,7 +391,10 @@ form.undo { margin-top: 0.5rem; }
 .map-target.offered { border: 2px solid #ffe066; animation: offered-glow 1.6s ease-in-out infinite; }
 @keyframes offered-glow { 50% { box-shadow: 0 0 0 4px rgba(255, 224, 102, 0.55); } }
 .map-target:hover, .map-target:focus-within { z-index: 10; }
-.map-target > .bubble { top: 0; left: calc(100% + 6px); transform: none; }
+.map-target > .bubble { top: 0; left: calc(100% + 6px); transform: none; box-sizing: border-box; max-width: min(20rem, var(--room)); }
+.map-target > .place-bubble { width: min(20rem, var(--room)); }
+/* Right half of the map: the bubble opens to the left, inside the map. */
+.map-target.east > .bubble { left: auto; right: calc(100% + 6px); }
 /* Enlarged: the same map over the page; the checkbox works without JS. */
 .map-zoom-toggle { position: absolute; opacity: 0; pointer-events: none; }
 .map-zoom { align-self: flex-start; }

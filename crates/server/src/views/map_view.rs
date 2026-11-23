@@ -85,6 +85,21 @@ impl MapSpace {
     pub fn is_offered(&self) -> bool {
         !self.offered.is_empty()
     }
+
+    /// Whether the place is on the right half of the map, where its bubble
+    /// opens to the left so that the map's edge does not hide it.
+    pub fn east(&self) -> bool {
+        f64::from(self.x) > BOARD_SIZE.0 / 2.0
+    }
+
+    /// The widest its bubble may be: the room between the place and the
+    /// map's edge on the side it opens to, in units of the map's width.
+    pub fn bubble_room(&self) -> String {
+        let x = f64::from(self.x) * 100.0 / BOARD_SIZE.0;
+        // Half a target (7 % of the map) and a small gap stand in between.
+        let room = x.max(100.0 - x) - 3.5;
+        format!("calc({room:.2}cqw - 10px)")
+    }
 }
 
 /// The bubble of a place: a location's text and icons, or a plain bubble.
@@ -267,10 +282,13 @@ fn present(spot: &Spot) -> Vec<String> {
             }
         })
         .collect();
-    if !spot.monsters.is_empty() {
-        let names: Vec<&str> = spot.monsters.iter().map(|m| m.name.as_str()).collect();
-        lines.push(format!("Monstres : {}", names.join(", ")));
-    }
+    lines.extend(spot.monsters.iter().map(|monster| {
+        format!(
+            "Monstre : {}, danger {}",
+            monster.name,
+            monster.danger.gauge()
+        )
+    }));
     if let Some(gate) = &spot.gate {
         let modifier = gate.tip.lines.last().cloned().unwrap_or_default();
         lines.push(format!("{} ({modifier})", gate.name));

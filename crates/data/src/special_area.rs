@@ -29,4 +29,8 @@ pub struct SpecialArea {
     pub short_name: String,
     /// Display position on the board image.
     pub position: Position,
+    /// Scene illustrations, relative to the `illustrations/` folder; one is
+    /// picked at random. Empty when the area has none.
+    #[serde(default)]
+    pub illustrations: Vec<String>,
 }

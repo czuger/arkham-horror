@@ -175,9 +175,16 @@ async fn the_scene_shows_where_the_investigator_is() {
         assert!(scene.contains(words), "{words}");
     }
     let lost = scene_at(&data, &mut session, Place::LostInTimeAndSpace);
-    assert!(lost.contains("class=\"scene-fallback\""));
     assert!(lost.contains("Perdu dans le Temps"));
-    assert!(!lost.contains("scene-image"));
+    assert!(
+        lost.contains("src=\"illustrations/grand/zones_speciales/lost_in_time_and_space.jpg?v=")
+            || lost.contains(
+                "src=\"illustrations/grand/zones_speciales/lost_in_time_and_space_house.jpg?v="
+            ),
+        "{lost}"
+    );
+    let jail = scene_at(&data, &mut session, Place::JailCell);
+    assert!(jail.contains("src=\"illustrations/grand/lieux/jail_cell.jpg?v="));
     db.close().await;
 }
 

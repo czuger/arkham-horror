@@ -5,14 +5,13 @@ use data::{
 };
 use engine::{MonsterStats, View};
 
+use crate::views::monster_danger::Danger;
 use crate::views::names::{card, investigator_name, sheet};
 use crate::views::tip::Tip;
 
 /// A monster's values as they stand now, with its abilities and special text.
 pub fn monster(view: &View<'_, '_>, monster: &Monster) -> Tip {
-    let stats = view
-        .monster_stats(&monster.id)
-        .unwrap_or_else(|| printed(monster));
+    let stats = current_stats(view, monster);
     let abilities: Vec<String> = stats.abilities.iter().map(|a| a.label()).collect();
     Tip::new(monster.name.clone())
         .line(format!(
@@ -25,26 +24,19 @@ pub fn monster(view: &View<'_, '_>, monster: &Monster) -> Tip {
         .line(format!("Force {}", stats.toughness))
         .maybe(Some(abilities.join(", ")))
         .maybe(monster.special.clone())
+        .line(Danger::of(&stats).line())
         .picture(monster.image.clone())
 }
 
-/// A monster on the board: name, movement and awareness, and the token
-/// image (combat side, then movement side) at its own size.
-pub fn monster_movement_side(view: &View<'_, '_>, monster: &Monster) -> Tip {
-    let stats = view
-        .monster_stats(&monster.id)
-        .unwrap_or_else(|| printed(monster));
-    Tip::new(monster.name.clone())
-        .line(format!(
-            "Mouvement {} · Conscience {:+}",
-            stats.movement.label(),
-            stats.awareness
-        ))
-        .picture(monster.image.clone())
+/// A monster's values as they stand now; the printed ones when the engine
+/// cannot tell.
+pub fn current_stats(view: &View<'_, '_>, monster: &Monster) -> MonsterStats {
+    view.monster_stats(&monster.id)
+        .unwrap_or_else(|| printed(monster))
 }
 
 /// The values printed on a token, when the engine cannot tell the current ones.
-fn printed(monster: &Monster) -> MonsterStats {
+pub fn printed(monster: &Monster) -> MonsterStats {
     MonsterStats {
         awareness: i32::from(monster.awareness),
         horror: monster.horror,

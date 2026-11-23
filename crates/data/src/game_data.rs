@@ -119,8 +119,8 @@ impl GameData {
     ///
     /// # Returns
     ///
-    /// Locations, districts, both areas of each Other World and monster
-    /// portraits, in that order.
+    /// Locations, districts, both areas of each Other World, monster
+    /// portraits and special areas, in that order.
     pub fn illustrations(&self) -> impl Iterator<Item = &str> {
         cited_illustrations(self)
     }
