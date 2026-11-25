@@ -1,5 +1,6 @@
 //! Web server for the Arkham Horror adaptation: pages, forms and embedded database.
 
+mod ambiance;
 mod app_error;
 mod app_state;
 mod config;
@@ -7,6 +8,7 @@ mod database;
 mod embedded_files;
 mod game_row;
 mod illustrations;
+mod music_library;
 mod play_mode;
 mod progress;
 mod relative_path;

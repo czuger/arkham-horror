@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 const DEFAULT_ADDR: &str = "127.0.0.1:3000";
 const DB_FILE: &str = "arkham.db";
+const MUSIC_FOLDER: &str = "musiques";
 
 /// Server settings, read from environment variables.
 ///
@@ -13,16 +14,20 @@ const DB_FILE: &str = "arkham.db";
 /// | `ARKHAM_SOCKET` | unset: listen on TCP; set: listen on this Unix socket instead |
 /// | `ARKHAM_DATA_DIR` | unset: the current folder; persistent folder for the saved games |
 /// | `ARKHAM_DB` | `$ARKHAM_DATA_DIR/arkham.db`, or `arkham.db` without `ARKHAM_DATA_DIR` |
+/// | `ARKHAM_MUSIC_DIR` | `$ARKHAM_DATA_DIR/musiques`, or `musiques` without `ARKHAM_DATA_DIR` |
 ///
 /// The game data files (`data/`), the images (`assets/`) and the CSS and
 /// JavaScript files (`static/`) are built into the program; they are not
-/// settings. `ARKHAM_DATA_DIR` only holds what the server writes.
+/// settings. `ARKHAM_DATA_DIR` holds what the server writes, and the music
+/// (too big to build in), read at startup.
 #[derive(Debug, Clone)]
 pub struct Config {
     /// Where the server listens.
     pub listen: Listen,
     /// SQLite database file, created on first run.
     pub db_path: PathBuf,
+    /// The music folder: one subfolder of MP3 files per mood.
+    pub music_dir: PathBuf,
 }
 
 /// Where the server accepts connections.
@@ -57,6 +62,7 @@ impl Config {
         Ok(Self {
             listen: listen_from_env()?,
             db_path: db_path_from_env(),
+            music_dir: music_dir_from_env(),
         })
     }
 }
@@ -79,6 +85,16 @@ fn db_path_from_env() -> PathBuf {
     match env_value("ARKHAM_DATA_DIR") {
         Some(dir) => PathBuf::from(dir).join(DB_FILE),
         None => PathBuf::from(DB_FILE),
+    }
+}
+
+fn music_dir_from_env() -> PathBuf {
+    if let Some(dir) = env_value("ARKHAM_MUSIC_DIR") {
+        return dir.into();
+    }
+    match env_value("ARKHAM_DATA_DIR") {
+        Some(dir) => PathBuf::from(dir).join(MUSIC_FOLDER),
+        None => PathBuf::from(MUSIC_FOLDER),
     }
 }
 

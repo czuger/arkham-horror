@@ -4,6 +4,7 @@ use axum::http::Uri;
 use axum::response::{Html, IntoResponse, Response};
 use engine::inspect;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::{redirect_from, root_of};
@@ -14,6 +15,7 @@ use crate::views::OtherWorldView;
 #[template(path = "other_world.html")]
 struct OtherWorldPage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     encounter: OtherWorldView,
@@ -39,9 +41,11 @@ pub async fn other_world(
         return Ok(redirect_from(&uri, &session.decision_page()).into_response());
     };
     let seat = session.other_world_seat();
+    let ambiance = state.ambiance(&session, Screen::OtherWorld);
     let page = inspect(&state.data, &session.outcome.state, |view| {
         Some(OtherWorldPage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             encounter: OtherWorldView::new(view, seat, &session.outcome, &span)?,

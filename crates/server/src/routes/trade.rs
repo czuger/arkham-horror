@@ -8,6 +8,7 @@ use axum::response::{Html, IntoResponse, Redirect, Response};
 use data::CardId;
 use engine::inspect;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::{redirect_from, root_of};
@@ -19,6 +20,7 @@ use crate::views::{TradeView, is_trade};
 #[template(path = "trade.html")]
 struct TradePage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     trade: TradeView,
@@ -41,6 +43,7 @@ pub async fn trade(
     Path(id): Path<i64>,
 ) -> Result<Response, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
+    let ambiance = state.ambiance(&session, Screen::Other);
     let Some(decision) = session.decision().filter(|d| is_trade(d)) else {
         return Ok(redirect_from(&uri, &session.page()).into_response());
     };
@@ -52,6 +55,7 @@ pub async fn trade(
         };
         Some(TradePage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             trade,

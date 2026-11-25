@@ -4,6 +4,7 @@ use axum::http::Uri;
 use axum::response::Html;
 use engine::inspect;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::root_of;
@@ -14,6 +15,7 @@ use crate::views::{JournalLine, journal_lines};
 #[template(path = "journal.html")]
 struct JournalPage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     lines: Vec<JournalLine>,
@@ -32,6 +34,7 @@ pub async fn journal(
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
+    let ambiance = state.ambiance(&session, Screen::Other);
     let outcome = &session.outcome;
     let lines = inspect(&state.data, &outcome.state, |view| {
         journal_lines(
@@ -45,6 +48,7 @@ pub async fn journal(
     Ok(Html(
         JournalPage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             can_undo: !session.progress.human_moves.is_empty(),

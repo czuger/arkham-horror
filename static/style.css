@@ -27,6 +27,17 @@ h3 { font-size: 1rem; }
 }
 .top a { color: #f4efe4; text-decoration: none; }
 .top .brand { font-weight: bold; font-size: 1.2rem; }
+.top .music-toggle {
+  margin: 0 0 0 auto;
+  align-self: center;
+  background: transparent;
+  color: #f4efe4;
+  border-color: #8a7560;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.6rem;
+}
+.top .music-toggle:hover { background: #4a3a2a; }
+.top .music-toggle[aria-pressed="true"] { background: #6b2a12; border-color: #f0d9b5; }
 
 button, .button {
   font: inherit;

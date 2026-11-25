@@ -3,6 +3,7 @@ use axum::extract::{Path, State};
 use axum::http::Uri;
 use axum::response::Html;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::root_of;
@@ -13,6 +14,7 @@ use crate::views::DoomTrackView;
 #[template(path = "ancient_one.html")]
 struct AncientOnePage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     track: DoomTrackView,
@@ -30,11 +32,13 @@ pub async fn ancient_one(
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
+    let ambiance = state.ambiance(&session, Screen::Other);
     let track =
         DoomTrackView::new(&state.data, &session.outcome.state).ok_or(AppError::NotFound)?;
     Ok(Html(
         AncientOnePage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             track,

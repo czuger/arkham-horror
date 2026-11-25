@@ -10,6 +10,7 @@ use data::{AncientOneId, GameData, InvestigatorId};
 use engine::Setup;
 use serde::Deserialize;
 
+use crate::ambiance::Ambiance;
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::play_mode::PlayMode;
@@ -25,6 +26,7 @@ const DEFAULT_AIS: usize = 2;
 #[template(path = "new_game.html")]
 struct NewGamePage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     investigators: Vec<(String, String)>,
     ancient_ones: Vec<(String, String)>,
@@ -106,6 +108,7 @@ fn form_page(state: &AppState, uri: &Uri, error: String) -> Result<String, AppEr
     let data = &state.data;
     Ok(NewGamePage {
         htmx: state.htmx,
+        ambiance: Ambiance::Default,
         root: root_of(uri.path()),
         investigators: data
             .investigators

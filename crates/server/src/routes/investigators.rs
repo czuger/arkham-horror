@@ -5,6 +5,7 @@ use axum::response::Html;
 use data::SheetMarkers;
 use engine::{View, inspect};
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::play_mode::PlayMode;
@@ -16,6 +17,7 @@ use crate::views::{HandZones, InvestigatorMat, SheetDecision, on_sheet, sheet};
 #[template(path = "investigator.html")]
 struct InvestigatorPage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     markers: SheetMarkers,
@@ -76,6 +78,7 @@ fn page(
 ) -> Result<Html<String>, AppError> {
     let id = session.id;
     let mode = session.mode();
+    let ambiance = state.ambiance(&session, Screen::Other);
     let decision = session
         .decision()
         .filter(|decision| mode.human(seat) && decision.who == seat && on_sheet(decision));
@@ -85,6 +88,7 @@ fn page(
         let sheet = sheet(view.data(), &inv.id)?;
         Some(InvestigatorPage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             markers: state.data.investigators.markers.clone(),

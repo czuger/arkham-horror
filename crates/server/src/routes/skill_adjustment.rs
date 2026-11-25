@@ -6,6 +6,7 @@ use axum::response::{Html, IntoResponse, Redirect, Response};
 use engine::inspect;
 use serde::Deserialize;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::{redirect_from, root_of};
@@ -16,6 +17,7 @@ use crate::views::{SkillAdjustment, adjusts_skills};
 #[template(path = "skill_adjustment.html")]
 struct SkillAdjustmentPage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     slider: String,
@@ -50,12 +52,14 @@ pub async fn skill_adjustment(
     Path(id): Path<i64>,
 ) -> Result<Response, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
+    let ambiance = state.ambiance(&session, Screen::Other);
     let Some(decision) = session.decision().filter(|d| adjusts_skills(d)) else {
         return Ok(redirect_from(&uri, &session.page()).into_response());
     };
     let page = inspect(&state.data, &session.outcome.state, |view| {
         Some(SkillAdjustmentPage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             slider: state.data.investigators.markers.slider.clone(),

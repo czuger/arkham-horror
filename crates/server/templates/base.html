@@ -10,13 +10,18 @@
   {% if htmx %}<script src="static/htmx.min.js" defer></script>{% endif %}
   <script src="static/drag_drop.js" defer></script>
   <script src="static/skill_adjustment.js" defer></script>
+  {% if htmx %}<script src="static/navigation.js" defer></script>{% endif %}
+  <script src="static/musique.js" defer></script>
 </head>
-<body{% if htmx %} hx-boost="true"{% endif %}>
+{# htmx 4 only passes attributes down when marked « :inherited ». Every link
+    and form then swaps #contenu alone: the music player stays. #}
+<body{% if htmx %} hx-boost:inherited="true" hx-target:inherited="#contenu" hx-select:inherited="#contenu" hx-swap:inherited="outerHTML"{% endif %}>
   <header class="top">
     <a href="./" class="brand">Horreur à Arkham</a>
     <a href="nouvelle">Nouvelle partie</a>
+    <button type="button" id="musique" class="music-toggle" aria-pressed="false" title="Musique d'ambiance">♪ Musique</button>
   </header>
-  <main>
+  <main id="contenu" hx-history-elt data-ambiance="{{ ambiance }}">
     {% block content %}{% endblock %}
   </main>
 </body>

@@ -9,12 +9,22 @@ use data::{GameData, InvestigatorId, LocationId, OtherWorld, OtherWorldId, Stree
 use engine::{Area, Choice, DecisionKind, Place, Setup};
 use tower::ServiceExt;
 
+use crate::ambiance::Ambiance;
 use crate::database::Database;
 use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::play_mode::PlayMode;
-use crate::routes::game_page;
+use crate::routes::{Layout, game_page};
 use crate::session::Session;
 use crate::tests::test_app::{TestApp, move_number};
+
+/// The layout of a game page shown at `partie/<id>`, without htmx.
+fn layout() -> Layout {
+    Layout {
+        root: "../".to_owned(),
+        htmx: false,
+        ambiance: Ambiance::Default,
+    }
+}
 
 fn temp() -> tempfile::TempDir {
     tempfile::tempdir().expect("temp dir")
@@ -120,7 +130,7 @@ async fn the_map_offers_every_proposed_destination() {
         .map(|(index, _)| index)
         .collect();
     assert!(!places.is_empty());
-    let page = game_page(&data, &session, "../".to_owned(), false, None).expect("page");
+    let page = game_page(&data, &session, layout(), None).expect("page");
     let map = between(&page, "<section class=\"map\"", "</section>");
     assert!(map.contains("<svg"));
     for index in &places {
@@ -144,7 +154,7 @@ async fn the_map_offers_every_proposed_destination() {
 /// The scene of a game page whose investigator stands at `place`.
 fn scene_at(data: &GameData, session: &mut Session, place: Place) -> String {
     session.outcome.state.investigators[0].place = place;
-    let page = game_page(data, session, "../".to_owned(), false, None).expect("page");
+    let page = game_page(data, session, layout(), None).expect("page");
     between(&page, "<section class=\"scene", "</section>").to_owned()
 }
 

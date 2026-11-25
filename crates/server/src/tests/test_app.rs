@@ -12,6 +12,7 @@ use tower::ServiceExt;
 use crate::app_state::AppState;
 use crate::database::Database;
 use crate::embedded_files::load_game_data;
+use crate::music_library::MusicLibrary;
 use crate::router::build_router;
 
 /// A response: status, `Location` header and body.
@@ -28,14 +29,21 @@ pub struct TestApp {
 }
 
 impl TestApp {
-    /// Opens (or reopens) the application on a database file.
+    /// Opens (or reopens) the application on a database file, without
+    /// music.
     pub async fn open(db_path: &Path) -> Self {
+        Self::with_music(db_path, MusicLibrary::default()).await
+    }
+
+    /// Opens the application on a database file and a music library.
+    pub async fn with_music(db_path: &Path, music: MusicLibrary) -> Self {
         let data = Arc::new(load_game_data().expect("data"));
         let db = Database::open(db_path).await.expect("open");
         let state = AppState {
             db,
             data,
             htmx: false,
+            music: Arc::new(music),
         };
         Self {
             router: build_router(state),

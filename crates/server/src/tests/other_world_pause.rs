@@ -51,7 +51,7 @@ fn toward_a_gate(data: &GameData, session: &Session) -> usize {
 }
 
 /// Plays seed 3 until the human's next page is the Other World pause.
-async fn play_into_an_other_world(db: &Database, data: &GameData) {
+pub(crate) async fn play_into_an_other_world(db: &Database, data: &GameData) {
     let setup = Setup {
         seed: 3,
         players: 3,

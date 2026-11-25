@@ -3,6 +3,7 @@ use axum::extract::State;
 use axum::http::Uri;
 use axum::response::Html;
 
+use crate::ambiance::Ambiance;
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::game_row::GameRow;
@@ -12,6 +13,7 @@ use crate::relative_path::root_of;
 #[template(path = "home.html")]
 struct HomePage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     games: Vec<GameRow>,
 }
@@ -26,6 +28,7 @@ pub async fn home(State(state): State<AppState>, uri: Uri) -> Result<Html<String
     Ok(Html(
         HomePage {
             htmx: state.htmx,
+            ambiance: Ambiance::Default,
             root: root_of(uri.path()),
             games,
         }

@@ -1,5 +1,6 @@
 mod hand_zones;
 mod illustrated_pages;
+mod music;
 mod old_games;
 mod other_world_pause;
 mod pages;

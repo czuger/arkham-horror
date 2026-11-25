@@ -3,21 +3,32 @@ use axum::http::HeaderValue;
 use axum::http::header::HeaderName;
 use axum::middleware;
 use axum::routing::{get, post};
+use tower_http::services::ServeDir;
 use tower_http::set_header::SetResponseHeaderLayer;
 
+use crate::ambiance::Ambiance;
 use crate::app_state::AppState;
 use crate::embedded_files;
 use crate::illustrations;
 use crate::routes;
 use crate::same_origin::same_origin;
 
-/// Builds the application router: pages, forms, `robots.txt`, and the
-/// built-in images and static files.
+/// Builds the application router: pages, forms, `robots.txt`, the
+/// built-in images and static files, and the music.
 ///
 /// Every response carries `X-Robots-Tag: noindex, nofollow`; forms posted
 /// from another site are refused.
 pub fn build_router(state: AppState) -> Router {
-    Router::new()
+    let music_dir = state.music.dir.clone();
+    let router = Ambiance::ALL
+        .into_iter()
+        .fold(Router::new(), |router, ambiance| {
+            router.nest_service(
+                &format!("/musique/{ambiance}"),
+                ServeDir::new(music_dir.join(ambiance.folder())),
+            )
+        });
+    router
         .route("/", get(routes::home))
         .route(
             "/nouvelle",
@@ -44,6 +55,7 @@ pub fn build_router(state: AppState) -> Router {
             "/partie/{id}/investigateurs/{seat}",
             get(routes::investigator),
         )
+        .route("/musique/pistes", get(routes::music_tracks))
         .route("/robots.txt", get(routes::robots))
         .route("/assets/{*path}", get(embedded_files::asset))
         .route("/static/{*path}", get(embedded_files::static_file))

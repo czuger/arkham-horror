@@ -6,6 +6,7 @@ use data::{CardId, GameData, MonsterId};
 use engine::{Context, Deck, Exhibit, inspect};
 use serde::Deserialize;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::root_of;
@@ -19,6 +20,7 @@ use crate::views::{
 #[template(path = "game.html")]
 struct GamePage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     seed: u64,
@@ -54,22 +56,29 @@ pub async fn game(
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
     let root = root_of(uri.path());
-    let page = game_page(
-        &state.data,
-        &session,
+    let layout = Layout {
         root,
-        state.htmx,
-        query.voir.as_deref(),
-    );
+        htmx: state.htmx,
+        ambiance: state.ambiance(&session, Screen::Other),
+    };
+    let page = game_page(&state.data, &session, layout, query.voir.as_deref());
     Ok(Html(page?))
+}
+
+/// What every page needs besides its own content.
+pub(crate) struct Layout {
+    /// The way back to the site root, for `<base href>`.
+    pub root: String,
+    /// Whether the pages load htmx.
+    pub htmx: bool,
+    /// The music mood.
+    pub ambiance: Ambiance,
 }
 
 /// Renders the game page of a loaded game.
 ///
 /// # Arguments
 ///
-/// * `root` - the way back to the site root, for `<base href>`.
-/// * `htmx` - whether the pages load htmx.
 /// * `preview` - the key of a place to show in the scene instead of the
 ///   investigator's own; an unknown key is ignored.
 ///
@@ -79,8 +88,7 @@ pub async fn game(
 pub(crate) fn game_page(
     data: &GameData,
     session: &Session,
-    root: String,
-    htmx: bool,
+    layout: Layout,
     preview: Option<&str>,
 ) -> Result<String, askama::Error> {
     let id = session.id;
@@ -98,8 +106,9 @@ pub(crate) fn game_page(
             drawn: drawn_location_cards(session),
         };
         GamePage {
-            htmx,
-            root,
+            htmx: layout.htmx,
+            ambiance: layout.ambiance,
+            root: layout.root,
             id,
             seed: session.progress.setup.seed,
             map: MapView::new(view, &tokens, id),

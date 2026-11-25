@@ -4,6 +4,7 @@ use axum::http::Uri;
 use axum::response::Html;
 use engine::inspect;
 
+use crate::ambiance::{Ambiance, Screen};
 use crate::app_error::AppError;
 use crate::app_state::AppState;
 use crate::relative_path::root_of;
@@ -14,6 +15,7 @@ use crate::views::{BoardView, CombatDecision, CombatView, HandZones, MapView};
 #[template(path = "combat.html")]
 struct CombatPage {
     htmx: bool,
+    ambiance: Ambiance,
     root: String,
     id: i64,
     map: MapView,
@@ -39,6 +41,7 @@ pub async fn combat(
     Path(id): Path<i64>,
 ) -> Result<Html<String>, AppError> {
     let session = Session::load(&state.db, &state.data, id).await?;
+    let ambiance = state.ambiance(&session, Screen::Combat);
     let decision = session.decision().filter(|_| session.in_combat());
     let seat = session.combat_seat();
     let span = session.combat();
@@ -47,6 +50,7 @@ pub async fn combat(
         let inv = view.state().investigators.get(seat)?;
         Some(CombatPage {
             htmx: state.htmx,
+            ambiance,
             root: root_of(uri.path()),
             id,
             map: MapView::new(view, &BoardView::new(view, None, session.mode()), id),

@@ -12,6 +12,7 @@ use crate::app_state::AppState;
 use crate::config::{Config, Listen};
 use crate::database::{Database, DatabaseError};
 use crate::embedded_files::{StaticFiles, load_game_data};
+use crate::music_library::MusicLibrary;
 use crate::router::build_router;
 use crate::session::delete_outdated_games;
 
@@ -48,7 +49,7 @@ pub enum StartupError {
     Io(#[from] io::Error),
 }
 
-/// Loads the game data, opens the database, deletes the games that no
+/// Loads the game data, lists the music tracks, opens the database, deletes the games that no
 /// longer fit the rules, then serves on TCP or on a Unix socket until
 /// Ctrl-C or SIGTERM.
 ///
@@ -74,6 +75,7 @@ pub async fn run(config: Config) -> Result<(), StartupError> {
         db: db.clone(),
         data,
         htmx,
+        music: Arc::new(MusicLibrary::scan(&config.music_dir)),
     });
     let served = match &config.listen {
         Listen::Tcp(addr) => serve_tcp(*addr, app).await,
