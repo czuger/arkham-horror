@@ -4,7 +4,7 @@
 use std::collections::BTreeMap;
 use std::fmt;
 
-use data::{Board, Position};
+use data::{Board, Position, Stability};
 use engine::View;
 
 use crate::views::board_geometry::{BOARD_SIZE, percent};
@@ -27,6 +27,8 @@ pub struct MapView {
     pub worlds: Vec<WorldFrame>,
     /// Every place: locations, streets, Other World areas, special areas.
     pub spaces: Vec<MapSpace>,
+    /// Preview mode (« Aperçu ») on: every place shows its preview.
+    pub survey: bool,
 }
 
 /// One place on the map, with symbols for what stands there.
@@ -40,6 +42,8 @@ pub struct MapSpace {
     pub short_name: String,
     /// `location`, `street`, `world` or `special`: the shape and CSS class.
     pub kind: &'static str,
+    /// `stable` or `unstable` for a location, empty otherwise: CSS class.
+    pub stability: &'static str,
     /// Centre, x, in `board.ron` coordinates.
     pub x: i32,
     /// Centre, y.
@@ -148,7 +152,14 @@ impl MapView {
             arrows: arrows(board),
             worlds: world_frames(board),
             spaces,
+            survey: false,
         }
+    }
+
+    /// The same map, in preview mode (« Aperçu ») when `survey`.
+    pub fn surveying(mut self, survey: bool) -> Self {
+        self.survey = survey;
+        self
     }
 }
 
@@ -157,6 +168,7 @@ impl MapView {
 struct Site<'b> {
     key: String,
     kind: &'static str,
+    stability: &'static str,
     name: &'b str,
     short_name: &'b str,
     position: Position,
@@ -167,6 +179,7 @@ fn places(board: &Board) -> Vec<Site<'_>> {
     let streets = board.streets.iter().map(|s| Site {
         key: s.id.to_string(),
         kind: "street",
+        stability: "",
         name: &s.name,
         short_name: &s.short_name,
         position: s.position,
@@ -174,6 +187,10 @@ fn places(board: &Board) -> Vec<Site<'_>> {
     let locations = board.locations.iter().map(|l| Site {
         key: l.id.to_string(),
         kind: "location",
+        stability: match l.stability {
+            Stability::Stable => "stable",
+            Stability::Unstable => "unstable",
+        },
         name: &l.name,
         short_name: &l.short_name,
         position: l.position,
@@ -181,6 +198,7 @@ fn places(board: &Board) -> Vec<Site<'_>> {
     let specials = board.special_areas.iter().map(|a| Site {
         key: special_key(a.kind).to_owned(),
         kind: "special",
+        stability: "",
         name: &a.name,
         short_name: &a.short_name,
         position: a.position,
@@ -199,6 +217,7 @@ fn world_areas(board: &Board) -> impl Iterator<Item = Site<'_>> {
             Site {
                 key: w.id.to_string(),
                 kind: "world",
+                stability: "",
                 name: &w.name,
                 short_name: "1",
                 position: w.first_area,
@@ -206,6 +225,7 @@ fn world_areas(board: &Board) -> impl Iterator<Item = Site<'_>> {
             Site {
                 key: format!("{}_2", w.id),
                 kind: "world",
+                stability: "",
                 name: &w.name,
                 short_name: "2",
                 position: w.second_area,
@@ -224,6 +244,7 @@ fn space(board: &Board, place: Site<'_>, spot: Option<Spot>) -> MapSpace {
         name: area_name(&place),
         short_name: place.short_name.to_owned(),
         kind: place.kind,
+        stability: place.stability,
         x,
         y,
         left: percent(place.position.x, BOARD_SIZE.0),

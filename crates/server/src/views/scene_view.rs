@@ -8,6 +8,7 @@ use engine::{Area, Choice, Decision, MonsterPlace, Place, View};
 use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::views::board_view::{BoardView, place_key, special_key};
 use crate::views::image_token::ImageToken;
+use crate::views::monster_facts::{Fact, monster_facts};
 use crate::views::names::{ancient_one, card};
 use crate::views::scene_subject::SceneSubject;
 use crate::views::special_illustration::special_illustration;
@@ -61,6 +62,8 @@ pub struct SceneMonster {
     pub portrait: String,
     /// Current values and abilities.
     pub tip: Tip,
+    /// The same values, one line each, shown over the picture in a preview.
+    pub facts: Vec<Fact>,
 }
 
 /// A place offered by the decision, shown by its picture.
@@ -300,10 +303,15 @@ fn monsters(view: &View<'_, '_>, seat: usize, subject: &SceneSubject) -> Vec<Sce
 
 fn scene_monster(view: &View<'_, '_>, id: &MonsterId) -> Option<SceneMonster> {
     let monster = view.data().monsters.monsters.iter().find(|m| &m.id == id)?;
+    let facts = view
+        .monster_stats(id)
+        .map(|stats| monster_facts(monster, &stats))
+        .unwrap_or_default();
     Some(SceneMonster {
         name: monster.name.clone(),
         portrait: illustration_url(IllustrationSize::Thumbnail, &monster.portrait),
         tip: tips::monster(view, monster),
+        facts,
     })
 }
 

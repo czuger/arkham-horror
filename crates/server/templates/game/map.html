@@ -1,8 +1,12 @@
 <section class="map" aria-label="Carte d'Arkham">
   <input type="checkbox" id="map-zoom" class="map-zoom-toggle">
+  <input type="checkbox" id="map-survey" class="map-survey-toggle"{% if map.survey %} checked{% endif %}>
   <label for="map-zoom" class="map-zoom-backdrop" aria-hidden="true"></label>
   <div class="map-frame">
-    <label for="map-zoom" class="map-zoom button small"><span class="when-small">Agrandir la carte</span><span class="when-big">Réduire la carte</span></label>
+    <div class="map-tools">
+      <label for="map-zoom" class="map-zoom button small"><span class="when-small">Agrandir la carte</span><span class="when-big">Réduire la carte</span></label>
+      <label for="map-survey" class="map-survey button small" title="Changer de mode. Mouvement : un clic sur un lieu proposé vous y emmène. Aperçu : un clic sur un lieu le montre, sans vous déplacer."><span class="mode-move">Mouvement</span><span class="mode-survey">Aperçu</span></label>
+    </div>
     <div class="map-board">
       <svg class="map-drawing" viewBox="0 0 1064 1576" role="img" aria-label="Plan symbolique d'Arkham">
         <rect class="map-ground" x="0" y="0" width="1064" height="1576" rx="24"/>
@@ -16,7 +20,7 @@
         <polygon class="arrow {% if arrow.white %}white{% else %}black{% endif %}" points="{{ arrow.points }}"/>
         {% endfor %}
         {% for space in map.spaces %}
-        <g class="space {{ space.kind }}{% if space.is_offered() %} offered{% endif %}{% if space.here %} here{% endif %}{% if space.closed %} closed{% endif %}" data-key="{{ space.key }}">
+        <g class="space {{ space.kind }}{% if !space.stability.is_empty() %} {{ space.stability }}{% endif %}{% if space.is_offered() %} offered{% endif %}{% if space.here %} here{% endif %}{% if space.closed %} closed{% endif %}" data-key="{{ space.key }}">
           {% if space.here %}<circle class="here-ring" cx="{{ space.x }}" cy="{{ space.y }}" r="50"/>{% endif %}
           {% if space.kind == "location" %}<circle class="shape" cx="{{ space.x }}" cy="{{ space.y }}" r="30"/>
           {% else if space.kind == "street" %}<polygon class="shape" points="{{ space.diamond() }}"/>
@@ -33,15 +37,14 @@
         </g>
         {% endfor %}
       </svg>
-      <div class="map-targets">
+      <div class="map-targets map-targets-move">
+        {% for space in map.spaces %}{% for (index, label) in space.offered %}
+        <button type="submit" form="decision" name="choix" value="{{ index }}" class="map-target offered" style="left: {{ space.left }}; top: {{ space.top }}" aria-label="{{ label }}"></button>
+        {% endfor %}{% endfor %}
+      </div>
+      <div class="map-targets map-targets-survey">
         {% for space in map.spaces %}
-        {% if space.is_offered() %}
-        {% for (index, label) in space.offered %}
-        <button type="submit" form="decision" name="choix" value="{{ index }}" class="map-target offered tip{% if space.east() %} east{% endif %}" style="left: {{ space.left }}; top: {{ space.top }}; --room: {{ space.bubble_room() }}" aria-label="{{ label }}">{{ space.tip|safe }}</button>
-        {% endfor %}
-        {% else %}
-        <a class="map-target tip{% if space.east() %} east{% endif %}" href="partie/{{ map.game }}?voir={{ space.key }}" style="left: {{ space.left }}; top: {{ space.top }}; --room: {{ space.bubble_room() }}" aria-label="Voir : {{ space.name }}">{{ space.tip|safe }}</a>
-        {% endif %}
+        <a class="map-target tip{% if space.east() %} east{% endif %}" href="partie/{{ map.game }}?voir={{ space.key }}&amp;carte=apercu" style="left: {{ space.left }}; top: {{ space.top }}; --room: {{ space.bubble_room() }}" aria-label="Voir : {{ space.name }}">{{ space.tip|safe }}</a>
         {% endfor %}
       </div>
     </div>

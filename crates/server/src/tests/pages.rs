@@ -263,7 +263,9 @@ async fn locations_show_their_text_and_icons_on_hover() {
     let app = TestApp::open(&dir.path().join("db")).await;
     let game = new_game(&app, NEW_GAME).await;
     let page = app.get(&game).await.body;
-    let map = &page[page.find("class=\"map-targets\"").expect("map")..];
+    let map = &page[page
+        .find("class=\"map-targets map-targets-move\"")
+        .expect("map")..];
     assert!(map.matches("class=\"bubble place-bubble\"").count() >= 26);
     assert!(
         page.contains("<b>Prêt Bancaire</b> : Au lieu de faire"),

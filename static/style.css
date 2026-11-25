@@ -406,6 +406,9 @@ form.undo { margin-top: 0.5rem; }
 .arrow.black { fill: #0b0806; stroke: #b9a888; stroke-width: 2; }
 .space .shape { stroke-width: 4; }
 .space.location .shape { fill: #3b2f24; stroke: #c9b48c; }
+/* Stable locations green, unstable ones red, as the diamonds of the board. */
+.space.location.stable .shape { fill: #2f5d34; stroke: #8fd19a; }
+.space.location.unstable .shape { fill: #6e2420; stroke: #e8877c; }
 .space.street .shape { fill: #4a3a2a; stroke: #e0c890; }
 .space.world .shape { fill: #3d2d4d; stroke: #b29cd0; }
 .space.special .shape { fill: #2b2520; stroke: #8a7a62; stroke-dasharray: 6 5; }
@@ -421,8 +424,9 @@ form.undo { margin-top: 0.5rem; }
 .pawn-mark { fill: #7fb2e5; stroke: #1d1712; stroke-width: 3; }
 .here-ring { fill: none; stroke: #ff3b2f; stroke-width: 9; }
 .here-mark { fill: #ff3b2f; stroke: #fff; stroke-width: 4; }
-.space.offered .shape { fill: #ffe066; stroke: #fff6c2; filter: drop-shadow(0 0 10px #ffd21f); }
-.space.offered .label { fill: #ffe066; }
+/* Places offered light up in movement mode only. */
+.map-survey-toggle:not(:checked) ~ .map-frame .space.offered .shape { fill: #ffe066; stroke: #fff6c2; filter: drop-shadow(0 0 10px #ffd21f); }
+.map-survey-toggle:not(:checked) ~ .map-frame .space.offered .label { fill: #ffe066; }
 /* Targets: real links and buttons over the drawing, so it works without JS. */
 .map-targets { position: absolute; inset: 0; }
 .map-target {
@@ -441,7 +445,15 @@ form.undo { margin-top: 0.5rem; }
 .map-target.east > .bubble { left: auto; right: calc(100% + 6px); }
 /* Enlarged: the same map over the page; the checkbox works without JS. */
 .map-zoom-toggle { position: absolute; opacity: 0; pointer-events: none; }
-.map-zoom { align-self: flex-start; }
+.map-tools { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+/* Movement / preview switch: a checkbox too; preview links every place. */
+.map-survey-toggle { position: absolute; opacity: 0; pointer-events: none; }
+.map-survey-toggle:focus-visible ~ .map-frame .map-survey { outline: 3px solid #ffe066; }
+.map-survey-toggle:checked ~ .map-frame .map-survey .mode-move,
+.map-survey-toggle:not(:checked) ~ .map-frame .map-survey .mode-survey { display: none; }
+.map-targets-survey { display: none; }
+.map-survey-toggle:checked ~ .map-frame .map-targets-survey { display: block; }
+.map-survey-toggle:checked ~ .map-frame .map-targets-move { display: none; }
 .map-zoom-toggle:focus-visible ~ .map-frame .map-zoom { outline: 3px solid #ffe066; }
 .map-zoom .when-big, .map-zoom-backdrop { display: none; }
 .map-zoom-toggle:checked ~ .map-zoom-backdrop { display: block; position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, 0.7); }
@@ -491,6 +503,21 @@ form.undo { margin-top: 0.5rem; }
   white-space: nowrap;
 }
 .scene.previewing .scene-picture { outline: 3px dashed #ffe066; outline-offset: -3px; }
+/* Preview: the monsters there, over the picture; a portrait an eighth of
+   the picture wide (a quarter of this half-wide box). */
+.scene-foes {
+  position: absolute; top: 3rem; left: 0.6rem; width: 50%; max-height: calc(100% - 9rem);
+  overflow-y: auto; display: flex; flex-direction: column; gap: 0.4rem; z-index: 2;
+}
+.scene-foe {
+  display: grid; grid-template-columns: 25% 1fr; gap: 0.5rem; align-items: start;
+  padding: 0.4rem; border-radius: 6px; background: rgba(20, 14, 10, 0.85); color: #f4efe4; font-size: 0.8rem;
+}
+.scene-foe img { display: block; width: 100%; height: auto; border-radius: 4px; border: 2px solid #c0392b; }
+.scene-foe strong { display: block; font-size: 0.95rem; margin-bottom: 0.15rem; }
+.scene-foe .facts .tip { border-bottom: 1px dotted #b08850; }
+.scene-foe .facts .tip > .bubble { left: 0; transform: none; }
+@media (max-width: 600px) { .scene-foes { width: calc(100% - 1.2rem); } }
 .scene-cards { position: absolute; top: 0.6rem; right: 0.6rem; display: flex; gap: 0.4rem; }
 .scene-cards .drawn-card { margin: 0; background: rgba(20, 14, 10, 0.85); color: #f4efe4; padding: 0.3rem; border-radius: 6px; font-size: 0.8rem; text-align: center; }
 .scene-cards .drawn-card img { display: block; max-height: 13rem; width: auto; border-radius: 4px; }

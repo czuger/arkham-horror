@@ -5,15 +5,17 @@ use std::path::Path;
 
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
-use data::{GameData, InvestigatorId, LocationId, OtherWorld, OtherWorldId, StreetId, WorldScene};
-use engine::{Area, Choice, DecisionKind, Place, Setup};
+use data::{
+    GameData, InvestigatorId, LocationId, MonsterId, OtherWorld, OtherWorldId, StreetId, WorldScene,
+};
+use engine::{Area, BoardMonster, Choice, DecisionKind, MonsterPlace, Place, Setup};
 use tower::ServiceExt;
 
 use crate::ambiance::Ambiance;
 use crate::database::Database;
 use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::play_mode::PlayMode;
-use crate::routes::{Layout, game_page};
+use crate::routes::{Layout, MapMode, game_page};
 use crate::session::Session;
 use crate::tests::test_app::{TestApp, move_number};
 
@@ -110,6 +112,23 @@ fn between<'p>(page: &'p str, start: &str, end: &str) -> &'p str {
     &rest[..rest.find(end).expect(end)]
 }
 
+/// In preview mode, every place is a preview link that keeps the mode,
+/// besides the move buttons.
+fn check_preview_mode(data: &GameData, session: &Session) {
+    let survey = MapMode {
+        preview: None,
+        survey: true,
+    };
+    let page = game_page(data, session, layout(), survey).expect("page");
+    let map = between(&page, "<section class=\"map\"", "</section>");
+    assert!(map.contains("class=\"map-survey-toggle\" checked>"));
+    let previews = between(map, "map-targets-survey", "</div>");
+    assert_eq!(
+        previews.matches("&amp;carte=apercu\"").count(),
+        map.matches("<g class=\"space ").count()
+    );
+}
+
 #[tokio::test(flavor = "current_thread")]
 async fn the_map_offers_every_proposed_destination() {
     let dir = temp();
@@ -130,7 +149,7 @@ async fn the_map_offers_every_proposed_destination() {
         .map(|(index, _)| index)
         .collect();
     assert!(!places.is_empty());
-    let page = game_page(&data, &session, layout(), None).expect("page");
+    let page = game_page(&data, &session, layout(), MapMode::default()).expect("page");
     let map = between(&page, "<section class=\"map\"", "</section>");
     assert!(map.contains("<svg"));
     for index in &places {
@@ -143,18 +162,31 @@ async fn the_map_offers_every_proposed_destination() {
         map.matches("class=\"map-target offered").count(),
         places.len()
     );
-    assert!(
-        map.contains("class=\"space location offered")
-            || map.contains("class=\"space street offered")
-    );
+    let lit = map
+        .split("<g class=\"space ")
+        .skip(1)
+        .filter(|g| {
+            g.split('"')
+                .next()
+                .is_some_and(|class| class.contains("offered"))
+        })
+        .count();
+    assert!(lit > 0, "offered places drawn lit");
     assert!(map.contains("href=\"partie/1?voir="), "preview links");
+    assert_eq!(map.matches("class=\"space location stable").count(), 15);
+    assert_eq!(map.matches("class=\"space location unstable").count(), 11);
+    assert!(
+        map.contains("class=\"map-survey-toggle\">"),
+        "movement mode"
+    );
+    check_preview_mode(&data, &session);
     db.close().await;
 }
 
 /// The scene of a game page whose investigator stands at `place`.
 fn scene_at(data: &GameData, session: &mut Session, place: Place) -> String {
     session.outcome.state.investigators[0].place = place;
-    let page = game_page(data, session, layout(), None).expect("page");
+    let page = game_page(data, session, layout(), MapMode::default()).expect("page");
     between(&page, "<section class=\"scene", "</section>").to_owned()
 }
 
@@ -287,4 +319,33 @@ async fn a_preview_shows_another_place_without_touching_the_game() {
     assert_eq!(unknown.status, StatusCode::OK);
     assert!(!unknown.body.contains("Revenir à ma position"));
     assert_eq!(app.get(game).await.body, own, "nothing changed");
+}
+
+#[tokio::test(flavor = "current_thread")]
+async fn a_preview_shows_the_monsters_there_with_their_values() {
+    let dir = temp();
+    let db = Database::open(&dir.path().join("db")).await.expect("db");
+    let data = load_data();
+    let mut session = Session::start(&db, &data, setup(7), PlayMode::Solo)
+        .await
+        .expect("game");
+    let woods = LocationId::new("woods");
+    session.outcome.state.monsters.push(BoardMonster {
+        monster: MonsterId::new("byakhee"),
+        place: MonsterPlace::Location(woods),
+    });
+    let at = |key| MapMode {
+        preview: Some(key),
+        survey: true,
+    };
+    let page = game_page(&data, &session, layout(), at("woods")).expect("page");
+    let foes = between(&page, "<div class=\"scene-foes\"", "</figcaption>");
+    assert!(foes.contains("<strong>Byakhee</strong>"), "{foes}");
+    assert!(foes.contains("Force 1"), "{foes}");
+    assert!(foes.contains("Conscience"), "{foes}");
+    let empty = game_page(&data, &session, layout(), at("uptown")).expect("page");
+    assert!(!empty.contains("scene-foes"));
+    let own = game_page(&data, &session, layout(), MapMode::default()).expect("page");
+    assert!(!own.contains("scene-foes"), "only in a preview");
+    db.close().await;
 }

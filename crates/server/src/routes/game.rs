@@ -39,6 +39,9 @@ pub struct GameQuery {
     /// A place to preview in the scene (`?voir=woods`); the game is left
     /// as it is.
     voir: Option<String>,
+    /// `apercu` when the map is in preview mode: every place shows its
+    /// preview, none moves the investigator.
+    carte: Option<String>,
 }
 
 /// The game page: map, scene, decision form, status, investigators and
@@ -61,7 +64,11 @@ pub async fn game(
         htmx: state.htmx,
         ambiance: state.ambiance(&session, Screen::Other),
     };
-    let page = game_page(&state.data, &session, layout, query.voir.as_deref());
+    let map_mode = MapMode {
+        preview: query.voir.as_deref(),
+        survey: query.carte.as_deref() == Some("apercu"),
+    };
+    let page = game_page(&state.data, &session, layout, map_mode);
     Ok(Html(page?))
 }
 
@@ -75,12 +82,18 @@ pub(crate) struct Layout {
     pub ambiance: Ambiance,
 }
 
+/// What the map shows and does on the game page.
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct MapMode<'q> {
+    /// The key of a place to show in the scene instead of the
+    /// investigator's own; an unknown key is ignored.
+    pub preview: Option<&'q str>,
+    /// Preview mode (« Aperçu »): every place on the map shows its preview
+    /// instead of moving the investigator there.
+    pub survey: bool,
+}
+
 /// Renders the game page of a loaded game.
-///
-/// # Arguments
-///
-/// * `preview` - the key of a place to show in the scene instead of the
-///   investigator's own; an unknown key is ignored.
 ///
 /// # Errors
 ///
@@ -89,8 +102,9 @@ pub(crate) fn game_page(
     data: &GameData,
     session: &Session,
     layout: Layout,
-    preview: Option<&str>,
+    map_mode: MapMode<'_>,
 ) -> Result<String, askama::Error> {
+    let preview = map_mode.preview;
     let id = session.id;
     let decision = session.decision();
     let outcome = &session.outcome;
@@ -111,7 +125,7 @@ pub(crate) fn game_page(
             root: layout.root,
             id,
             seed: session.progress.setup.seed,
-            map: MapView::new(view, &tokens, id),
+            map: MapView::new(view, &tokens, id).surveying(map_mode.survey),
             scene: SceneView::new(view, &tokens, request),
             party: PartyRow::all(view, decision, session.mode()),
             status: StatusView::new(view, &outcome.status),

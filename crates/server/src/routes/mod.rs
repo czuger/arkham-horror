@@ -16,7 +16,7 @@ pub use ancient_one::ancient_one;
 pub use combat::combat;
 pub use game::game;
 #[cfg(test)]
-pub(crate) use game::{Layout, game_page};
+pub(crate) use game::{Layout, MapMode, game_page};
 pub use home::home;
 pub use investigators::{investigator, investigators};
 pub use journal::journal;

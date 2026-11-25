@@ -8,6 +8,19 @@
       <p class="fallback-name">{{ scene.title }}</p>
     </div>
     {% endif %}
+    {% if scene.preview && !scene.monsters.is_empty() %}
+    <div class="scene-foes" aria-label="Monstres présents">
+      {% for monster in scene.monsters %}
+      <div class="scene-foe">
+        <img src="{{ monster.portrait }}" alt="{{ monster.name }}">
+        <div>
+          <strong>{{ monster.name }}</strong>
+          <ul class="facts">{% for fact in monster.facts %}{% include "combat/fact.html" %}{% endfor %}</ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% if scene.preview %}
     <p class="preview-banner">Aperçu, la partie n'a pas bougé. <a class="button small" href="partie/{{ scene.game }}">Revenir à ma position</a></p>
     {% endif %}
