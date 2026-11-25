@@ -5,12 +5,8 @@
   {% if !decision.hint.is_empty() %}<p class="hint">{{ decision.hint }}</p>{% endif %}
   {% if decision.on_sheet %}
   <p><a class="on-sheet" href="partie/{{ id }}/investigateurs">Répondre sur votre fiche d'investigateur</a></p>
-  {% else if let Some(keep) = decision.keep_skills %}
-  <form id="decision" method="post" action="partie/{{ id }}/reponse">
-    <input type="hidden" name="coup" value="{{ decision.move_number }}">
-    <a class="adjust-skills button" href="partie/{{ id }}/ajustement">Ajuster les compétences</a>
-    <button type="submit" name="choix" value="{{ keep }}">Passer : ne rien changer</button>
-  </form>
+  {% else if decision.adjusting %}
+  <p><a class="adjust-skills button" href="partie/{{ id }}/ajustement">Aller à l'ajustement des compétences</a></p>
   {% else if decision.trading %}
   <p><a class="trading button" href="partie/{{ id }}/echange">Aller à la page de l'échange</a></p>
   {% else if decision.in_combat %}

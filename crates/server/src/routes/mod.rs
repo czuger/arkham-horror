@@ -25,5 +25,7 @@ pub use music::music_tracks;
 pub use new_game::{create_game, new_game_form};
 pub use other_world::other_world;
 pub use robots::robots;
-pub use skill_adjustment::{adjust_skills, skill_adjustment};
+pub use skill_adjustment::{
+    adjust_skills, investigator_adjustment, plan_adjustment, skill_adjustment,
+};
 pub use trade::{propose_trade, trade};

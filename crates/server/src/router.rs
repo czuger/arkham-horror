@@ -28,12 +28,28 @@ pub fn build_router(state: AppState) -> Router {
                 ServeDir::new(music_dir.join(ambiance.folder())),
             )
         });
-    router
+    game_routes(router)
         .route("/", get(routes::home))
         .route(
             "/nouvelle",
             get(routes::new_game_form).post(routes::create_game),
         )
+        .route("/musique/pistes", get(routes::music_tracks))
+        .route("/robots.txt", get(routes::robots))
+        .route("/assets/{*path}", get(embedded_files::asset))
+        .route("/static/{*path}", get(embedded_files::static_file))
+        .route("/illustrations/{*path}", get(illustrations::illustration))
+        .layer(SetResponseHeaderLayer::overriding(
+            HeaderName::from_static("x-robots-tag"),
+            HeaderValue::from_static("noindex, nofollow"),
+        ))
+        .layer(middleware::from_fn(same_origin))
+        .with_state(state)
+}
+
+/// The pages and forms of one game, under `/partie/{id}`.
+fn game_routes(router: Router<AppState>) -> Router<AppState> {
+    router
         .route("/partie/{id}", get(routes::game))
         .route("/partie/{id}/reponse", post(routes::answer))
         .route("/partie/{id}/annuler", post(routes::undo))
@@ -47,6 +63,10 @@ pub fn build_router(state: AppState) -> Router {
             get(routes::skill_adjustment).post(routes::adjust_skills),
         )
         .route(
+            "/partie/{id}/ajustement/{seat}",
+            get(routes::investigator_adjustment).post(routes::plan_adjustment),
+        )
+        .route(
             "/partie/{id}/echange",
             get(routes::trade).post(routes::propose_trade),
         )
@@ -55,15 +75,4 @@ pub fn build_router(state: AppState) -> Router {
             "/partie/{id}/investigateurs/{seat}",
             get(routes::investigator),
         )
-        .route("/musique/pistes", get(routes::music_tracks))
-        .route("/robots.txt", get(routes::robots))
-        .route("/assets/{*path}", get(embedded_files::asset))
-        .route("/static/{*path}", get(embedded_files::static_file))
-        .route("/illustrations/{*path}", get(illustrations::illustration))
-        .layer(SetResponseHeaderLayer::overriding(
-            HeaderName::from_static("x-robots-tag"),
-            HeaderValue::from_static("noindex, nofollow"),
-        ))
-        .layer(middleware::from_fn(same_origin))
-        .with_state(state)
 }

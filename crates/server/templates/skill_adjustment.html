@@ -2,13 +2,13 @@
 {% block title %}Ajustement des compétences — Horreur à Arkham{% endblock %}
 {% block content %}
 <nav class="seat-tabs">
-  <a href="partie/{{ id }}" class="back">Retour à la partie</a>
+  <a href="partie/{{ id }}/ajustement" class="back">Retour à la liste des investigateurs</a>
 </nav>
-<form id="adjustment" class="adjustment" method="post" action="partie/{{ id }}/ajustement" data-focus="{{ adjustment.focus }}">
+<form id="adjustment" class="adjustment" method="post" action="partie/{{ id }}/ajustement/{{ adjustment.seat }}" data-focus="{{ adjustment.focus }}">
 <input type="hidden" name="coup" value="{{ adjustment.move_number }}">
 <section class="decision">
   <h1>Ajustement des compétences : {{ adjustment.name }}</h1>
-  <p class="hint">Cliquez sur les crans de la fiche pour y mettre les curseurs. Concentration : {{ adjustment.focus }} cran(s) à déplacer en tout.</p>
+  <p class="hint">Cliquez sur les crans de la fiche pour y mettre les curseurs. Concentration : {{ adjustment.focus }} cran(s) à déplacer en tout. Une fois validé, vous revenez à la liste des investigateurs.</p>
   <ul class="track-values">
     {% for track in adjustment.tracks %}
     <li><span>{{ track.name }}</span> : {% for stop in track.stops %}{% if stop.checked %}<output data-track="{{ track.field }}">{{ stop.label }}</output>{% endif %}{% endfor %}</li>
@@ -30,9 +30,4 @@
   {% endfor %}{% endfor %}
 </div>
 </form>
-{% if can_undo %}
-<form method="post" action="partie/{{ id }}/annuler" class="inline undo">
-  <button type="submit" class="small">Annuler le dernier coup</button>
-</form>
-{% endif %}
 {% endblock %}

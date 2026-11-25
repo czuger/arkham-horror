@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Ajustement des compétences — Horreur à Arkham{% endblock %}
+{% block content %}
+<nav class="seat-tabs">
+  <a href="partie/{{ id }}" class="back">Retour à la partie</a>
+</nav>
+<section class="decision adjustment-roster">
+  <h1>Ajustement des compétences</h1>
+  <p class="hint">Ajustez les investigateurs que vous voulez, dans l'ordre que vous voulez, puis passez. Ceux que vous n'ajustez pas gardent leurs curseurs.</p>
+  <ul class="adjusters">
+    {% for row in roster.rows %}
+    <li class="adjuster{% if !row.can_adjust %} idle{% endif %}">
+      <img class="adjuster-sheet" src="assets/{{ row.image }}" alt="Fiche de {{ row.name }}">
+      <div class="adjuster-facts">
+        <h2>{{ row.name }}</h2>
+        <ul class="track-values">
+          {% for skill in row.skills %}<li>{{ skill }}</li>{% endfor %}
+        </ul>
+        <p class="hint">{% if let Some(focus) = row.focus %}Concentration : {{ focus }}. {% endif %}{{ row.note }}</p>
+      </div>
+      {% if row.can_adjust %}
+      <a class="button adjust-skills" href="partie/{{ id }}/ajustement/{{ row.seat }}">Ajuster les compétences</a>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  <form id="decision" method="post" action="partie/{{ id }}/ajustement">
+    <input type="hidden" name="coup" value="{{ roster.move_number }}">
+    <button type="submit">Passer</button>
+  </form>
+</section>
+{% if can_undo %}
+<form method="post" action="partie/{{ id }}/annuler" class="inline undo">
+  <button type="submit" class="small">Annuler le dernier coup</button>
+</form>
+{% endif %}
+{% endblock %}

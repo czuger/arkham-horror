@@ -4,7 +4,7 @@ use data::{CardId, Timing};
 
 use crate::decision::{Choice, Context, DecisionKind, DecisionOption};
 use crate::game::{Game, option};
-use crate::halt::Flow;
+use crate::halt::{Flow, Halt};
 use crate::rules::abilities::is_mandatory;
 use crate::state::{Phase, Place};
 
@@ -15,23 +15,42 @@ impl Game<'_> {
     /// The Upkeep phase, investigator by investigator.
     pub fn upkeep_phase(&mut self) -> Flow<()> {
         self.state.phase = Phase::Upkeep;
+        let mut seats = Vec::new();
         for seat in self.state.seat_order() {
             let inv = self.inv_mut(seat);
             if inv.lose_next_turn {
                 inv.lose_next_turn = false;
                 inv.skipping_turn = true;
             }
-            if self.inv(seat).skipping_turn {
-                continue;
+            if !self.inv(seat).skipping_turn {
+                seats.push(seat);
             }
-            self.catch_knock_out(seat, |game| game.upkeep(seat))?;
+        }
+        self.upkeep_all(&seats)
+    }
+
+    /// The upkeep of `seats`, in order, then their skill adjustments one
+    /// after the other, so they can be set together. An investigator
+    /// knocked out during their upkeep does not adjust.
+    pub fn upkeep_all(&mut self, seats: &[usize]) -> Flow<()> {
+        let mut adjusting = Vec::new();
+        for &seat in seats {
+            match self.upkeep(seat) {
+                Ok(()) => adjusting.push(seat),
+                Err(Halt::KnockedOut(knocked)) if knocked == seat => {}
+                Err(halt) => return Err(halt),
+            }
+        }
+        for (index, &seat) in adjusting.iter().enumerate() {
+            let after = adjusting.get(index + 1..).unwrap_or_default();
+            self.adjust_skills(seat, after)?;
         }
         Ok(())
     }
 
     /// One investigator's upkeep: back from Lost in Time and Space, refresh
-    /// cards, upkeep actions, skill adjustment.
-    pub fn upkeep(&mut self, seat: usize) -> Flow<()> {
+    /// cards, upkeep actions. The skill adjustment follows everyone's upkeep.
+    fn upkeep(&mut self, seat: usize) -> Flow<()> {
         if self.inv(seat).place == Place::LostInTimeAndSpace && !self.inv(seat).delayed {
             self.move_anywhere(seat)?;
         }
@@ -39,8 +58,7 @@ impl Game<'_> {
             held.exhausted = false;
         }
         self.upkeep_actions(seat)?;
-        self.sheet_upkeep(seat)?;
-        self.adjust_skills(seat)
+        self.sheet_upkeep(seat)
     }
 
     /// Mandatory upkeep actions of the held cards, in the player's order.
@@ -93,14 +111,18 @@ impl Game<'_> {
         Ok(())
     }
 
-    /// Moves the sliders, one stop at a time, within the focus.
-    pub fn adjust_skills(&mut self, seat: usize) -> Flow<()> {
+    /// Moves the sliders, one stop at a time, within the focus; `after`
+    /// adjust next.
+    fn adjust_skills(&mut self, seat: usize, after: &[usize]) -> Flow<()> {
         let mut focus = self.sheet(seat)?.focus;
         while focus > 0 {
             let mut options = vec![option(Choice::Done, "Terminer l'ajustement")];
             options.extend(self.slider_moves(seat));
             let prompt = format!("Ajustement des compétences (Concentration restante : {focus})");
-            let context = Context::Focus { remaining: focus };
+            let context = Context::Focus {
+                remaining: focus,
+                after: after.to_vec(),
+            };
             let Choice::Slider { track, stop } =
                 self.ask_about(seat, DecisionKind::AdjustSkills, context, prompt, options)?
             else {

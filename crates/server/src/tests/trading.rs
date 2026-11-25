@@ -15,6 +15,8 @@ async fn current_page(app: &TestApp) -> String {
         app.get(&format!("{GAME}/investigateurs")).await.body
     } else if page.contains("class=\"in-combat") {
         app.get(&format!("{GAME}/combat")).await.body
+    } else if page.contains("class=\"adjust-skills") {
+        app.get(&format!("{GAME}/ajustement")).await.body
     } else {
         page
     }

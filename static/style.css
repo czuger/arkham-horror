@@ -261,6 +261,24 @@ main:has(.mat) { max-width: none; }
 }
 .stop-choice input:checked + img.slider { display: block; }
 .decision a.adjust-skills { display: block; margin-bottom: 0.4rem; }
+/* Adjustment screen: one row per investigator, sheet thumbnail, skills
+   and a button; the move-on button below. */
+.adjustment-roster h1 { font-size: 1.3rem; margin-top: 0; }
+.adjusters { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: 0.6rem; }
+.adjuster {
+  display: grid; grid-template-columns: 8rem 1fr auto; gap: 0.8rem; align-items: center;
+  padding: 0.5rem; border: 1px solid #d8cbb3; border-radius: 6px; background: #fffaf0;
+}
+.adjuster.idle { opacity: 0.7; }
+.adjuster h2 { font-size: 1.1rem; margin: 0 0 0.2rem; }
+.adjuster .track-values { margin: 0.2rem 0; }
+.adjuster .hint { margin: 0; }
+.adjuster-sheet { width: 100%; height: auto; border-radius: 4px; }
+.adjuster a.adjust-skills { display: inline-block; margin: 0; }
+@media (max-width: 600px) {
+  .adjuster { grid-template-columns: 5rem 1fr; }
+  .adjuster a.adjust-skills { grid-column: 1 / -1; text-align: center; }
+}
 /* Trade page: both sides' items, ticked to change hands. */
 .trade { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
 .trade-head, .trade-actions { grid-column: 1 / -1; margin: 0; }

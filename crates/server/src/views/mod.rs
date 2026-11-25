@@ -1,3 +1,4 @@
+mod adjustment_roster;
 mod board_geometry;
 mod board_view;
 mod closed_marker;
@@ -32,6 +33,7 @@ mod tips;
 mod trade_view;
 mod world_scene;
 
+pub use adjustment_roster::AdjustmentRoster;
 pub use board_view::BoardView;
 pub use combat_span::CombatSpan;
 pub use combat_view::{CombatDecision, CombatView};
@@ -49,6 +51,6 @@ pub use party_row::PartyRow;
 pub use scene_subject::SceneSubject;
 pub use scene_view::{SceneRequest, SceneView};
 pub use sheet_decision::{SheetDecision, on_sheet, prepares_combat};
-pub use skill_adjustment::{SkillAdjustment, adjusts_skills};
+pub use skill_adjustment::{Adjuster, SkillAdjustment, adjusters, adjusts_skills};
 pub use status_view::StatusView;
 pub use trade_view::{TradeView, is_trade};

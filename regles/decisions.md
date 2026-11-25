@@ -175,3 +175,9 @@ Si la FAQ officielle (`FAQ_Officiel_032017_V2.pdf`, voir R7) contredit une déci
 **Décision (21/11/2026)** : les **armes** restent en main d'un combat au suivant. Avant le combat, l'investigateur choisit « Garder en main » ou « Changer ce que vous avez en main » ; s'il change, il prend ou lâche armes et sorts, deux mains au plus. La question revient à un nouveau round seulement si une carte a quitté ses mains (arme défaussée après usage). Les **sorts** durent le combat, puis quittent les mains. Une arme perdue, vendue ou défaussée quitte aussi les mains. Contre le Grand Ancien, la question est posée à chaque attaque.
 
 **Raison** : choix de l'utilisateur, pour gérer les mains sur la fiche de l'investigateur. Le livret laisse choisir armes et sorts à chaque round de combat.
+
+## R29 — Ajustements des compétences regroupés en fin d'Entretien
+
+**Décision (25/11/2026)** : à l'Entretien, chaque investigateur fait d'abord, dans l'ordre des joueurs, son rafraîchissement et ses actions d'Entretien ; **ensuite seulement**, tous ajustent leurs compétences, l'un après l'autre. Un investigateur assommé pendant son Entretien n'ajuste pas. Même chose à chaque round de la Bataille finale.
+
+**Raison** : demande de l'utilisateur, pour régler tous les investigateurs sur un seul écran. Le livret fait tout l'Entretien d'un investigateur avant de passer au suivant, mais les curseurs d'un investigateur ne jouent pas sur l'Entretien des autres : le résultat est le même.

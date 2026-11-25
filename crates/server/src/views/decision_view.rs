@@ -26,9 +26,8 @@ pub struct DecisionView {
     pub on_sheet: bool,
     /// Answered on the combat page, not with these buttons.
     pub in_combat: bool,
-    /// The Upkeep skill adjustment: the answer that leaves the sliders as
-    /// they are, the rest being set on the adjustment page.
-    pub keep_skills: Option<usize>,
+    /// The Upkeep skill adjustment, set on the adjustment screen.
+    pub adjusting: bool,
     /// A trade being put together, on the trade page.
     pub trading: bool,
 }
@@ -63,7 +62,7 @@ impl DecisionView {
             move_number,
             on_sheet: on_sheet(decision),
             in_combat: false,
-            keep_skills: keep_skills(decision),
+            adjusting: adjusts_skills(decision),
             trading: is_trade(decision),
         }
     }
@@ -73,17 +72,6 @@ impl DecisionView {
         self.in_combat = in_combat && !self.on_sheet;
         self
     }
-}
-
-/// In a skill adjustment, the answer that ends it at once.
-fn keep_skills(decision: &Decision) -> Option<usize> {
-    if !adjusts_skills(decision) {
-        return None;
-    }
-    decision
-        .options
-        .iter()
-        .position(|option| option.choice == Choice::Done)
 }
 
 /// The cards to pick from when keeping, buying, selling or losing one; empty

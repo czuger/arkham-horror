@@ -94,9 +94,7 @@ impl Game<'_> {
         }
         self.turn_answers = 0;
         self.log(format!("Round {round}."));
-        for seat in self.state.seat_order() {
-            self.catch_knock_out(seat, |game| game.upkeep(seat))?;
-        }
+        self.upkeep_all(&self.state.seat_order())?;
         self.state.first_player = (self.state.first_player + 1) % self.state.players();
         self.check_all_devoured()?;
         for seat in self.state.seat_order() {

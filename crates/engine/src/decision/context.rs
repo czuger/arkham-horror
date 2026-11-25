@@ -47,6 +47,8 @@ pub enum Context {
     Focus {
         /// Concentration left this Upkeep.
         remaining: u8,
+        /// The investigators who adjust next, in order.
+        after: Vec<usize>,
     },
     /// A trade between two investigators, as put together so far (boxed:
     /// the largest context, carried by every decision).

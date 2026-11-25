@@ -10,8 +10,8 @@ use crate::app_error::AppError;
 use crate::database::{Database, DatabaseError};
 use crate::game_row::GameContent;
 use crate::play_mode::{HUMAN_SEAT, PlayMode};
-use crate::progress::Progress;
-use crate::views::{CombatSpan, OtherWorldSpan, is_trade, on_sheet};
+use crate::progress::{PlannedSliders, Progress};
+use crate::views::{CombatSpan, OtherWorldSpan, adjusts_skills, is_trade, on_sheet};
 
 /// What to do once the cards in hand are kept, sent with the answer that
 /// keeps them (so fighting is one click on the combat page).
@@ -55,6 +55,7 @@ impl Session {
             answers: Vec::new(),
             human_moves: Vec::new(),
             seen_events: 0,
+            planned_sliders: PlannedSliders::default(),
         };
         let outcome = advance(data, &progress)?;
         progress.answers.clone_from(&outcome.answers);
@@ -128,11 +129,13 @@ impl Session {
     }
 
     /// Where the human answers the decision: the investigator's page for
-    /// the sliders, the trade page for a trade, the combat page while
-    /// facing a monster, the game page otherwise.
+    /// the sliders, the adjustment screen at Upkeep, the trade page for a
+    /// trade, the combat page while facing a monster, the game page
+    /// otherwise.
     pub fn decision_page(&self) -> String {
         match self.decision() {
             Some(decision) if on_sheet(decision) => format!("partie/{}/investigateurs", self.id),
+            Some(decision) if adjusts_skills(decision) => format!("partie/{}/ajustement", self.id),
             Some(decision) if is_trade(decision) => format!("partie/{}/echange", self.id),
             Some(_) if self.in_combat() => format!("partie/{}/combat", self.id),
             _ => format!("partie/{}", self.id),
@@ -296,6 +299,7 @@ impl Session {
         };
         self.progress.answers.truncate(position);
         self.progress.seen_events = seen;
+        self.progress.planned_sliders = PlannedSliders::default();
         self.replay(data)?;
         Ok(true)
     }
