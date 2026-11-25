@@ -7,6 +7,7 @@ use crate::location_icon::EncounterIcon;
 use crate::special_area::SpecialAreaKind;
 use crate::terror_track::TerrorTrack;
 use crate::validation::issue::Issue;
+use crate::validation::world_scene_checks::check_world_scenes;
 
 /// Runs every board check and appends the problems found to `issues`.
 pub(crate) fn check_board(board: &Board, issues: &mut Vec<Issue>) {
@@ -16,6 +17,7 @@ pub(crate) fn check_board(board: &Board, issues: &mut Vec<Issue>) {
     check_arrows(board, issues);
     check_districts(board, issues);
     check_other_worlds(board, issues);
+    check_world_scenes(board, issues);
     check_special_areas(board, issues);
     check_terror_track(board, issues);
     check_icon_images(board, issues);
@@ -175,7 +177,7 @@ mod tests {
     use super::*;
     use crate::ids::{LocationId, OtherWorldId, StreetId};
     use crate::location::{Location, Stability};
-    use crate::other_world::{EncounterColor, OtherWorld, WorldIllustrations};
+    use crate::other_world::{EncounterColor, OtherWorld, WorldScene};
     use crate::position::Position;
     use crate::rect::Rect;
     use crate::special_area::SpecialArea;
@@ -242,10 +244,12 @@ mod tests {
                 id: OtherWorldId::new("w"),
                 name: String::new(),
                 short_name: String::new(),
-                illustrations: WorldIllustrations {
-                    first: String::new(),
-                    second: String::new(),
-                },
+                scenes: vec![WorldScene {
+                    id: "s".to_owned(),
+                    image: String::new(),
+                    night: None,
+                    leads_to: ["s".to_owned(), "s".to_owned()],
+                }],
                 colors: vec![EncounterColor::Red],
                 first_area: ORIGIN,
                 second_area: ORIGIN,
@@ -260,6 +264,7 @@ mod tests {
                 marker: String::new(),
                 spaces: vec![ORIGIN; TerrorTrack::SPACES],
             },
+            night_from_terror: 5,
             closed_marker: String::new(),
         }
     }
@@ -340,6 +345,32 @@ mod tests {
                     kind: SpecialAreaKind::Sky
                 },
             ]
+        );
+    }
+
+    #[test]
+    fn a_world_place_leading_nowhere_is_reported() {
+        let mut board = small_board();
+        board.other_worlds[0].scenes[0].leads_to[1] = "nulle_part".to_owned();
+        assert_eq!(
+            issues(&board),
+            [Issue::UnknownReference {
+                context: "Autre Monde « w », s".to_owned(),
+                family: "lieu",
+                id: "nulle_part".to_owned(),
+            }]
+        );
+    }
+
+    #[test]
+    fn a_world_without_places_is_reported() {
+        let mut board = small_board();
+        board.other_worlds[0].scenes.clear();
+        assert_eq!(
+            issues(&board),
+            [Issue::NoWorldScene {
+                world: "w".to_owned()
+            }]
         );
     }
 }

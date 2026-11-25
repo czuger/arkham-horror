@@ -1,7 +1,7 @@
 //! Loads the real files under `data/` and checks them against the box contents.
 
 use std::collections::{BTreeSet, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use data::{Deck, GameData, MonsterAbility, MythosKind, Stability, StreetId};
 
@@ -30,6 +30,22 @@ fn every_cited_image_exists() {
     }
 }
 
+/// Adds every PNG under `root/folder`, subfolders included, as a path
+/// relative to `root`.
+fn pictures_under(root: &Path, folder: &str, found: &mut BTreeSet<String>) {
+    let entries = std::fs::read_dir(root.join(folder)).unwrap_or_else(|e| panic!("{e}"));
+    for entry in entries {
+        let entry = entry.unwrap_or_else(|e| panic!("{e}"));
+        let name = entry.file_name();
+        let relative = format!("{folder}/{}", name.to_string_lossy());
+        if entry.path().is_dir() {
+            pictures_under(root, &relative, found);
+        } else if relative.ends_with(".png") {
+            found.insert(relative);
+        }
+    }
+}
+
 #[test]
 fn every_illustration_exists_and_none_is_orphan() {
     let data = load();
@@ -40,8 +56,8 @@ fn every_illustration_exists_and_none_is_orphan() {
     let cited: BTreeSet<String> = data.illustrations().map(str::to_owned).collect();
     assert_eq!(
         cited.len(),
-        26 + 9 + 2 * 8 + 29 + 2 + 1,
-        "one illustration per entry"
+        26 + 9 + 170 + 29 + 2 + 1,
+        "one illustration per entry, 170 for the places of the Other Worlds"
     );
     let mut on_disk = BTreeSet::new();
     for folder in [
@@ -51,14 +67,7 @@ fn every_illustration_exists_and_none_is_orphan() {
         "monstres",
         "zones_speciales",
     ] {
-        let entries = std::fs::read_dir(dir.join(folder)).unwrap_or_else(|e| panic!("{e}"));
-        for entry in entries {
-            let name = entry.unwrap_or_else(|e| panic!("{e}")).file_name();
-            let name = name.to_string_lossy();
-            if name.ends_with(".png") {
-                on_disk.insert(format!("{folder}/{name}"));
-            }
-        }
+        pictures_under(&dir, folder, &mut on_disk);
     }
     let orphans: Vec<&String> = on_disk.difference(&cited).collect();
     assert!(orphans.is_empty(), "illustrations never used: {orphans:?}");

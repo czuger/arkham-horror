@@ -155,6 +155,7 @@ impl<'a> Game<'a> {
             entered_gate: None,
             power_used: false,
             in_hand: Vec::new(),
+            world_visits: 0,
         })
     }
 

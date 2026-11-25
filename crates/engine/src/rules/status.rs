@@ -20,11 +20,16 @@ pub(crate) const RETAINER: &str = "retainer";
 const DEPUTY_ITEMS: [&str; 2] = ["deputys_revolver", "patrol_wagon"];
 
 impl Game<'_> {
-    /// Moves an investigator. Leaving a location drops the explored marker.
+    /// Moves an investigator. Leaving a location drops the explored marker;
+    /// going into an Other World from outside counts one more visit.
     pub fn move_to(&mut self, seat: usize, place: Place) {
         let inv = self.inv_mut(seat);
         if inv.place != place {
             inv.explored = false;
+        }
+        let from_outside = !matches!(inv.place, Place::OtherWorld { .. });
+        if from_outside && matches!(place, Place::OtherWorld { .. }) {
+            inv.world_visits = inv.world_visits.saturating_add(1);
         }
         inv.place = place;
     }

@@ -6,7 +6,8 @@ use engine::{Outcome, View};
 use crate::illustrations::{IllustrationSize, illustration_url};
 use crate::views::journal_line::{JournalLine, journal_lines};
 use crate::views::other_world_span::OtherWorldSpan;
-use crate::views::scene_view::{area_label, world_illustration};
+use crate::views::scene_view::area_label;
+use crate::views::world_scene::visit_illustration;
 
 /// An Other World encounter: the area's picture and every line of it.
 #[derive(Debug, Clone)]
@@ -40,7 +41,7 @@ impl OtherWorldView {
             who: view.name(seat),
             world: data.board.other_world(&span.world)?.name.clone(),
             area: area_label(span.area).to_owned(),
-            image: world_illustration(data, &span.world, span.area)
+            image: visit_illustration(view, seat, &span.world, span.area, inv.world_visits)
                 .map(|path| illustration_url(IllustrationSize::Large, &path)),
             lines: journal_lines(view, &outcome.events, &outcome.shown, span.start, to),
             now_at: view.place_name(&inv.place),

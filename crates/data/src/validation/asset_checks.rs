@@ -3,6 +3,7 @@
 use std::path::Path;
 
 use crate::game_data::GameData;
+use crate::other_world::WorldScene;
 use crate::validation::issue::Issue;
 
 /// Reports every cited image missing from `assets_dir`.
@@ -30,7 +31,7 @@ pub(crate) fn check_illustration_files(
 }
 
 /// Lists the illustration paths cited by the data files, relative to
-/// `illustrations/`: locations, districts, both areas of each Other World,
+/// `illustrations/`: locations, districts, the places of each Other World,
 /// monster portraits.
 pub(crate) fn cited_illustrations(data: &GameData) -> impl Iterator<Item = &str> {
     let board = &data.board;
@@ -44,12 +45,12 @@ pub(crate) fn cited_illustrations(data: &GameData) -> impl Iterator<Item = &str>
                 .iter()
                 .map(|street| street.illustration.as_str()),
         )
-        .chain(board.other_worlds.iter().flat_map(|world| {
-            [
-                world.illustrations.first.as_str(),
-                world.illustrations.second.as_str(),
-            ]
-        }))
+        .chain(
+            board
+                .other_worlds
+                .iter()
+                .flat_map(|world| world.scenes.iter().flat_map(WorldScene::pictures)),
+        )
         .chain(
             data.monsters
                 .monsters

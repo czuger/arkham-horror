@@ -60,6 +60,11 @@ pub enum Issue {
         /// The Other World.
         world: String,
     },
+    /// An Other World has no place for the scene to show.
+    NoWorldScene {
+        /// The Other World.
+        world: String,
+    },
     /// An Other World has no gate marker leading to it.
     WorldWithoutGate {
         /// The Other World.
@@ -157,6 +162,9 @@ impl fmt::Display for Issue {
             ),
             Self::EmptyDistrict { street } => write!(f, "le quartier « {street} » n'a aucun lieu"),
             Self::MissingSpecialArea { kind } => write!(f, "case spéciale absente : {kind:?}"),
+            Self::NoWorldScene { world } => {
+                write!(f, "l'Autre Monde « {world} » n'a aucun lieu illustré")
+            }
             Self::NoEncounterColour { world } => {
                 write!(
                     f,

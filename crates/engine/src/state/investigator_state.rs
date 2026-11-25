@@ -61,6 +61,10 @@ pub struct InvestigatorState {
     /// Weapons kept in hand from one combat to the next (R28).
     #[serde(default)]
     pub in_hand: Vec<CardId>,
+    /// Times the investigator went into an Other World: tells one visit from
+    /// the next (the scene picks the world's places from it).
+    #[serde(default)]
+    pub world_visits: u32,
 }
 
 impl InvestigatorState {

@@ -19,6 +19,7 @@ mod names;
 mod other_world_span;
 mod other_world_view;
 mod party_row;
+mod scene_pick;
 mod scene_subject;
 mod scene_view;
 mod sheet_decision;
@@ -29,6 +30,7 @@ mod status_view;
 mod tip;
 mod tips;
 mod trade_view;
+mod world_scene;
 
 pub use board_view::BoardView;
 pub use combat_span::CombatSpan;

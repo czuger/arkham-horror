@@ -56,7 +56,7 @@ pub use location_ability::LocationAbility;
 pub use location_icon::{EncounterIcon, LocationIcon};
 pub use monster::{Check, Monster, MonsterAbility, Monsters, Movement};
 pub use named_text::NamedText;
-pub use other_world::{EncounterColor, OtherWorld, WorldIllustrations};
+pub use other_world::{EncounterColor, OtherWorld, WorldScene};
 pub use position::Position;
 pub use rect::Rect;
 pub use sheet_markers::SheetMarkers;

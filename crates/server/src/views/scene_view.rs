@@ -14,6 +14,7 @@ use crate::views::special_illustration::special_illustration;
 use crate::views::spot::{InvestigatorToken, Spot};
 use crate::views::tip::Tip;
 use crate::views::tips;
+use crate::views::world_scene::world_illustration;
 
 /// The scene of the game page.
 #[derive(Debug, Clone)]
@@ -133,7 +134,7 @@ impl SceneView {
             closed: spot.closed,
             destinations: request
                 .decision
-                .map(|d| destinations(view, d))
+                .map(|d| destinations(view, request.seat, d))
                 .unwrap_or_default(),
             drawn,
         }
@@ -169,7 +170,7 @@ fn picture(view: &View<'_, '_>, seat: usize, subject: &SceneSubject) -> Picture 
         fallback_image: None,
     };
     match subject {
-        SceneSubject::Place(place) => place_picture(view, place),
+        SceneSubject::Place(place) => place_picture(view, seat, place),
         SceneSubject::Sky => bare(special_name(data, data::SpecialAreaKind::Sky), None),
         SceneSubject::Outskirts => bare(special_name(data, data::SpecialAreaKind::Outskirts), None),
         SceneSubject::Monster(id) => monster_picture(view, seat, id),
@@ -190,7 +191,7 @@ fn picture(view: &View<'_, '_>, seat: usize, subject: &SceneSubject) -> Picture 
 }
 
 /// A place: its illustration, or its name only.
-fn place_picture(view: &View<'_, '_>, place: &Place) -> Picture {
+fn place_picture(view: &View<'_, '_>, seat: usize, place: &Place) -> Picture {
     let data = view.data();
     let board = &data.board;
     let large = |path: &str| Some(illustration_url(IllustrationSize::Large, path));
@@ -208,7 +209,7 @@ fn place_picture(view: &View<'_, '_>, place: &Place) -> Picture {
         ),
         Place::OtherWorld { world, area } => (
             Some(area_label(*area).to_owned()),
-            world_illustration(data, world, *area).and_then(|path| large(&path)),
+            world_illustration(view, seat, world, *area).and_then(|path| large(&path)),
         ),
         Place::LostInTimeAndSpace => (
             None,
@@ -234,19 +235,6 @@ pub fn area_label(area: Area) -> &'static str {
         Area::First => "Autre Monde, 1re zone",
         Area::Second => "Autre Monde, 2e zone",
     }
-}
-
-/// The illustration of one area of an Other World.
-pub fn world_illustration(
-    data: &GameData,
-    world: &data::OtherWorldId,
-    area: Area,
-) -> Option<String> {
-    let world = data.board.other_world(world)?;
-    Some(match area {
-        Area::First => world.illustrations.first.clone(),
-        Area::Second => world.illustrations.second.clone(),
-    })
 }
 
 /// The monster faced: its portrait, and where the fight takes place.
@@ -320,7 +308,7 @@ fn scene_monster(view: &View<'_, '_>, id: &MonsterId) -> Option<SceneMonster> {
 }
 
 /// The places the decision offers, each with its thumbnail.
-fn destinations(view: &View<'_, '_>, decision: &Decision) -> Vec<Destination> {
+fn destinations(view: &View<'_, '_>, seat: usize, decision: &Decision) -> Vec<Destination> {
     decision
         .options
         .iter()
@@ -335,20 +323,20 @@ fn destinations(view: &View<'_, '_>, decision: &Decision) -> Vec<Destination> {
                 index,
                 label: option.label.clone(),
                 name: view.place_name(&place),
-                picture: thumbnail(view, &place),
+                picture: thumbnail(view, seat, &place),
             })
         })
         .collect()
 }
 
 /// The thumbnail of a place, if it has an illustration.
-fn thumbnail(view: &View<'_, '_>, place: &Place) -> Option<String> {
+fn thumbnail(view: &View<'_, '_>, seat: usize, place: &Place) -> Option<String> {
     let data = view.data();
     let board = &data.board;
     let path = match place {
         Place::Location(id) => board.location(id)?.illustration.clone(),
         Place::Street(id) => board.street(id)?.illustration.clone(),
-        Place::OtherWorld { world, area } => world_illustration(data, world, *area)?,
+        Place::OtherWorld { world, area } => world_illustration(view, seat, world, *area)?,
         Place::LostInTimeAndSpace => {
             special_illustration(view, SpecialAreaKind::LostInTimeAndSpace)?
         }

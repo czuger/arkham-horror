@@ -3,7 +3,7 @@
 use data::LocationId;
 
 use super::{clean_state, hold, put_at, run};
-use crate::state::{Ending, OpenGate};
+use crate::state::{Area, Ending, OpenGate, Place};
 
 fn open(state: &mut crate::state::GameState, location: &str) {
     let marker = state.gate_stack.remove(0);
@@ -136,4 +136,30 @@ fn unexplored_investigator_is_drawn_through_the_gate() {
         crate::state::Place::OtherWorld { .. }
     ));
     assert!(!state.investigators[0].delayed);
+}
+
+#[test]
+fn each_trip_through_a_gate_counts_one_world_visit() {
+    let mut state = clean_state(1, "azathoth");
+    open(&mut state, "woods");
+    put_at(&mut state, "woods");
+    let (result, _) = run(&mut state, &[], &[], |game| {
+        let woods = LocationId::new("woods");
+        game.draw_through_gate(0, &woods, false)?;
+        let Place::OtherWorld { world, .. } = game.inv(0).place.clone() else {
+            panic!("not in an Other World");
+        };
+        game.move_to(
+            0,
+            Place::OtherWorld {
+                world,
+                area: Area::Second,
+            },
+        );
+        assert_eq!(game.inv(0).world_visits, 1, "same visit in the 2nd area");
+        game.move_to(0, Place::Location(woods.clone()));
+        game.draw_through_gate(0, &woods, false)
+    });
+    assert_eq!(result, Ok(()));
+    assert_eq!(state.investigators[0].world_visits, 2);
 }

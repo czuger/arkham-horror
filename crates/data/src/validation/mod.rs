@@ -13,6 +13,7 @@ mod issue;
 mod location_card_checks;
 mod monster_checks;
 mod mythos_card_checks;
+mod world_scene_checks;
 
 pub(crate) use ancient_one_checks::check_ancient_ones;
 pub(crate) use asset_checks::{check_illustration_files, check_images, cited_illustrations};
