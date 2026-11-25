@@ -8,6 +8,8 @@
 
   /** Cross-fade length of each mood, in seconds: entering a combat is quick. */
   const FADE_SECONDS = { default: 3, other_world: 4, combat: 1.5 };
+  /** Cross-fade length when the player skips to the next track. */
+  const SKIP_FADE_SECONDS = 1;
   /** Where the play/pause choice is kept between full reloads. */
   const STORAGE_KEY = "arkham.musique";
 
@@ -119,6 +121,7 @@
       fadeOut(old, fade);
     }
     current = next;
+    show();
   }
 
   /** Near the end of the current track, cross-fades to the next one. */
@@ -192,12 +195,31 @@
     }
   }
 
+  /** Skips to another track of the mood playing, with a quick fade. */
+  function skip() {
+    if (!on || !context || !current) return;
+    crossFade(current.mood, SKIP_FADE_SECONDS);
+  }
+
   /** Shows the player's choice on the button. */
   function show() {
     const button = document.getElementById("musique");
     if (!button) return;
     button.setAttribute("aria-pressed", String(on));
     button.title = on ? "Couper la musique" : "Jouer la musique d'ambiance";
+    const next = document.getElementById("musique-suivante");
+    if (next) next.hidden = !(on && current);
+    const title = document.getElementById("musique-titre");
+    if (title) title.textContent = on && current ? trackTitle(current.track) : "";
+  }
+
+  /** A track's title from its file name: no extension, date or copy number. */
+  function trackTitle(name) {
+    return (name || "")
+      .replace(/\.mp3$/i, "")
+      .replace(/ \(\d+\)$/, "")
+      .replace(/_\d{4}-\d{2}-\d{2}T\d+$/, "")
+      .replace(/_/g, " ");
   }
 
   function readChoice() {
@@ -226,6 +248,8 @@
   document.addEventListener("click", (event) => {
     if (event.target instanceof Element && event.target.closest("#musique")) {
       toggle().catch((error) => console.warn("musique :", error));
+    } else if (event.target instanceof Element && event.target.closest("#musique-suivante")) {
+      skip();
     }
   });
   document.addEventListener("htmx:after:settle", readPage);

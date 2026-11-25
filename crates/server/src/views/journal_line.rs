@@ -16,6 +16,8 @@ pub struct JournalLine {
     pub rolls: Vec<DiceRoll>,
     /// Monsters an investigator starts to fight.
     pub foes: Vec<FoughtMonster>,
+    /// The text is an encounter's, shown framed.
+    pub encounter: bool,
 }
 
 /// A monster an investigator faces, with its illustrated portrait.
@@ -29,7 +31,7 @@ pub struct FoughtMonster {
     pub portrait: String,
 }
 
-/// A Mythos, location or gate card drawn, or an investigator card received.
+/// A Mythos card drawn, or an investigator card received.
 #[derive(Debug, Clone)]
 pub struct DrawnCard {
     /// Name, image and bubble.
@@ -88,6 +90,7 @@ pub fn journal_lines(
             cards: Vec::new(),
             rolls: Vec::new(),
             foes: Vec::new(),
+            encounter: false,
         })
         .collect();
     let last = if to == events.len() {
@@ -101,6 +104,7 @@ pub fn journal_lines(
             cards: Vec::new(),
             rolls: Vec::new(),
             foes: Vec::new(),
+            encounter: false,
         });
     }
     for item in shown
@@ -122,9 +126,11 @@ pub fn journal_lines(
     lines
 }
 
-/// Adds a card drawn or a roll to a line.
+/// Adds a card drawn or a roll to a line. Location and gate cards are left
+/// out: their encounter text is the line itself, framed.
 fn attach(view: &View<'_, '_>, line: &mut JournalLine, what: &Exhibit) {
     match what {
+        Exhibit::Encounter { .. } => line.encounter = true,
         Exhibit::Card {
             deck,
             card: id,
@@ -132,9 +138,8 @@ fn attach(view: &View<'_, '_>, line: &mut JournalLine, what: &Exhibit) {
         } => {
             let action = match deck {
                 Deck::Mythos => "Carte Mythe tirée par",
-                Deck::Location => "Carte Lieu tirée par",
-                Deck::Gate => "Carte Portail tirée par",
                 Deck::Investigator => "Carte reçue par",
+                Deck::Location | Deck::Gate => return,
             };
             line.cards.push(DrawnCard {
                 token: card(view.data(), id),

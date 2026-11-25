@@ -38,6 +38,11 @@ h3 { font-size: 1rem; }
 }
 .top .music-toggle:hover { background: #4a3a2a; }
 .top .music-toggle[aria-pressed="true"] { background: #6b2a12; border-color: #f0d9b5; }
+.top .music-next { align-self: center; margin: 0 0 0 -1rem; background: transparent; color: #f4efe4; border-color: #8a7560; font-size: 0.85rem; padding: 0.1rem 0.5rem; }
+.top .music-next:hover { background: #4a3a2a; }
+.top .music-next[hidden] { display: none; }
+.top .music-title { align-self: center; margin-left: -0.8rem; color: #d9c6a5; font-size: 0.85rem; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40vw; }
+.top .music-title:empty { display: none; }
 
 button, .button {
   font: inherit;
@@ -157,6 +162,9 @@ main:has(.game) { max-width: none; padding: 0.5rem; }
 .journal li { margin-bottom: 0.2rem; }
 .journal .old { color: #7a6b58; }
 .journal .new { color: #2b2118; }
+/* An encounter's text: framed like a card paragraph. */
+.journal .encounter-text { display: block; margin: 0.3rem 0; padding: 0.4rem 0.6rem; background: #f3e6c4; color: #2b2118; border: 1px solid #8a6d3b; border-left: 4px solid #6b4f2a; border-radius: 4px; font-style: italic; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+.journal .old .encounter-text { opacity: 0.75; }
 /* Dice rolled: one face per die, successes in green. */
 .roll { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; margin: 0.1rem 0; }
 .die { font-size: 1.7rem; line-height: 1; color: #9a8a74; }

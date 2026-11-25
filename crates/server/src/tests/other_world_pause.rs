@@ -85,6 +85,7 @@ async fn an_other_world_encounter_is_followed_by_a_pause() {
     let app = TestApp::open(&path).await;
     let page = app.get("/partie/1/autre-monde").await.body;
     assert!(page.contains("Amanda Sharpe — rencontre dans"), "{page}");
-    assert!(page.contains("Carte Portail tirée par"), "{page}");
+    assert!(!page.contains("Carte Portail tirée par"), "{page}");
+    assert!(page.contains("encounter-text"), "{page}");
     assert!(page.contains("Continuer la partie"), "{page}");
 }

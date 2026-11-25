@@ -65,6 +65,12 @@ pub enum Exhibit {
         /// The investigator.
         seat: usize,
     },
+    /// The next journal line is the text of an encounter (location or
+    /// Other World) the investigator follows.
+    Encounter {
+        /// The investigator.
+        seat: usize,
+    },
 }
 
 /// What a roll of dice is counted by.

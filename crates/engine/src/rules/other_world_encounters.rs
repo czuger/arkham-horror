@@ -39,6 +39,7 @@ impl<'a> Game<'a> {
             let Some((card, encounter)) = self.pick_gate_encounter(seat, world)? else {
                 return Ok(());
             };
+            self.show(Exhibit::Encounter { seat });
             self.log(format!(
                 "Rencontre dans {} : {}",
                 self.world(world)?.name,

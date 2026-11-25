@@ -21,6 +21,7 @@ impl<'a> Game<'a> {
             else {
                 return Ok(());
             };
+            self.show(Exhibit::Encounter { seat });
             self.log(format!(
                 "Rencontre à {} : {}",
                 self.location(location)?.name,
